@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Decimal
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -28,19 +28,20 @@ from base import Base
 class Ecriture(Base):
     __tablename__ = 'ecriture'
     id = Column(Integer, primary_key=True)
-    date = Column(Date, nullable=False)
+    date_ecriture = Column('date', Date, nullable=False)
     dc = Column(Integer, nullable=False)
-    type = Column(String(2), nullable=False)
+    type_ecriture = Column('type', String(2), nullable=False)
     nom = Column(String(200), nullable=False)
     valide = Column(Boolean)
     compte_id = Column(Integer, ForeignKey('compte.id'), nullable=False)
+    categories = relationship('EcritureCategorie')
 
 class EcritureCategorie(Base):
     __tablename__ = 'ecriture_categorie'
     id = Column(Integer, primary_key=True)
     categorie = Column(String(200), nullable=False)
-    #description = Column(String(), nullable=False)
-    montant = Column(Decimal, nullable=False)
+    description = Column(String(), nullable=False)
+    montant = Column(Float(asdecimal=True), nullable=False)
+    ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=False)
-    compte_id = Column(Integer, ForeignKey('compte.id'), nullable=False)
 
