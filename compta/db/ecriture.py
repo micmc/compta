@@ -34,7 +34,7 @@ class Ecriture(Base):
     nom = Column(String(200), nullable=False)
     valide = Column(Boolean)
     compte_id = Column(Integer, ForeignKey('compte.id'), nullable=False)
-    categories = relationship('EcritureCategorie')
+    compte = relationship('Compte', backref=backref('ecritures', uselist=True))
 
 class EcritureCategorie(Base):
     __tablename__ = 'ecriture_categorie'
@@ -45,4 +45,5 @@ class EcritureCategorie(Base):
     ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=False)
     categories = relationship('Categorie', backref=backref('ecritures', uselist=True))
+    ecriture = relationship('Ecriture', backref=backref('ecriture_categories', uselist=True))
 
