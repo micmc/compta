@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Float
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 from base import Base
 
@@ -44,4 +44,5 @@ class EcritureCategorie(Base):
     montant = Column(Float(asdecimal=True), nullable=False)
     ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=False)
+    categories = relationship('Categorie', backref=backref('ecritures', uselist=True))
 
