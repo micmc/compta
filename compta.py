@@ -21,20 +21,37 @@ def arg_parse():
     parser = optparse.OptionParser()                  
     
     parser.add_option("-i", "--index",                
-                      help="Compte index to add",     
+                      help=U"Compte index to add",     
                       dest="compte_index", type="int")
 
-    group = optparse.OptionGroup(parser, "List")
-    group.add_option("--solde", action="store_true",
+    # group for display dabase information
+    group_list = optparse.OptionGroup(parser, "Liste")
+    group_list.add_option("--solde", action="store_true",
                      dest="solde", help=U"Solde du compte")
-    group.add_option("--last",  action="store_true",
+    group_list.add_option("--last",  action="store_true",
                      dest="last", help=U"les 5 dernières opérations")
-    group.add_option("--banque", action="store_true",
+    group_list.add_option("--banque", action="store_true",
                      dest="banque", help=U"Liste des banques")
-    group.add_option("--compte", action="store_true",
+    group_list.add_option("--compte", action="store_true",
                      dest="compte", help=U"Liste des comptes")
-    parser.add_option_group(group)
-                                                      
+    parser.add_option_group(group_list)
+    
+    # group for manage ecriture
+    group_ecriture = optparse.OptionGroup(parser, "Ecriture")
+    group_ecriture.add_option("--add", action="store_true",
+                              dest="add_ecriture", help=U"Ajout d'une ecriture")
+    group_ecriture.add_option("-m", 
+                              dest="montant", help=U"Montant")
+    group_ecriture.add_option("-D",
+                              dest="date_ecriture", help=U"Date [YYYY/MM/DD]")
+    group_ecriture.add_option("-c",
+                              dest="categorie", help=U"Categorie")
+    group_ecriture.add_option("-n",
+                              dest="nom", help=U"Nom")
+    group_ecriture.add_option("-d",
+                              dest="description", help=U"Description")
+    parser.add_option_group(group_ecriture)
+
     (options, args) = parser.parse_args()
 
     #if options.compte_index is None and not options.compte:  
@@ -66,7 +83,28 @@ def liste_last(session, compte_id, latest=10):
                                 ecriture.type_ecriture,
                                 ecriture.categories[0].montant,
                                 ecriture.nom)
+
+#./compta.py --add -i 1 -m 45 -n test -D 2014-12-01
+def ecriture(session, compte_id, nom, montant, date_ecriture, categorie="", description=""):
+    if not categorie:
+        list_categorie = select([func.count(EcritureCategorie.categorie_id).label('categorie_count'),Categorie.nom]).where(
+                                and_(EcritureCategorie.categorie_id==Categorie.id)).group_by(Categorie.nom).order_by(desc('categorie_count'))
+        categories = session.query(list_categorie).limit(10)
+        i = 1
+        for categorie in categories:
+            print U"%d : %s " % (i,categorie.nom)
+            i += 1
+        input = raw_input("Choisissez la categorie")
+        categorie = session.query(Categorie).filter_by(id = input).one()
+
+    date_ecriture = Column('date', Date, nullable=False)
+    dc = Column(Integer, nullable=False)
+    type_ecriture = Column('type', String(2), nullable=False)
+    nom = Column(String(200), nullable=False)
     
+    ecriture = Ecriture(nom=nom, montant=montant, date_ecriture=date_ecriture, compte_id=compte_id, categorie_id=categorie.id,description
+    ecriture_categorie = EcritureCategorie(nom=nom, montant=montant
+
 def main():
     options = arg_parse()
 
@@ -91,6 +129,11 @@ def main():
         liste_solde(session,options.compte_index)
     if options.last:
         liste_last(session,options.compte_index)
+    if options.add_ecriture:
+        ecriture(session,options.compte_index,
+                 options.nom,
+                 options.montant,
+                 options.date_ecriture)
 
 if __name__ == "__main__":
     main()
