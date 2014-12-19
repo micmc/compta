@@ -85,25 +85,32 @@ def liste_last(session, compte_id, latest=10):
                                 ecriture.nom)
 
 #./compta.py --add -i 1 -m 45 -n test -D 2014-12-01
-def ecriture(session, compte_id, nom, montant, date_ecriture, categorie="", description=""):
+def ecriture(session, compte_id, nom, montant, date_ecriture, categorie="", description="", type_ecriture=""):
     if not categorie:
         list_categorie = select([func.count(EcritureCategorie.categorie_id).label('categorie_count'),Categorie.nom]).where(
                                 and_(EcritureCategorie.categorie_id==Categorie.id)).group_by(Categorie.nom).order_by(desc('categorie_count'))
         categories = session.query(list_categorie).limit(10)
         i = 1
         for categorie in categories:
+            
             print U"%d : %s " % (i,categorie.nom)
             i += 1
         input = raw_input("Choisissez la categorie")
-        categorie = session.query(Categorie).filter_by(id = input).one()
+        categorie = session.query(Categorie).filter_by(nom = categories[int(input)-1].nom).one()
 
-    date_ecriture = Column('date', Date, nullable=False)
-    dc = Column(Integer, nullable=False)
-    type_ecriture = Column('type', String(2), nullable=False)
-    nom = Column(String(200), nullable=False)
-    
-    ecriture = Ecriture(nom=nom, montant=montant, date_ecriture=date_ecriture, compte_id=compte_id, categorie_id=categorie.id,description
-    ecriture_categorie = EcritureCategorie(nom=nom, montant=montant
+    if not type_ecriture:
+        type_ecriture='CB'
+
+    if montant < 0:
+        dc = -1
+    else:
+        dc = 1
+    date_ecriture = datetime.strptime(date_ecriture,"%Y-%m-%d")
+    ecriture = Ecriture(nom=nom, date_ecriture=date_ecriture, dc=dc, compte_id=compte_id, type_ecriture=type_ecriture,valide=True)
+    session.add(ecriture)
+    ecriture_categorie = EcritureCategorie(montant=montant, description=description, categorie_id=categorie.id,categorie='test')
+    ecriture.ecriture_categories.append(ecriture_categorie)
+    session.commit()
 
 def main():
     options = arg_parse()
