@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+#from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 from base import Base
@@ -27,4 +27,3 @@ class Banque(Base):
     cle_controle = Column(String(2), nullable=False)
     code_banque = Column(String(5), nullable=False)
     code_guichet = Column(String(5), nullable=False)
-    compte = relationship('Compte')

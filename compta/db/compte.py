@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+#from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, backref
 
 from base import Base
 
@@ -24,3 +24,4 @@ class Compte(Base):
     type = Column(String(3), nullable=False)
     archive = Column(Boolean)
     banque_id = Column(Integer, ForeignKey('banque.id'), nullable=False)
+    banque = relationship('Banque', backref=backref('banques', uselist=True))
