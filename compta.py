@@ -44,8 +44,8 @@ def arg_parse():
                               dest="montant", help=U"Montant")
     group_ecriture.add_option("-D",
                               dest="date_ecriture", help=U"Date [YYYY/MM/DD]")
-    group_ecriture.add_option("-c",
-                              dest="categorie", help=U"Categorie")
+    #group_ecriture.add_option("-c",
+    #                          dest="categorie", help=U"Categorie")
     group_ecriture.add_option("-n",
                               dest="nom", help=U"Nom")
     group_ecriture.add_option("-d",
@@ -63,7 +63,10 @@ def arg_parse():
 def liste_compte(session):
     comptes = session.query(Compte).all()
     for compte in comptes:
-        print U"%d : %s, %s - %s" % (compte.id, compte.type, compte.banque.nom, compte.nom)
+        print U"%d : %s, %s - %s" % (compte.id,
+                                     compte.type,
+                                     compte.banque.nom,
+                                     compte.nom)
 
 def liste_banque(session):
     banques = session.query(Banque).all()
@@ -79,10 +82,11 @@ def liste_solde(session, compte_id):
 def liste_last(session, compte_id, latest=10):
     ecritures = session.query(Ecriture).filter_by(compte_id = compte_id).order_by(desc(Ecriture.date_ecriture)).limit(latest)
     for ecriture in ecritures:
-        print U"%s : %s - %2.2f €, %s" % (ecriture.date_ecriture,
+        print U"%s : %s - %2.2f €, %s / %s" % (ecriture.date_ecriture,
                                 ecriture.type_ecriture,
-                                ecriture.categories[0].montant,
-                                ecriture.nom)
+                                ecriture.ecriture_categories[0].montant,
+                                ecriture.nom,
+                                ecriture.ecriture_categories[0].categorie.nom)
 
 #./compta.py --add -i 1 -m 45 -n test -D 2014-12-01
 def ecriture(session, compte_id, nom, montant, date_ecriture, categorie="", description="", type_ecriture=""):
@@ -97,7 +101,6 @@ def ecriture(session, compte_id, nom, montant, date_ecriture, categorie="", desc
             i += 1
         input = raw_input("Choisissez la categorie")
         categorie = session.query(Categorie).filter_by(nom = categories[int(input)-1].nom).one()
-
     if not type_ecriture:
         type_ecriture='CB'
 
@@ -106,9 +109,15 @@ def ecriture(session, compte_id, nom, montant, date_ecriture, categorie="", desc
     else:
         dc = 1
     date_ecriture = datetime.strptime(date_ecriture,"%Y-%m-%d")
-    ecriture = Ecriture(nom=nom, date_ecriture=date_ecriture, dc=dc, compte_id=compte_id, type_ecriture=type_ecriture,valide=True)
+    ecriture = Ecriture(nom=nom,
+                        date_ecriture=date_ecriture,
+                        dc=dc,
+                        compte_id=compte_id,
+                        type_ecriture=type_ecriture,valide=True)
     session.add(ecriture)
-    ecriture_categorie = EcritureCategorie(montant=montant, description=description, categorie_id=categorie.id,categorie='test')
+    ecriture_categorie = EcritureCategorie(montant=montant,
+                                           description=description,
+                                           categorie_id=categorie.id)
     ecriture.ecriture_categories.append(ecriture_categorie)
     session.commit()
 

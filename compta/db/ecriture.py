@@ -39,11 +39,10 @@ class Ecriture(Base):
 class EcritureCategorie(Base):
     __tablename__ = 'ecriture_categorie'
     id = Column(Integer, primary_key=True)
-    categorie = Column(String(200), nullable=False)
     description = Column(String(), nullable=False)
     montant = Column(Float(asdecimal=True), nullable=False)
     ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=False)
-    categories = relationship('Categorie', backref=backref('ecritures', uselist=True))
+    categorie = relationship('Categorie', backref=backref('ecritures', uselist=True))
     ecriture = relationship('Ecriture', backref=backref('ecriture_categories', uselist=True))
 
