@@ -1,3 +1,4 @@
 *.pyc
 *.py.swp
 db/compta.test
+carte_pass.xml
