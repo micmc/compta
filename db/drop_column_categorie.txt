@@ -1,0 +1,14 @@
+CREATE TABLE "ecriture_categorie_new" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "description" text,
+    "montant" decimal NOT NULL,
+    "ecriture_id" integer NOT NULL REFERENCES "ecriture_ecriture" ("id"),
+    "categorie_id" integer NOT NULL REFERENCES "categorie" ("id"));
+
+INSERT INTO ecriture_categorie_new (id,description,montant,ecriture_id,categorie_id) SELECT id,description,montant,ecriture_id,categorie_id FROM ecriture_categorie;
+
+DROP TABLE ecriture_categorie;
+ALTER TABLE ecriture_categorie_new RENAME TO ecriture_categorie;
+
+CREATE INDEX "ecriture_categorie_ecriture_id" ON "ecriture_categorie" ("ecriture_id");
+CREATE INDEX "ecriture_categorie_categorie_id" ON "ecriture_categorie" ("categorie:_id");
