@@ -3,40 +3,36 @@
   <head>
     <meta charset="UTF-8">
     <title>Page web</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery-2.1.3.js"></script>
+    <script type="text/javascript" src="js/banque.js"></script>
     <link rel = "stylesheet" type = "text/css" href = "css/styles.css" />
   </head>
   
-  <script type="text/javascript">
-    jQuery(document).ready(function($){
-      $('.table').fadeOut();
-    });
-  </script>
-
   <body>
     <h1>Liste des banques</h1>
-    <p>
-      <table>
-        <thead>
+    <table id="banque" class="banque">
+      <thead>
+        <tr>
+          <td>Nom</td>
+          <td>Adresse</td>
+          <td>Ville</td>
+          <td>CP</td>
+          <td>Clé</td>
+          <td>Code Banque</td>
+          <td>Code Guichet</td>
+        </tr>
+      </thead>
+      <tbody>
           <tr>
-            <td>Nom</td>
-            <td>Adresse</td>
-            <td>Ville</td>
-            <td>CP</td>
-            <td>Clé</td>
-            <td>Code Banque</td>
-            <td>Code Guichet</td>
+              <td>test</td>
+          <tr>
+      </tbody>
+      <tfoot>
+          <tr>
+          <td>Ajouter</td>
           </tr>
-        </thead>
-        <tbody>
-        </tbody>
-        <tfoot>
-            <tr>
-            <td>Ajouter</td>
-            </tr>
-        </tfoot>
-      <table>
-    </p>
+      </tfoot>
+    </table>
   </body>
 </html>
 
