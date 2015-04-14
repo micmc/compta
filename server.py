@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 from bottle import Bottle
-from bottle import get, run, route, response
+from bottle import get, run, route, response, request
 from json import dumps
 from bottle import HTTPError
 from bottle.ext import sqlalchemy
@@ -49,6 +49,17 @@ def show(db):
                             'code_banque': banque.code_banque,
                             'code_guichet': banque.code_guichet})
     return dumps(list_banque)
+
+@app.put('/banque/<id>')
+def update_banque(db, id=None):
+    if not id:
+        app.abort(404, 'no id received')
+    data = request.body.readline()
+    if not data:
+        app.abort(204, 'No data received')
+    entity = json.loads(data)
+    if not entity.has_key('nom'):
+        app.abort(404, 'No nom specified')
 
 @app.get('/banque/<nom>')
 def show(db, nom=None):
