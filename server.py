@@ -43,7 +43,11 @@ def show(db):
                             'nom': banque.nom,
                             'adresse': banque.adresse,
                             'ville': banque.ville,
-                            'cp': banque.cp})
+                            'cp': banque.cp,
+                            'pays': banque.pays,
+                            'cle': banque.cle_controle,
+                            'code_banque': banque.code_banque,
+                            'code_guichet': banque.code_guichet})
     return dumps(list_banque)
 
 @app.get('/banque/<nom>')
