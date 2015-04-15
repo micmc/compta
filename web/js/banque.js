@@ -33,7 +33,22 @@ function set_update(thisObj) {
     attr_code_guichet.html('<input type="text" value="' + attr_code_guichet.text() + '">');
     $("td.status", thisObj).html('<input type="button" value="OK">');
     $("td.status", thisObj).click(function(event) {
-        alert("fini");
+        banque_id = thisObj.attr("id").replace(/r_/,"");
+        nom = $("#r_" + banque_id + " td.nom input").val();
+        $.ajax(
+        {
+            method: "PUT",
+            url: "http://localhost:8080/banque/" + banque_id,
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify({
+                    nom: $("#r_" + banque_id + " td.nom input").val(),
+                    adresse: $("#r_" + banque_id + " td.adresse input").val()
+                  }),
+            success: function(data) {
+                console.log("OK pour update", data);
+            },
+        });
     });
     $(thisObj).off('click');
     return 0;
@@ -52,7 +67,7 @@ $("table.banque").ready(function(e) {
     {
         method: "GET",
         url: "http://localhost:8080/banque",
-        dataType: "json", 
+        dataType: "json",
         success: function(data) {
             for(i=0; i< data.length; i++) {
                 $('<tr id="r_'+data[i].id+'">'+
@@ -67,11 +82,11 @@ $("table.banque").ready(function(e) {
                   '<td class="status"></td>'+
                   '</tr>').appendTo("table.banque tbody");
                 $("#r_" + data[i].id).click(function(event) {
-                    set_update($(this));    
+                    set_update($(this));
                 });
             }
         },
-    });    
+    });
 });
 
 

@@ -33,6 +33,10 @@ def enable_cors():
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, POST, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
 
+@app.route('/banque/<id:int>', method=['OPTIONS'])
+def default_banque(id):
+    return {}
+
 @app.get('/banque')
 @app.get('/banque/<id:int>')
 @app.get('/banque/<nom:re:[a-zA-Z\ ]+>')
@@ -68,10 +72,15 @@ def update_banque(db, id=None):
     """ Update information for a banque """
     if not id:
         abort(404, 'no id received')
-    data = request.body.readline()
+    for k,v in request.headers.iteritems():
+        print k, v
     if not data:
         abort(204, 'No data received')
-    entity = loads(data)
+    entity = {}
+    try:
+        entity = loads(data)
+    except :
+        print "erreur chargement json %s" % (data,)
     try:
         banque = db.query(Banque).\
                     filter(Banque.id == id).\
