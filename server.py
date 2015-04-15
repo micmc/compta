@@ -74,6 +74,7 @@ def update_banque(db, id=None):
         abort(404, 'no id received')
     for k,v in request.headers.iteritems():
         print k, v
+    data = request.body.readline()
     if not data:
         abort(204, 'No data received')
     entity = {}

@@ -12,6 +12,10 @@ $('document').ready(function(){
     //});
 });
 
+function put_update(thisObj) {
+    return 0;
+}
+
 function set_update(thisObj) {
     //$(thisObj).prepend("<form>");
     var attr_nom = $("td.nom", thisObj);
@@ -34,19 +38,45 @@ function set_update(thisObj) {
     $("td.status", thisObj).html('<input type="button" value="OK">');
     $("td.status", thisObj).click(function(event) {
         banque_id = thisObj.attr("id").replace(/r_/,"");
-        nom = $("#r_" + banque_id + " td.nom input").val();
-        $.ajax(
+        data_banque = {
+                nom: $("#r_" + banque_id + " td.nom input").val(),
+                adresse: $("#r_" + banque_id + " td.adresse input").val(),
+                ville: $("#r_" + banque_id + " td.ville input").val(),
+                cp : $("#r_" + banque_id + " td.cp input").val(),
+                pays : $("#r_" + banque_id + " td.pays input").val(),
+                cle : $("#r_" + banque_id + " td.cle input").val(),
+                code_banque: $("#r_" + banque_id + " td.code_banque input").val(),
+                code_guichet: $("#r_" + banque_id + " td.pays input").val(),
+               };
+         $.ajax(
         {
             method: "PUT",
             url: "http://localhost:8080/banque/" + banque_id,
-            dataType: "json",
+            dataType: "html",
             contentType: "application/json",
-            data: JSON.stringify({
-                    nom: $("#r_" + banque_id + " td.nom input").val(),
-                    adresse: $("#r_" + banque_id + " td.adresse input").val()
-                  }),
+            data: JSON.stringify(data_banque),
             success: function(data) {
                 console.log("OK pour update", data);
+                $("#r_" + banque_id + " td.nom input").remove();
+                $("#r_" + banque_id + " td.nom").text(data_banque["nom"]);
+                $("#r_" + banque_id + " td.adresse input").remove();
+                $("#r_" + banque_id + " td.adresse").text(data_banque["adresse"]);
+                $("#r_" + banque_id + " td.ville input").remove();
+                $("#r_" + banque_id + " td.ville").text(data_banque["ville"]);
+                $("#r_" + banque_id + " td.cp input").remove();
+                $("#r_" + banque_id + " td.cp").text(data_banque["cp"]);
+                $("#r_" + banque_id + " td.pays input").remove();
+                $("#r_" + banque_id + " td.pays").text(data_banque["pays"]);
+                $("#r_" + banque_id + " td.cle input").remove();
+                $("#r_" + banque_id + " td.cle").text(data_banque["cle"]);
+                $("#r_" + banque_id + " td.code_banque input").remove();
+                $("#r_" + banque_id + " td.code_banque").text(data_banque["code_banque"]);
+                $("#r_" + banque_id + " td.code_guichet input").remove();
+                $("#r_" + banque_id + " td.code_guichet").text(data_banque["code_guichet"]);
+                $("#r_" + banque_id + " td.status input").remove()
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log("Error", jqXHR);
             },
         });
     });
@@ -54,9 +84,6 @@ function set_update(thisObj) {
     return 0;
 }
 
-function put_update(thisObj) {
-    return 0;
-}
 
 function refresh_update(thisObj) {
     return 0;
