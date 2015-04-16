@@ -17,10 +17,10 @@ from base import Base
 
 class Compte(Base):
     """ Class to manage compte
-        
-        Two constraints is used in sqlite : 
+
+        Two constraints is used in sqlite :
         ALTER TABLE compte  ADD compte_type_enum  CHECK (type IN ('dif', 'div', 'prs', 'prv', 'vir'));
-        ALTER TABLE compte  ADD compte_archive CHECK (archive IN (0, 1)), 
+        ALTER TABLE compte  ADD compte_archive CHECK (archive IN (0, 1)),
     """
     __tablename__ = 'compte'
     id = Column(Integer, primary_key=True)
@@ -30,3 +30,6 @@ class Compte(Base):
     type = Column(Enum('dif','div','prs','prv','vir', name="compte_type_enum"), nullable=False)
     archive = Column(Boolean, default=False)
     banque_id = Column(Integer, ForeignKey('banque.id'), nullable=False)
+
+    ecritures= relationship('Ecriture', backref='compte')
+

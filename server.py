@@ -5,6 +5,8 @@
 from bottle import Bottle
 from bottle import response, request, abort
 from json import dumps, loads
+from datetime import datetime
+
 from bottle.ext import sqlalchemy
 #from sqlalchemy import create_engine, Column, Integer, Sequence, String
 #from sqlalchemy.ext.declarative import declarative_base
@@ -15,8 +17,8 @@ from sqlalchemy.exc import IntegrityError
 from compta.db.base import Base
 from compta.db.banque import Banque
 from compta.db.compte import Compte
-#from compta.db.ecriture import Ecriture, EcritureCategorie
-#from compta.db.categorie import Categorie
+from compta.db.ecriture import Ecriture, EcritureCategorie
+from compta.db.categorie import Categorie
 
 app = Bottle()
 
@@ -283,6 +285,44 @@ def delete_compte(db, id=None):
     db.delete(compte)
     db.commit()
 
+@app.get('/ecriture')
+@app.get('/ecriture/<id:int>')
+@app.get('/ecriture/<nom:re:[a-zA-Z\ ]+>')
+@app.get('/compte/<id_compte:int>/ecriture')
+@app.get('/compte/<id_compte:int>/ecriture/<id:int>')
+@app.get('/compte/<id_compte:int>/ecriture/<nom:re:[a-zA-Z\ ]+>')
+def list_ecriture(db, id=None, nom=None, id_compte=None):
+    """ List compte """
+    ecritures = db.query(Ecriture, EcritureCategorie, Categorie).\
+                   join(Ecriture.categories).\
+                   join(EcritureCategorie.categorie)
+    if id_compte:
+        ecritures = ecritures.filter(Ecriture.compte_id == id_compte)
+    if nom:
+        ecritures = ecritures.filter(Ecriture.nom == nom)
+    if id:
+        ecritures = ecritures.filter(Ecriture.id == id)
+    try:
+        ecritures = ecritures.order_by(Ecriture.date).\
+                              all()
+    except NoResultFound:
+        abort(404, "ID not found")
+    if not ecritures:
+        abort(404, "ID not found")
+    list_ecritures = []
+    for ecriture in ecritures:
+        list_ecritures.append({'id': ecriture.Ecriture.id,
+                               'nom': ecriture.Ecriture.nom,
+                               'date': datetime.strftime(ecriture.Ecriture.date,"%Y/%m/%d"),
+                               'dc': ecriture.Ecriture.dc,
+                               'type': ecriture.Ecriture.type,
+                               'valide': ecriture.Ecriture.valide,
+                               'compte_id': ecriture.Ecriture.compte_id,
+                               'categorie': ecriture.Categorie.nom,
+                               'montant': "%0.2f" %(ecriture.EcritureCategorie.montant,),
+                               'description': ecriture.EcritureCategorie.description,
+                            })
+    return dumps(list_ecritures)
 
 if __name__ == "__main__":
     main()
