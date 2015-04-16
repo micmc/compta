@@ -10,6 +10,7 @@ from bottle.ext import sqlalchemy
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError
 
 from compta.db.base import Base
 from compta.db.banque import Banque
@@ -22,7 +23,8 @@ app = Bottle()
 def main():
     """ Main Page """
     engine = create_engine('sqlite:///./db/compta.test', echo=False)
-
+    Base.metadata.bind = engine
+    Base.metadata.create_all(engine)
     plugin = sqlalchemy.Plugin(engine, Base.metadata, create=False)
     app.install(plugin)
     app.run(host='localhost', port=8080, debug=True)
@@ -223,10 +225,14 @@ def update_compte(db, id=None):
         if entity["archive"].isnumeric():
             compte.archive = entity["archive"]
         elif entity["archive"].lower() == "true":
-             compte.archive = True
+            compte.archive = True
         else:
-             compte.archive = False
-    db.commit() 
+            compte.archive = False
+    try:
+        db.commit()
+    except IntegrityError:
+        abort(404, 'Integrity Error')
+
 
 @app.post('/compte')
 def insert_compte(db):
@@ -254,11 +260,14 @@ def insert_compte(db):
         if entity["archive"].isnumeric():
             compte.archive = entity["archive"]
         elif entity["archive"].lower() == "true":
-             compte.archive = True
+            compte.archive = True
         else:
-             compte.archive = False
+            compte.archive = False
     db.add(compte)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        abort(404, 'Integrity Error')
     response.status = 201
     response.headers["Location"] = "/compte/%s" % (compte.id,)
 
