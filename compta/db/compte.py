@@ -22,6 +22,5 @@ class Compte(Base):
     numero = Column(String(12), nullable=False)
     cle = Column(String(3), nullable=False)
     type = Column(String(3), nullable=False)
-    archive = Column(Boolean)
+    archive = Column(Boolean, default=False)
     banque_id = Column(Integer, ForeignKey('banque.id'), nullable=False)
-    banque = relationship('Banque', backref=backref('banques', uselist=True))
