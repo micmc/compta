@@ -315,8 +315,11 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
         if somme == 'yes':
             ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
                                  (func.sum(Ecriture.dc * EcritureCategorie.montant).label("somme")/100).label("somme")).\
-            join(Ecriture.categories).\
-            one()
+                           join(Ecriture.categories)
+            if id_compte:
+                ecritures = ecritures.filter(Ecriture.compte_id == id_compte)
+            ecritures = ecritures.order_by(Ecriture.date).\
+                                  one()
             return dumps({'somme': "%0.2f" % (ecritures.somme,),
                           'nombre': str(ecritures.nombre),
                          })
