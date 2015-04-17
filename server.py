@@ -321,8 +321,33 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                                'categorie': ecriture.Categorie.nom,
                                'montant': "%0.2f" %(ecriture.EcritureCategorie.montant,),
                                'description': ecriture.EcritureCategorie.description,
-                            })
+                              })
     return dumps(list_ecritures)
+
+@app.get('/categorie')
+@app.get('/categorie/<id:int>')
+@app.get('/categorie/<nom:re:[a-zA-Z\ ]+>')
+def list_categorie(db, id=None, nom=None, id_compte=None):
+    """ List categorie """
+    categories = db.query(Categorie)
+    if nom:
+        categories = categories.filter(Categorie.nom == nom)
+    if id:
+        categories = categories.filter(Categorie.id == id)
+    try:
+        categories = categories.order_by(Categorie.nom).\
+                                all()
+    except NoResultFound:
+        abort(404, "ID not found")
+    if not categories:
+        abort(404, "ID not found")
+    list_categories = []
+    for categorie in categories:
+        list_categories.append({'id': categorie.id,
+                               'nom': categorie.nom,
+                               })
+    return dumps(list_categories)
+
 
 if __name__ == "__main__":
     main()
