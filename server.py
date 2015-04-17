@@ -387,17 +387,77 @@ def update_ecriture(db, id=None):
         else:
             ecriture.Ecriture.valide = False
     if entity.has_key('montant'):
-        ecriture.EcritureCategorie.montant = int(entity["montant"])*100
+        ecriture.EcritureCategorie.montant = (int(entity["montant"])*100)
     if entity.has_key('type'):
-        ecriture.EcritureCategorie.type = entity["type"]
+        ecriture.Ecriture.type = entity["type"]
     if entity.has_key('description'):
         ecriture.EcritureCategorie.description = entity["description"]
     if entity.has_key('categorie'):
-        ecriture.Ecriture.categorie_id = entity["categorie"]
+        ecriture.EcritureCategorie.categorie_id = entity["categorie"]
     try:
         db.commit()
     except IntegrityError:
         abort(404, 'Integrity Error')
+
+@app.post('/ecriture')
+def insert_ecriture(db):
+    """ Insert a new ecriture """
+    data = request.body.readline()
+    if not data:
+        abort(204, 'No data received')
+    entity = loads(data)
+    if not entity.has_key('nom'):
+        abort(404, 'Nom : non spécifié')
+    if not entity.has_key('date'):
+        abort(404, 'Date : non spécifié')
+    if not entity.has_key('dc'):
+        abort(404, 'dc : non spécifié')
+    if not entity.has_key('montant'):
+        abort(404, 'montant : non spécifié')
+    if not entity.has_key('compte_id'):
+        abort(404, 'compte_id : non spécifié')
+    if not entity.has_key('type'):
+        abort(404, 'type : non spécifié')
+    ecriture = Ecriture(nom=entity["nom"],
+                          date=datetime.strptime(entity["date"],"%Y/%m/%d"),
+                          dc=entity["dc"],
+                          compte_id=entity["compte_id"],
+                          type=entity["type"],)
+    if entity.has_key('valide'):
+        if entity["valide"].isnumeric():
+            ecriture.valide = entity["valide"]
+        elif entity["valide"].lower() == "true":
+            ecriture.valide = True
+        else:
+            ecriture.valide = False
+    else:
+        ecriture.valide = False
+    db.add(ecriture)
+    try:
+        db.commit()
+    except IntegrityError:
+        abort(404, 'Integrity Error')
+    
+    ecriture_categorie = EcritureCategorie(montant=(int(entity["montant"])*100),
+                                           ecriture_id=ecriture.id,)
+    if entity.has_key('description'):
+        ecriture_categorie.description = entity["description"]
+    else:
+        ecriture_categorie.description = "-"
+    if entity.has_key('categorie'):
+        ecriture_categorie.categorie_id = entity["categorie"]
+    else:
+        categorie = db.query(Categorie.id).\
+                       filter(Categorie.nom == "Consommation").\
+                       one()
+        ecriture_categorie.categorie_id = categorie.id
+    db.add(ecriture_categorie)
+    try:
+        db.commit()
+    except IntegrityError:
+        abort(404, 'Integrity Error')
+    response.status = 201
+    response.headers["Location"] = "/ecriture/%s/" % (ecriture.id,)
 
 @app.get('/categorie')
 @app.get('/categorie/<id:int>')
