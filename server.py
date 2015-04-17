@@ -375,6 +375,24 @@ def list_categorie(db, id=None, nom=None, id_compte=None):
                                })
     return dumps(list_categories)
 
+@app.post('/categorie')
+def insert_categorie(db):
+    """ Insert a new categorie """
+    data = request.body.readline()
+    if not data:
+        abort(204, 'No data received')
+    entity = loads(data)
+    if not entity.has_key('nom'):
+        abort(404, 'Nom : non spécifié')
+    categorie = Categorie(nom=entity["nom"])
+    db.add(categorie)
+    try:
+        db.commit()
+    except IntegrityError:
+        abort(404, 'Integrity Error')
+    response.status = 201
+    response.headers["Location"] = "/categorie/%s" % (categorie.id,)
+
 
 if __name__ == "__main__":
     main()
