@@ -40,7 +40,7 @@ class EcritureCategorie(Base):
     __tablename__ = 'ecriture_categorie'
     id = Column(Integer, primary_key=True)
     description = Column(String(), nullable=False)
-    montant = Column(Numeric(precision=2, asdecimal=True), nullable=False)
+    montant = Column(Integer, nullable=False)
     ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=False)
     categorie = relationship('Categorie')

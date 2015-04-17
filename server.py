@@ -314,7 +314,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
             ecritures = ecritures.filter(Ecriture.valide == False)
         if somme == 'yes':
             ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
-                                     func.sum(Ecriture.dc * EcritureCategorie.montant).label("somme")).\
+                                 (func.sum(Ecriture.dc * EcritureCategorie.montant).label("somme")/100).label("somme")).\
             join(Ecriture.categories).\
             one()
             return dumps({'somme': "%0.2f" % (ecritures.somme,),
@@ -325,9 +325,9 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                               all()
         
         if filters == 'last_10':
-            ecritures = ecritures[:10]
+            ecritures = ecritures[-10:]
         if filters == 'last_5':
-            ecritures = ecritures[:5]
+            ecritures = ecritures[-5:]
 
     except NoResultFound:
         abort(404, "ID not found")
