@@ -13,6 +13,7 @@ from bottle.ext import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import func
 
 from compta.db.base import Base
 from compta.db.banque import Banque
@@ -303,8 +304,31 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
     if id:
         ecritures = ecritures.filter(Ecriture.id == id)
     try:
+        filters = request.query.filters
+        valide = request.query.valide
+        somme = request.query.somme
+
+        if valide == "yes":
+            ecritures = ecritures.filter(Ecriture.valide == True)
+        elif valide == "no":
+            ecritures = ecritures.filter(Ecriture.valide == False)
+        if somme == 'yes':
+            ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
+                                     func.sum(Ecriture.dc * EcritureCategorie.montant).label("somme")).\
+            join(Ecriture.categories).\
+            one()
+            return dumps({'somme': "%0.2f" % (ecritures.somme,),
+                          'nombre': str(ecritures.nombre),
+                         })
+
         ecritures = ecritures.order_by(Ecriture.date).\
                               all()
+        
+        if filters == 'last_10':
+            ecritures = ecritures[:10]
+        if filters == 'last_5':
+            ecritures = ecritures[:5]
+
     except NoResultFound:
         abort(404, "ID not found")
     if not ecritures:
