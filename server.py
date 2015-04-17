@@ -25,7 +25,7 @@ app = Bottle()
 
 def main():
     """ Main Page """
-    engine = create_engine('sqlite:///./db/compta.test', echo=False)
+    engine = create_engine('sqlite:///./db/compta.test', echo=True)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     plugin = sqlalchemy.Plugin(engine, Base.metadata, create=False)
@@ -346,10 +346,58 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                                'valide': ecriture.Ecriture.valide,
                                'compte_id': ecriture.Ecriture.compte_id,
                                'categorie': ecriture.Categorie.nom,
-                               'montant': "%0.2f" %(ecriture.EcritureCategorie.montant,),
+                               'montant': "%0.2f" %(ecriture.EcritureCategorie.montant/100,),
                                'description': ecriture.EcritureCategorie.description,
                               })
     return dumps(list_ecritures)
+
+@app.put('/ecriture/<id:int>')
+def update_ecriture(db, id=None):
+    """ Update information for an ecriture """
+    if not id:
+        abort(404, 'no id received')
+    data = request.body.readline()
+    if not data:
+        abort(204, 'No data received')
+    entity = {}
+    try:
+        entity = loads(data)
+    except:
+        print "erreur chargement json %s" % (data,)
+        abort(404, 'Error on loading data')
+    try:
+        ecriture = db.query(Ecriture, EcritureCategorie).\
+                      join(Ecriture.categories).\
+                      filter(Ecriture.id == id).\
+                      one()
+    except NoResultFound:
+        abort(404, "ID not found")
+    
+    if entity.has_key('nom'):
+        ecriture.Ecriture.nom = entity["nom"]
+    if entity.has_key('date'):
+        ecriture.Ecriture.date = datetime.strptime(entity["date"],"%Y/%m/%d")
+    if entity.has_key('dc'):
+        ecriture.Ecriture.dc = entity["dc"]
+    if entity.has_key('valide'):
+        if entity["valide"].isnumeric():
+            ecriture.Ecriture.valide = entity["valide"]
+        elif entity["valide"].lower() == "true":
+            ecriture.Ecriture.valide = True
+        else:
+            ecriture.Ecriture.valide = False
+    if entity.has_key('montant'):
+        ecriture.EcritureCategorie.montant = int(entity["montant"])*100
+    if entity.has_key('type'):
+        ecriture.EcritureCategorie.type = entity["type"]
+    if entity.has_key('description'):
+        ecriture.EcritureCategorie.description = entity["description"]
+    if entity.has_key('categorie'):
+        ecriture.Ecriture.categorie_id = entity["categorie"]
+    try:
+        db.commit()
+    except IntegrityError:
+        abort(404, 'Integrity Error')
 
 @app.get('/categorie')
 @app.get('/categorie/<id:int>')
