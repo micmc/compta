@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Enum
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
@@ -16,12 +16,18 @@ from base import Base
 #CREATE INDEX "banque_compte_decbfcd4" ON "compte" ("banque_id");
 
 class Compte(Base):
+    """ Class to manage compte
+
+        Two constraints is used in sqlite :
+        ALTER TABLE compte  ADD compte_type_enum  CHECK (type IN ('dif', 'div', 'prs', 'prv', 'vir'));
+        ALTER TABLE compte  ADD compte_archive CHECK (archive IN (0, 1)),
+    """
     __tablename__ = 'compte'
     id = Column(Integer, primary_key=True)
     nom = Column(String(50), nullable=False)
     numero = Column(String(12), nullable=False)
     cle = Column(String(3), nullable=False)
-    type_compte = Column('type',String(3), nullable=False)
-    archive = Column(Boolean)
+    type = Column(Enum('dif','div','prs','prv','vir', name="compte_type_enum"), nullable=False)
+    archive = Column(Boolean, default=False)
     banque_id = Column(Integer, ForeignKey('banque.id'), nullable=False)
-    banque = relationship('Banque', backref=backref('comptes', uselist=True))
+    ecritures= relationship('Ecriture', backref='compte')

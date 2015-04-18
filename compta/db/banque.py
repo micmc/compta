@@ -27,3 +27,4 @@ class Banque(Base):
     cle_controle = Column(String(2), nullable=False)
     code_banque = Column(String(5), nullable=False)
     code_guichet = Column(String(5), nullable=False)
+    comptes = relationship('Compte', backref='banque')
