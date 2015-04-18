@@ -6,6 +6,7 @@ from bottle import Bottle
 from bottle import response, request, abort
 from json import dumps, loads
 from datetime import datetime
+from decimal import Decimal
 
 from bottle.ext import sqlalchemy
 #from sqlalchemy import create_engine, Column, Integer, Sequence, String
@@ -314,7 +315,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
             ecritures = ecritures.filter(Ecriture.valide == False)
         if somme == 'yes':
             ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
-                                 (func.sum(Ecriture.dc * EcritureCategorie.montant).label("somme")/100).label("somme")).\
+                                 (func.sum(Ecriture.dc * EcritureCategorie.montant).label("somme")/100.0).label("somme")).\
                            join(Ecriture.categories)
             if id_compte:
                 ecritures = ecritures.filter(Ecriture.compte_id == id_compte)
@@ -387,7 +388,7 @@ def update_ecriture(db, id=None):
         else:
             ecriture.Ecriture.valide = False
     if entity.has_key('montant'):
-        ecriture.EcritureCategorie.montant = (int(entity["montant"])*100)
+        ecriture.EcritureCategorie.montant = (int(Decimal(entity["montant"])*100))
     if entity.has_key('type'):
         ecriture.Ecriture.type = entity["type"]
     if entity.has_key('description'):
@@ -438,12 +439,12 @@ def insert_ecriture(db):
     except IntegrityError:
         abort(404, 'Integrity Error')
     
-    ecriture_categorie = EcritureCategorie(montant=(int(entity["montant"])*100),
+    ecriture_categorie = EcritureCategorie(montant=int(Decimal(entity["montant"])*100),
                                            ecriture_id=ecriture.id,)
     if entity.has_key('description'):
         ecriture_categorie.description = entity["description"]
-    else:
-        ecriture_categorie.description = "-"
+    #else:
+    #    ecriture_categorie.description = "-"
     if entity.has_key('categorie'):
         ecriture_categorie.categorie_id = entity["categorie"]
     else:
