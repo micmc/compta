@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Float, Numeric
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
@@ -30,18 +30,18 @@ class Ecriture(Base):
     id = Column(Integer, primary_key=True)
     date = Column('date', Date, nullable=False)
     dc = Column(Integer, nullable=False)
-    type = Column('type', String(2), nullable=False)
+    type = Column('type', Enum('Vr', 'Pr', 'Cb', 'Ch', 'Re', 'Li'), nullable=False)
     nom = Column(String(200), nullable=False)
-    valide = Column(Boolean)
+    valide = Column(Boolean, default=False)
     compte_id = Column(Integer, ForeignKey('compte.id'), nullable=False)
     categories = relationship('EcritureCategorie', backref='ecriture')
 
 class EcritureCategorie(Base):
     __tablename__ = 'ecriture_categorie'
     id = Column(Integer, primary_key=True)
-    description = Column(String(), nullable=False)
     montant = Column(Integer, nullable=False)
+    description = Column(String(), nullable=True)
     ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
-    categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=False)
+    categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=True)
     categorie = relationship('Categorie')
 

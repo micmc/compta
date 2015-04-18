@@ -25,8 +25,8 @@ class Compte(Base):
     __tablename__ = 'compte'
     id = Column(Integer, primary_key=True)
     nom = Column(String(50), nullable=False)
-    numero = Column(String(12), nullable=False)
-    cle = Column(String(3), nullable=False)
+    numero = Column(String(12), nullable=True)
+    cle = Column(String(3), nullable=True)
     type = Column(Enum('dif','div','prs','prv','vir', name="compte_type_enum"), nullable=False)
     archive = Column(Boolean, default=False)
     banque_id = Column(Integer, ForeignKey('banque.id'), nullable=False)

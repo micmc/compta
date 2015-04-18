@@ -25,7 +25,7 @@ app = Bottle()
 
 def main():
     """ Main Page """
-    engine = create_engine('sqlite:///./db/compta.test', echo=True)
+    engine = create_engine('sqlite:///./db/compta.test', echo=False)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     plugin = sqlalchemy.Plugin(engine, Base.metadata, create=False)
