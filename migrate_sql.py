@@ -3,16 +3,34 @@
 
 import optparse
 import sys
-import os
+#import os
 from xml.etree.ElementTree import ElementTree
+from datetime import datetime
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm import sessionmaker
+#from sqlalchemy.exc import IntegrityError
+#from sqlalchemy.sql import func
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "compta.settings")
+from compta.db.base import Base
+from compta.db.banque import Banque
+from compta.db.compte import Compte
+from compta.db.ecriture import Ecriture, EcritureCategorie
+from compta.db.categorie import Categorie
 
-    from ecriture.models import Ecriture, Categorie
-    from banque.models import Compte
+def main():
+    """ Main Page """
 
+    #Initialize database engine
+    engine = create_engine('sqlite:///./db/compta.test', echo=False)
+    Base.metadata.bind = engine
+    Base.metadata.create_all(engine)
+
+    db_session = sessionmaker(bind=engine)
+    session = db_session()
+
+    #Parse arguments
     parser = optparse.OptionParser()
     parser.add_option("-f", "--file",
                       help="file to import",
@@ -21,44 +39,56 @@ if __name__ == "__main__":
                       help="Compte index to add",
                       dest="compte_index", type="int")
     (options, args) = parser.parse_args()
-    
+
     if options.file_import is None:
         print "options -f is missing"
         sys.exit(1)
     if options.compte_index is None:
         print "options -i is missing"
         sys.exit(1)
-    
+
+    #Read xml file
     tree = ElementTree()
     tree.parse(options.file_import)
     xml_lines = tree.getiterator('Requete_export')
-    compte = Compte(pk=options.compte_index)
+    #compte = Compte(pk=options.compte_index)
     tmp_cpt = 1
     for xml_line in xml_lines:
-        import_date = xml_line.find('FA_Date')
+        import_date = xml_line.find('FA_Date').split('T')[0]
         import_dc = xml_line.find('FA_DC')
         import_type = xml_line.find('FA_MPaiement')
         import_nom = xml_line.find('FA_Nom')
         import_categorie = xml_line.find('FA_Categorie')
         import_description = xml_line.find('FA_Description')
         import_montant = xml_line.find('FA_Montant')
-        ecriture = Ecriture()
-        ecriture.date = import_date.text.split('T')[0]
-        ecriture.dc = import_dc.text
-        ecriture.type = import_type.text
-        ecriture.nom = import_nom.text
-        ecriture.compte = compte
-        ecriture.save()
-        print ecriture
-        categorie = Categorie()
-        categorie.categorie = import_categorie.text
+        #Write Ecriture
+        ecriture = Ecriture(nom=import_nom.text,
+                            date=datetime.strptime(import_date, "%Y/%m/%d"),
+                            dc=import_dc.text,
+                            type=import_type.text,
+                            compte_id=compte)
+        session.add(ecriture)
+        session.commit()
+        #Write EcritureCategorie
+        ecriture_categorie = EcritureCategorie(montant=(int(import_montant.text)*100),
+                                               ecriture_id=ecriture.id)
+        try:
+            categorie = session.query(Categorie.id).\
+                                     filter(Categorie.nom == import_categorie.text).\
+                                     one()
+        except NoResultFound:
+            categorie = Categorie(nom=import_categorie)
+            session.add(categorie)
+            session.commit()
+        ecriture_categorie.categorie_id = categorie.id
+
         if import_description != None:
             categorie.description = import_description.text
-        categorie.montant = import_montant.text
-        categorie.ecriture = ecriture
-        categorie.save()
+        session.add(ecriture_categorie)
+        session.commit()
+
         print "Enregistrement effectué : " + str(tmp_cpt)
-        tmp_cpt +=  1
-        #for xml_child in xml_line.getchildren():
-        #    print xml_child.text
-        #    print xml_child.tag
+        tmp_cpt += 1
+
+if __name__ == "__main__":
+    main()
