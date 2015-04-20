@@ -16,13 +16,11 @@ class Banque(object):
     def __init__(self):
         """ Init class to manage parse argument """
 
-        self.parser = ParseArgs()                  
-        self.parser.get_banque()
-        self.options = self.parser.get_args()
-        print self.options
+        self.options = ParseArgs.get_method("banque")
 
     def list_banque(self):
         if self.options.id:
+            pass
 
     
 def main():

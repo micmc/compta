@@ -26,11 +26,27 @@ class ParseArgs(object):
         options = self.parser.parse_args()
         return options
 
-    def get_banque(self):
+    @staticmethod
+    def get_method(method):
+        if method == "banque":
+            return ParseBanque().get_args()
+
+class ParseBanque(ParseArgs):
+    """ Class for create banque object """
+
+    def __init__(self, **kwargs):
+        """ Initialize default class """
+        ParseArgs.__init__(self, **kwargs)
+
         """ Return banque """
         self.parser_banque = self.subparsers.add_parser('banque', help='banque help')
         self.parser_test = self.subparsers.add_parser('test', help='banque help')
         self.parser_banque.add_argument('cmd', help='command to pass [list, update, delete, insert]', choices=('list','update'))
         self.parser_banque.add_argument('-i', '--id', type=int, help='id of the compte', nargs=1)
+
+    def get_args(self):
+        """ Return argument """
+        sys.argv[0] = 'banque'
+        return self.parser.parse_args(sys.argv)
 
 
