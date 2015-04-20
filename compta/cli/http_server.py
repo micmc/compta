@@ -2,48 +2,42 @@
 # -*- coding: utf8 -*-
 """ module to manage request on server """
 
-from argparse import ArgumentParser
-import sys     
-import os      
-import string
+import sys
 import requests
-
-from decimal import Decimal
-from datetime import datetime
+from json import dumps, loads
 
 class RequestServer(object):
     """ Default class to manage parse argument """
 
-    def __init__(self, method, *args, **kwargs):
+    def __init__(self, address, port):
         """Initialize default initialisation parser"""
-        self.request = requests.request(method, *args, **kwargs)
-    
-    def get_status(self):
-        """ Return argument """
+        self.__session = requests.Session()
+        self.__address = address
+        self.__port = port
+        #self.__request = requests.request()
 
-        return self.request.status_code
+    def get(self, url):
+        """Get url data"""
+        url_data = 'http://%s:%s/%s' % (self.__address,
+                                        self.__port,
+                                        url)
+        self.__request = self.__session.get(url_data)
+        for data in self.__request.json():
+            print data
+        print self.__request.headers
+        return self.__request.status_code
 
     @staticmethod
     def get_method(method):
+        """Static fabric method"""
         if method == "get":
             pass
 
-#class ParseBanque(ParseArgs):
-#    """ Class for create banque object """
-#
-#    def __init__(self, **kwargs):
-#        """ Initialize default class """
-#        ParseArgs.__init__(self, **kwargs)
-#
-#        """ Return banque """
-#        self.parser_banque = self.subparsers.add_parser('banque', help='banque help')
-#        self.parser_test = self.subparsers.add_parser('test', help='banque help')
-#        self.parser_banque.add_argument('cmd', help='command to pass [list, update, delete, insert]', choices=('list','update'))
-#        self.parser_banque.add_argument('-i', '--id', type=int, help='id of the compte', nargs=1)
-#
-#    def get_args(self):
-#        """ Return argument """
-#        sys.argv[0] = 'banque'
-#        return self.parser.parse_args(sys.argv)
+class RequestServerBanque(RequestServer):
+    """ Class for create banque object """
 
+    def __init__(self, adresse, port):
+        """ Initialize default class """
+
+        RequestServer.__init__(self, adresse, port)
 
