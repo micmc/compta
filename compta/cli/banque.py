@@ -25,8 +25,7 @@ class Banque(object):
         #rqst = RequestServer('localhost', '8080')
         #print rqst.get('banque')
         rqst = RequestServer.get_method("banque")
-        response =  rqst.get()
-        print response.json()
+        print rqst.json()
 
     
 def main():

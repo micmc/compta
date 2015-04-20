@@ -28,6 +28,8 @@ class ParseArgs(object):
 
         if method == "banque":
             return ParseBanque().get_args()
+        elif method == "ecriture":
+            return ParseEcriture().get_args()
 
 class ParseBanque(ParseArgs):
     """ Class for create banque object """
@@ -41,7 +43,7 @@ class ParseBanque(ParseArgs):
         self.parser_test = self.subparsers.add_parser('test', help='banque help')
         self.parser_banque.add_argument('cmd',
                                         help='command to pass [list, update, delete, insert]',
-                                        choices=('list', 'update'))
+                                        choices=('list', 'insert', 'update', 'delete'))
         self.parser_banque.add_argument('-i', '--id', type=int,
                                         help='id of the compte',
                                         nargs=1)
@@ -49,6 +51,29 @@ class ParseBanque(ParseArgs):
     def get_args(self):
         """ Return argument """
         sys.argv[0] = 'banque'
+        return self.parser.parse_args(sys.argv)
+
+class ParseEcriture(ParseArgs):
+    """ Class for create ecriture object """
+
+    def __init__(self, **kwargs):
+        """ Initialize default class """
+        ParseArgs.__init__(self, **kwargs)
+
+        # Create ecriture object
+        self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
+        self.parser_ecriture.add_argument('cmd',
+                                        help='command to pass [list, update, delete, insert]',
+                                        choices=('list', 'insert', 'update', 'delete'))
+        self.parser_ecriture.add_argument('-i', '--id', type=int,
+                                          help='id of ecriture',
+                                         )
+        self.parser_ecriture.add_argument('-c', '--compte', type=int,
+                                          help='id of the compte',
+                                         )
+    def get_args(self):
+        """ Return argument """
+        sys.argv[0] = 'ecriture'
         return self.parser.parse_args(sys.argv)
 
 
