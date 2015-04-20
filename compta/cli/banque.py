@@ -9,6 +9,7 @@ from decimal import Decimal
 from datetime import datetime
 
 from argparser import ParseArgs
+from http_server import RequestServer
 
 class Banque(object):
     """ Default class to manage compte """
@@ -21,12 +22,14 @@ class Banque(object):
     def list_banque(self):
         if self.options.id:
             pass
+        rqst = RequestServer('GET', 'http://localhost:8080/banque')
+        print rqst.get_status()
 
     
 def main():
     banque = Banque()
     if banque.options.cmd == 'list':
-        banque.list_banque
+        banque.list_banque()
 
 if __name__ == '__main__':
     main()
