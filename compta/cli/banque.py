@@ -22,8 +22,11 @@ class Banque(object):
     def list_banque(self):
         if self.options.id:
             pass
-        rqst = RequestServer('localhost', '8080')
-        print rqst.get('banque')
+        #rqst = RequestServer('localhost', '8080')
+        #print rqst.get('banque')
+        rqst = RequestServer.get_method("banque")
+        response =  rqst.get()
+        print response.json()
 
     
 def main():
