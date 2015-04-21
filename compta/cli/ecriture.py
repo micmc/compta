@@ -8,7 +8,7 @@ import re
 
 from json import dumps
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, date
 
 from argparser import ParseArgs
 from http_server import RequestServer
@@ -50,10 +50,21 @@ class Ecriture(object):
         data['type'] = unicode(raw_input("Typr [Pr, Vr, Cb, Re, Ch, Li] : "))
         if not re.match("^(Pr|Vr|Cb|Re|Ch|Li)$",data['type']):
             raise Exception("Erreur dans le type")
-        data['date'] = unicode(raw_input("date [YYYY/DD/MM] :"))
-        if not re.match("^\d{4}\/\d{2}\/\d{2}$",data['date']):
+        data['date'] = unicode(raw_input("date [YYYY/]DD/MM] :"))
+        if not re.match("^(201[0-9]\/)?\d{1,2}\/\d{1,2}$",data['date']):
             raise Exception("Erreur dans la date")
+        if re.match("^\d{2}\/\d{2}$",data['date']):
+            data['date'] = str(date.today().year) + "/" + data['date']
+        response = RequestServer.get_method("categorie", sort="?sort=count")
+        list_categorie = response.json()
+        for i in range(1,4):
+            tmp_str = ""
+            for categorie in list_categorie[(i-1)*5:i*5]:
+                tmp_str += "%d - %12s, " % (categorie['id'], categorie['nom'])
+            print tmp_str[:-2]
         data['categorie'] = unicode(raw_input("categorie [consommation : 5] :"))
+        if not data['categorie'].isnumeric():
+            raise Exception("Erreur de categorie")
         print data
         response = RequestServer.post_method("ecriture", dumps(data))
         print response

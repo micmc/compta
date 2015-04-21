@@ -35,32 +35,39 @@ class RequestServer(object):
         return self.__request
 
     @staticmethod
-    def get_method(method, banque=None, compte=None, ecriture=None):
+    def get_method(method, banque=None, compte=None, ecriture=None, categorie=None, sort=None):
         """Static fabric method"""
+      
+        filter = ""
         if method == "banque":
             rqst =  RequestServerBanque()
-            filter = ""
             if banque:
                 filter="/%s" % (banque,)
             return rqst.get(filter=filter)
-        if method == "compte":
+        elif method == "compte":
             rqst =  RequestServerCompte()
-            filter = ""
             if banque:
                 rqst =  RequestServerBanque()
                 filter = "/%s/compte" % (banque,)
             elif compte:
                 filter += "/%s" % (compte,)
             return rqst.get(filter=filter)
-        if method == "ecriture":
+        elif method == "ecriture":
             rqst = RequestServerEcriture()
-            filter = ""
             if compte:
                 rqst = RequestServerCompte()
                 filter = "/%s/ecriture" % (compte,)
             if ecriture:
                 filter += "/%s" % (ecriture,)
             return rqst.get(filter=filter)
+        elif method == "categorie":
+            rqst = RequestServerCategorie()
+            if categorie:
+                filter += "/%s" % (categorie,)
+            if sort:
+                filter += sort 
+            return rqst.get(filter=filter)
+
 
     @classmethod
     def post_method(cls, method, data):
@@ -95,5 +102,14 @@ class RequestServerEcriture(RequestServer):
 
         RequestServer.__init__(self, address, port)
         self._url_data = self._url_data + "ecriture"
+
+class RequestServerCategorie(RequestServer):
+    """ Class for create categorie object """
+
+    def __init__(self, address='localhost', port='8080'):
+        """ Initialize default class """
+
+        RequestServer.__init__(self, address, port)
+        self._url_data = self._url_data + "categorie"
 
 

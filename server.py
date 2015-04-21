@@ -12,6 +12,7 @@ from bottle.ext import sqlalchemy
 #from sqlalchemy import create_engine, Column, Integer, Sequence, String
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
+from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
@@ -465,14 +466,22 @@ def insert_ecriture(db):
 @app.get('/categorie/<nom:re:[a-zA-Z\ ]+>')
 def list_categorie(db, id=None, nom=None, id_compte=None):
     """ List categorie """
-    categories = db.query(Categorie)
+    sort = request.query.sort
+    categories = db.query(Categorie.id, Categorie.nom, func.count(Categorie.nom).label("count")).\
+                    join(EcritureCategorie).\
+                    group_by(Categorie.nom)
     if nom:
         categories = categories.filter(Categorie.nom == nom)
     if id:
         categories = categories.filter(Categorie.id == id)
+    if sort == "id":
+        categories = categories.order_by(Categorie.id)
+    elif sort == "count":
+        categories = categories.order_by(desc('count'))
+    else:
+        categories = categories.order_by(Categorie.nom)
     try:
-        categories = categories.order_by(Categorie.nom).\
-                                all()
+        categories = categories.all()
     except NoResultFound:
         abort(404, "ID not found")
     if not categories:
@@ -481,6 +490,7 @@ def list_categorie(db, id=None, nom=None, id_compte=None):
     for categorie in categories:
         list_categories.append({'id': categorie.id,
                                'nom': categorie.nom,
+                               'count': categorie.count,
                                })
     return dumps(list_categories)
 
