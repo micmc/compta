@@ -296,6 +296,7 @@ def delete_compte(db, id=None):
 @app.get('/compte/<id_compte:int>/ecriture/<nom:re:[a-zA-Z\ ]+>')
 def list_ecriture(db, id=None, nom=None, id_compte=None):
     """ List compte """
+    
     ecritures = db.query(Ecriture, EcritureCategorie, Categorie).\
                    join(Ecriture.categories).\
                    join(EcritureCategorie.categorie)
@@ -309,6 +310,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
         filters = request.query.filters
         valide = request.query.valide
         somme = request.query.somme
+        sort = request.query.sort
 
         if valide == "yes":
             ecritures = ecritures.filter(Ecriture.valide == True)
@@ -325,9 +327,17 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
             return dumps({'somme': "%0.2f" % (ecritures.somme,),
                           'nombre': str(ecritures.nombre),
                          })
-
-        ecritures = ecritures.order_by(Ecriture.date).\
-                              all()
+        if sort == 'nom':
+            ecritures = ecritures.order_by(Ecriture.nom).\
+        elif sort == 'type':
+            ecritures = ecritures.order_by(Ecriture.nom).\
+        elif sort == 'montant':
+            ecritures = ecritures.order_by(EcritureCategorie.montant
+        elif sort == 'categorie':
+            ecritures = ecritures.order_by(Categorie.nom).\
+        else:
+            ecritures = ecritures.order_by(Ecriture.date).\
+        ecritures = ecritures.all()
         
         if filters == 'last_10':
             ecritures = ecritures[-10:]

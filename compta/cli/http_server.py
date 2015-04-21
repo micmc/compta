@@ -47,11 +47,9 @@ class RequestServer(object):
         elif method == "compte":
             rqst =  RequestServerCompte()
             if banque:
-                rqst =  RequestServerBanque()
                 filter = "/%s/compte" % (banque,)
             elif compte:
                 filter += "/%s" % (compte,)
-            return rqst.get(filter=filter)
         elif method == "ecriture":
             rqst = RequestServerEcriture()
             if compte:
@@ -59,14 +57,12 @@ class RequestServer(object):
                 filter = "/%s/ecriture" % (compte,)
             if ecriture:
                 filter += "/%s" % (ecriture,)
-            return rqst.get(filter=filter)
         elif method == "categorie":
             rqst = RequestServerCategorie()
             if categorie:
-                filter += "/%s" % (categorie,)
-            if sort:
-                filter += sort 
-            return rqst.get(filter=filter)
+        if sort:
+            filter += sort 
+        return rqst.get(filter=filter)
 
 
     @classmethod

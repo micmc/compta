@@ -71,6 +71,12 @@ class ParseEcriture(ParseArgs):
         self.parser_ecriture.add_argument('-c', '--compte', type=int,
                                           help='id of the compte',
                                          )
+        self.parser_ecriture.add_argument('-f', '--filter',
+                                          help='filter for compte',
+                                         )
+        self.parser_ecriture.add_argument('-s', '--sort',
+                                          help='sort for compte',
+                                         )
     def get_args(self):
         """ Return argument """
         sys.argv[0] = 'ecriture'

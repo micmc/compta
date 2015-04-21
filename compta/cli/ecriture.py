@@ -31,7 +31,8 @@ class Ecriture(object):
         #rqst = RequestServer('localhost', '8080')
         #print rqst.get('ecriture')
         response = RequestServer.get_method("ecriture", ecriture=id, compte=compte)
-        print response.json()
+        for response in response.json():
+            print response
 
     def insert_ecriture(self):
         data={}
