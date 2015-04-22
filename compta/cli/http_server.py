@@ -2,9 +2,9 @@
 # -*- coding: utf8 -*-
 """ module to manage request on server """
 
-import sys
+#import sys
 import requests
-from json import dumps, loads
+#from json import dumps, loads
 
 class RequestServer(object):
     """ Default class to manage parse argument """
@@ -14,7 +14,7 @@ class RequestServer(object):
         self.__session = requests.Session()
         self.__address = address
         self.__port = port
-        #self.__request = requests.request()
+        self.__request = None
         self._url_data = 'http://%s:%s/' % (self.__address,
                                             self.__port)
 
@@ -22,7 +22,7 @@ class RequestServer(object):
         """Get url data"""
         url_data = self._url_data
         if url is not None:
-            url_data += url 
+            url_data += url
         if filter is not None:
             url_data += filter
         self.__request = self.__session.get(url_data)
@@ -35,17 +35,22 @@ class RequestServer(object):
         return self.__request
 
     @staticmethod
-    def get_method(method, banque=None, compte=None, ecriture=None, categorie=None, sort=None):
-        """Static fabric method"""
-      
+    def get_method(method,
+                   banque=None,
+                   compte=None,
+                   ecriture=None,
+                   categorie=None,
+                   sort=None):
+        """ Static fabric method """
+
         filter = ""
         if method == "banque":
-            rqst =  RequestServerBanque()
+            rqst = RequestServerBanque()
             if banque:
-                filter="/%s" % (banque,)
+                filter = "/%s" % (banque,)
             return rqst.get(filter=filter)
         elif method == "compte":
-            rqst =  RequestServerCompte()
+            rqst = RequestServerCompte()
             if banque:
                 filter = "/%s/compte" % (banque,)
             elif compte:
@@ -60,13 +65,16 @@ class RequestServer(object):
         elif method == "categorie":
             rqst = RequestServerCategorie()
             if categorie:
+                filter += "/%s" % (categorie,)
         if sort:
-            filter += sort 
+            filter += sort
         return rqst.get(filter=filter)
 
 
     @classmethod
     def post_method(cls, method, data):
+        """ Static fabric method """
+
         if method == "ecriture":
             rqst = RequestServerEcriture()
             return rqst.post(data)

@@ -10,7 +10,7 @@ class ParseArgs(object):
 
     def __init__(self, **kwargs):
         """Initialize default initialisation parser"""
-        self.parser = ArgumentParser( **kwargs)
+        self.parser = ArgumentParser(**kwargs)
 
         self.parser.add_argument('-d', help='Debug')
 
@@ -63,12 +63,13 @@ class ParseEcriture(ParseArgs):
         # Create ecriture object
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
         self.parser_ecriture.add_argument('cmd',
-                                        help='command to pass [list, update, delete, insert]',
-                                        choices=('list', 'insert', 'update', 'delete'))
+                                          help='command to pass [list, update, delete, insert]',
+                                          choices=('list', 'insert', 'update', 'delete'))
         self.parser_ecriture.add_argument('-i', '--id', type=int,
                                           help='id of ecriture',
                                          )
         self.parser_ecriture.add_argument('-c', '--compte', type=int,
+                                          required=True,
                                           help='id of the compte',
                                          )
         self.parser_ecriture.add_argument('-f', '--filter',
@@ -76,6 +77,14 @@ class ParseEcriture(ParseArgs):
                                          )
         self.parser_ecriture.add_argument('-s', '--sort',
                                           help='sort for compte',
+                                         )
+        self.parser_ecriture.add_argument('-d', '--dc',
+                                          choices=["d", "c"],
+                                          help='Débit/Crédit',
+                                         )
+        self.parser_ecriture.add_argument('-t', '--type',
+                                          choices=["Pr", "Vr", "Cb", "Re", "Ch", "Li"],
+                                          help='Type',
                                          )
     def get_args(self):
         """ Return argument """

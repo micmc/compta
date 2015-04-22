@@ -1,14 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
+""" Class to manage ecriture table by cli command """
 
-import sys     
-import os      
-import string
 import re
 
 from json import dumps
-from decimal import Decimal
-from datetime import datetime, date
+from datetime import date
 
 from argparser import ParseArgs
 from http_server import RequestServer
@@ -22,6 +19,8 @@ class Ecriture(object):
         self.options = ParseArgs.get_method("ecriture")
 
     def list_ecriture(self):
+        """ List ecriture """
+
         id = None
         compte = None
         if self.options.id:
@@ -35,37 +34,51 @@ class Ecriture(object):
             print response
 
     def insert_ecriture(self):
-        data={}
-        data['compte_id']=self.options.compte
+        """ Insert an ecriture """
+
+        data = {}
+        data['compte_id'] = self.options.compte
         data['nom'] = unicode(raw_input("nom :"))
+
         data['montant'] = unicode(raw_input("montant :"))
-        if not re.match("^\d+(\.\d{1,2})?$",data['montant']):
+        if not re.match(r"^\d+(\.\d{1,2})?$", data['montant']):
             raise Exception("Erreur dans le montant")
-        data['dc'] = unicode(raw_input("Débit d / Crédit c : "))
-        if data['dc'] == "d":
-            data['dc'] = -1
-        elif data['dc'] == "c":
-            data['dc'] = 1
+
+        if not self.options.dc:
+            data['dc'] = unicode(raw_input("Débit d / Crédit c : "))
+            if data['dc'] == "d":
+                data['dc'] = -1
+            elif data['dc'] == "c":
+                data['dc'] = 1
+            else:
+                raise Exception("Erreur dans Débit/Crédit")
         else:
-            raise Exception("Erreur dans Débit/Crédit")
-        data['type'] = unicode(raw_input("Typr [Pr, Vr, Cb, Re, Ch, Li] : "))
-        if not re.match("^(Pr|Vr|Cb|Re|Ch|Li)$",data['type']):
-            raise Exception("Erreur dans le type")
+            data['dc'] = self.options.dc
+
+        if not self.options.type:
+            data['type'] = unicode(raw_input("Typr [Pr, Vr, Cb, Re, Ch, Li] : "))
+            if not re.match(r"^(Pr|Vr|Cb|Re|Ch|Li)$", data['type']):
+                raise Exception("Erreur dans le type")
+        else:
+            data['type'] = self.options.type
+
         data['date'] = unicode(raw_input("date [YYYY/]DD/MM] :"))
-        if not re.match("^(201[0-9]\/)?\d{1,2}\/\d{1,2}$",data['date']):
+        if not re.match(r"^(201[0-9]\/)?\d{1,2}\/\d{1,2}$", data['date']):
             raise Exception("Erreur dans la date")
-        if re.match("^\d{2}\/\d{2}$",data['date']):
+        if re.match(r"^\d{2}\/\d{2}$", data['date']):
             data['date'] = str(date.today().year) + "/" + data['date']
         response = RequestServer.get_method("categorie", sort="?sort=count")
         list_categorie = response.json()
-        for i in range(1,4):
+        for i in range(1, 4):
             tmp_str = ""
             for categorie in list_categorie[(i-1)*5:i*5]:
                 tmp_str += "%d - %12s, " % (categorie['id'], categorie['nom'])
             print tmp_str[:-2]
+
         data['categorie'] = unicode(raw_input("categorie [consommation : 5] :"))
         if not data['categorie'].isnumeric():
             raise Exception("Erreur de categorie")
+
         print data
         response = RequestServer.post_method("ecriture", dumps(data))
         print response
