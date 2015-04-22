@@ -48,7 +48,7 @@ def default_banque(id):
 
 @app.get('/banque')
 @app.get('/banque/<id:int>')
-@app.get('/banque/<nom:re:[a-zA-Z\ ]+>')
+@app.get(r'/banque/<nom:re:[a-zA-Z\ ]+>')
 def list_banque(db, id=None, nom=None):
     """ Display information for banque """
     banques = db.query(Banque)
@@ -76,7 +76,7 @@ def list_banque(db, id=None, nom=None):
                             'code_guichet': banque.code_guichet})
     return dumps(list_banque)
 
-@app.put('/banque/<id:int>')
+@app.put(r'/banque/<id:int>')
 def update_banque(db, id=None):
     """ Update information for a banque """
     if not id:
@@ -150,7 +150,7 @@ def insert_banque(db):
     response.status = 201
     response.headers["Location"] = "/banque/%s" % (banque.id,)
 
-@app.delete('/banque/<id:int>')
+@app.delete(r'/banque/<id:int>')
 def delete_banque(db, id=None):
     """ Delete a banque """
     try:
@@ -164,10 +164,10 @@ def delete_banque(db, id=None):
 
 
 @app.get('/compte')
-@app.get('/compte/<id_compte:int>')
-@app.get('/compte/<nom:re:[a-zA-Z\ ]+>')
-@app.get('/banque/<id:int>/compte')
-@app.get('/banque/<id:int>/compte/<id_compte:int>')
+@app.get(r'/compte/<id_compte:int>')
+@app.get(r'/compte/<nom:re:[a-zA-Z\ ]+>')
+@app.get(r'/banque/<id:int>/compte')
+@app.get(r'/banque/<id:int>/compte/<id_compte:int>')
 @app.get('/banque/<id:int>/compte/<nom:re:[a-zA-Z\ ]+>')
 def list_compte(db, id=None, nom=None, id_compte=None):
     """ List compte """
@@ -198,7 +198,7 @@ def list_compte(db, id=None, nom=None, id_compte=None):
                             })
     return dumps(list_comptes)
 
-@app.put('/compte/<id:int>')
+@app.put(r'/compte/<id:int>')
 def update_compte(db, id=None):
     """ Update information for a compte """
     if not id:
@@ -276,7 +276,7 @@ def insert_compte(db):
     response.status = 201
     response.headers["Location"] = "/compte/%s" % (compte.id,)
 
-@app.delete('/compte/<id:int>')
+@app.delete(r'/compte/<id:int>')
 def delete_compte(db, id=None):
     """ Delete a compte """
     try:
@@ -289,14 +289,14 @@ def delete_compte(db, id=None):
     db.commit()
 
 @app.get('/ecriture')
-@app.get('/ecriture/<id:int>')
-@app.get('/ecriture/<nom:re:[a-zA-Z\ ]+>')
-@app.get('/compte/<id_compte:int>/ecriture')
-@app.get('/compte/<id_compte:int>/ecriture/<id:int>')
-@app.get('/compte/<id_compte:int>/ecriture/<nom:re:[a-zA-Z\ ]+>')
+@app.get(r'/ecriture/<id:int>')
+@app.get(r'/ecriture/<nom:re:[a-zA-Z\ ]+>')
+@app.get(r'/compte/<id_compte:int>/ecriture')
+@app.get(r'/compte/<id_compte:int>/ecriture/<id:int>')
+@app.get(r'/compte/<id_compte:int>/ecriture/<nom:re:[a-zA-Z\ ]+>')
 def list_ecriture(db, id=None, nom=None, id_compte=None):
     """ List compte """
-    
+
     ecritures = db.query(Ecriture, EcritureCategorie, Categorie).\
                    join(Ecriture.categories).\
                    join(EcritureCategorie.categorie)
@@ -328,17 +328,17 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                           'nombre': str(ecritures.nombre),
                          })
         if sort == 'nom':
-            ecritures = ecritures.order_by(Ecriture.nom).\
+            ecritures = ecritures.order_by(Ecriture.nom)
         elif sort == 'type':
-            ecritures = ecritures.order_by(Ecriture.nom).\
+            ecritures = ecritures.order_by(Ecriture.nom)
         elif sort == 'montant':
-            ecritures = ecritures.order_by(EcritureCategorie.montant
+            ecritures = ecritures.order_by(EcritureCategorie.montant)
         elif sort == 'categorie':
-            ecritures = ecritures.order_by(Categorie.nom).\
+            ecritures = ecritures.order_by(Categorie.nom)
         else:
-            ecritures = ecritures.order_by(Ecriture.date).\
+            ecritures = ecritures.order_by(Ecriture.date)
         ecritures = ecritures.all()
-        
+
         if filters == 'last_10':
             ecritures = ecritures[-10:]
         if filters == 'last_5':
@@ -352,7 +352,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
     for ecriture in ecritures:
         list_ecritures.append({'id': ecriture.Ecriture.id,
                                'nom': ecriture.Ecriture.nom,
-                               'date': datetime.strftime(ecriture.Ecriture.date,"%Y/%m/%d"),
+                               'date': datetime.strftime(ecriture.Ecriture.date, "%Y/%m/%d"),
                                'dc': ecriture.Ecriture.dc,
                                'type': ecriture.Ecriture.type,
                                'valide': ecriture.Ecriture.valide,
@@ -363,7 +363,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                               })
     return dumps(list_ecritures)
 
-@app.put('/ecriture/<id:int>')
+@app.put(r'/ecriture/<id:int>')
 def update_ecriture(db, id=None):
     """ Update information for an ecriture """
     if not id:
@@ -384,11 +384,11 @@ def update_ecriture(db, id=None):
                       one()
     except NoResultFound:
         abort(404, "ID not found")
-    
+
     if entity.has_key('nom'):
         ecriture.Ecriture.nom = entity["nom"]
     if entity.has_key('date'):
-        ecriture.Ecriture.date = datetime.strptime(entity["date"],"%Y/%m/%d")
+        ecriture.Ecriture.date = datetime.strptime(entity["date"], "%Y/%m/%d")
     if entity.has_key('dc'):
         ecriture.Ecriture.dc = entity["dc"]
     if entity.has_key('valide'):
@@ -431,10 +431,10 @@ def insert_ecriture(db):
     if not entity.has_key('type'):
         abort(404, 'type : non spécifié')
     ecriture = Ecriture(nom=entity["nom"],
-                          date=datetime.strptime(entity["date"],"%Y/%m/%d"),
-                          dc=entity["dc"],
-                          compte_id=entity["compte_id"],
-                          type=entity["type"],)
+                        date=datetime.strptime(entity["date"], "%Y/%m/%d"),
+                        dc=entity["dc"],
+                        compte_id=entity["compte_id"],
+                        type=entity["type"],)
     if entity.has_key('valide'):
         if entity["valide"].isnumeric():
             ecriture.valide = entity["valide"]
@@ -449,7 +449,7 @@ def insert_ecriture(db):
         db.commit()
     except IntegrityError:
         abort(404, 'Integrity Error')
-    
+
     ecriture_categorie = EcritureCategorie(montant=int(Decimal(entity["montant"])*100),
                                            ecriture_id=ecriture.id,)
     if entity.has_key('description'):
@@ -472,8 +472,8 @@ def insert_ecriture(db):
     response.headers["Location"] = "/ecriture/%s/" % (ecriture.id,)
 
 @app.get('/categorie')
-@app.get('/categorie/<id:int>')
-@app.get('/categorie/<nom:re:[a-zA-Z\ ]+>')
+@app.get(r'/categorie/<id:int>')
+@app.get(r'/categorie/<nom:re:[a-zA-Z\ ]+>')
 def list_categorie(db, id=None, nom=None, id_compte=None):
     """ List categorie """
     sort = request.query.sort
@@ -499,8 +499,8 @@ def list_categorie(db, id=None, nom=None, id_compte=None):
     list_categories = []
     for categorie in categories:
         list_categories.append({'id': categorie.id,
-                               'nom': categorie.nom,
-                               'count': categorie.count,
+                                'nom': categorie.nom,
+                                'count': categorie.count,
                                })
     return dumps(list_categories)
 
