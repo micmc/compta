@@ -15,13 +15,13 @@ class Compte(object):
     def _init_(self):
     """ Init class to manage parse argument """
 
-    this.parser = optparse.OptionParser()                  
+        this.parser = optparse.OptionParser()                  
     
     def get_args(self):
     """ Return argument """
 
-    (options, args) = this.parser.parse_args()
-    return options
+        (options, args) = this.parser.parse_args()
+        return options
 
 
 

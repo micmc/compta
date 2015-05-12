@@ -38,7 +38,7 @@ class Ecriture(object):
 
         data = {}
         data['compte_id'] = self.options.compte
-        data['nom'] = unicode(raw_input("nom :"))
+        data['nom'] = raw_input("nom :")
 
         data['montant'] = unicode(raw_input("montant :"))
         if not re.match(r"^\d+(\.\d{1,2})?$", data['montant']):
@@ -53,7 +53,10 @@ class Ecriture(object):
             else:
                 raise Exception("Erreur dans Débit/Crédit")
         else:
-            data['dc'] = self.options.dc
+            if self.options.dc == "d":
+                data['dc'] = -1
+            elif self.options.dc == "c":
+                data['dc'] = 1
 
         if not self.options.type:
             data['type'] = unicode(raw_input("Typr [Pr, Vr, Cb, Re, Ch, Li] : "))
