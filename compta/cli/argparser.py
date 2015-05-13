@@ -73,7 +73,7 @@ class ParseEcriture(ParseArgs):
                                           help='id of the compte',
                                          )
         self.parser_ecriture.add_argument('-f', '--filter',
-                                          help='filter for compte',
+                                          help='filter for compte, must be a number to print or sum',
                                          )
         self.parser_ecriture.add_argument('-s', '--sort',
                                           help='sort for compte',

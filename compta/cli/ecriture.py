@@ -23,15 +23,33 @@ class Ecriture(object):
 
         id = None
         compte = None
+        filter = None
+        sort = None
         if self.options.id:
             id = self.options.id
         if self.options.compte:
             compte = self.options.compte
+        if self.options.filter:
+            filter = self.options.filter
+        if self.options.sort:
+            sort = self.options.sort
         #rqst = RequestServer('localhost', '8080')
         #print rqst.get('ecriture')
-        response = RequestServer.get_method("ecriture", ecriture=id, compte=compte)
-        for response in response.json():
-            print response
+        response = RequestServer.get_method("ecriture",
+                                            ecriture=id,
+                                            compte=compte,
+                                            filter=filter,
+                                            sort=sort
+                                           )
+        tmp_response = response.json()
+        if isinstance(tmp_response, list):
+            for response in tmp_response:
+                print response
+        elif isinstance(tmp_response, dict):
+            for k,v in tmp_response.iteritems():
+                print "%s -> %s" % (k,v)
+        else:
+            print tmp_response
 
     def insert_ecriture(self):
         """ Insert an ecriture """

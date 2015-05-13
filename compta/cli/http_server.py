@@ -40,35 +40,39 @@ class RequestServer(object):
                    compte=None,
                    ecriture=None,
                    categorie=None,
+                   filter=None,
                    sort=None):
         """ Static fabric method """
 
-        filter = ""
+        str_url = ""
+        str_filter = ""
         if method == "banque":
             rqst = RequestServerBanque()
             if banque:
-                filter = "/%s" % (banque,)
-            return rqst.get(filter=filter)
+                str_url = "/%s" % (banque,)
+            return rqst.get(url=str_url)
         elif method == "compte":
             rqst = RequestServerCompte()
             if banque:
-                filter = "/%s/compte" % (banque,)
+                str_url = "/%s/compte" % (banque,)
             elif compte:
-                filter += "/%s" % (compte,)
+                str_url += "/%s" % (compte,)
         elif method == "ecriture":
             rqst = RequestServerEcriture()
             if compte:
                 rqst = RequestServerCompte()
-                filter = "/%s/ecriture" % (compte,)
+                str_url = "/%s/ecriture" % (compte,)
             if ecriture:
-                filter += "/%s" % (ecriture,)
+                str_url += "/%s" % (ecriture,)
         elif method == "categorie":
             rqst = RequestServerCategorie()
             if categorie:
-                filter += "/%s" % (categorie,)
+                str_url += "/%s" % (categorie,)
+        if filter:
+            str_filter = "?filter=%s" % filter
         if sort:
-            filter += sort
-        return rqst.get(filter=filter)
+            str_filter += "&sort=%s" % sort
+        return rqst.get(url=str_url, filter=str_filter)
 
 
     @classmethod

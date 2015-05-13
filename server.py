@@ -2,6 +2,8 @@
 # -*- coding: utf8 -*-
 """ Application to create server for compta """
 
+import re
+
 from bottle import Bottle
 from bottle import response, request, abort
 from json import dumps, loads
@@ -295,9 +297,29 @@ def delete_compte(db, id=None):
 @app.get(r'/compte/<id_compte:int>/ecriture/<id:int>')
 @app.get(r'/compte/<id_compte:int>/ecriture/<nom:re:[a-zA-Z\ ]+>')
 def list_ecriture(db, id=None, nom=None, id_compte=None):
-    """ List compte """
+    """ List compte
+        Filter to use :
+        filter = [1-9]+ / sum : give number or sum
+        sort = field1,[field2,...] : sort by field
+        field = field1,[field2,...] : field to return
+        page = [1-9]+ / first / last : print by page
+        valide = yes / no : print valide or not valide
+    """
 
-    ecritures = db.query(Ecriture, EcritureCategorie, Categorie).\
+    filter = request.query.filter
+    valide = request.query.valide
+    sort = request.query.sort
+    field = request.query.field
+    page = request.query.page
+
+    ecritures = db.query(Ecriture.id.label("id"),
+                         func.trim(Ecriture.nom).label("nom"),
+                         Ecriture.date.label("date"),
+                         (EcritureCategorie.montant * Ecriture.dc).label("montant"),
+                         Ecriture.type.label("type"),
+                         Categorie.nom.label("categorie"),
+                         EcritureCategorie.description.label("description")
+                        ).\
                    join(Ecriture.categories).\
                    join(EcritureCategorie.categorie)
     if id_compte:
@@ -307,16 +329,11 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
     if id:
         ecritures = ecritures.filter(Ecriture.id == id)
     try:
-        filters = request.query.filters
-        valide = request.query.valide
-        somme = request.query.somme
-        sort = request.query.sort
-
         if valide == "yes":
             ecritures = ecritures.filter(Ecriture.valide == True)
         elif valide == "no":
             ecritures = ecritures.filter(Ecriture.valide == False)
-        if somme == 'yes':
+        if filter == 'sum':
             ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
                                  (func.sum(Ecriture.dc * EcritureCategorie.montant).label("somme")/100.0).label("somme")).\
                            join(Ecriture.categories)
@@ -324,25 +341,24 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                 ecritures = ecritures.filter(Ecriture.compte_id == id_compte)
             ecritures = ecritures.order_by(Ecriture.date).\
                                   one()
-            return dumps({'somme': "%0.2f" % (ecritures.somme,),
-                          'nombre': str(ecritures.nombre),
+            return dumps({'somme': "%0.2f" % ecritures.somme,
+                          'nombre': "%d" % ecritures.nombre,
                          })
-        if sort == 'nom':
-            ecritures = ecritures.order_by(Ecriture.nom)
-        elif sort == 'type':
-            ecritures = ecritures.order_by(Ecriture.nom)
-        elif sort == 'montant':
-            ecritures = ecritures.order_by(EcritureCategorie.montant)
-        elif sort == 'categorie':
-            ecritures = ecritures.order_by(Categorie.nom)
-        else:
-            ecritures = ecritures.order_by(Ecriture.date)
+        for lst_sort in sort.split(','):
+            if lst_sort == 'nom':
+                ecritures = ecritures.order_by(Ecriture.nom)
+            elif lst_sort == 'type':
+                ecritures = ecritures.order_by(Ecriture.type)
+            elif lst_sort == 'montant':
+                ecritures = ecritures.order_by(EcritureCategorie.montant)
+            elif lst_sort == 'categorie':
+                ecritures = ecritures.order_by(Categorie.nom)
+        ecritures = ecritures.order_by(desc(Ecriture.date))
+        print ecritures
         ecritures = ecritures.all()
 
-        if filters == 'last_10':
-            ecritures = ecritures[-10:]
-        if filters == 'last_5':
-            ecritures = ecritures[-5:]
+        if re.match(r"^\d+$", filter):
+            ecritures = ecritures[:int(filter):]
 
     except NoResultFound:
         abort(404, "ID not found")
@@ -350,16 +366,16 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
         abort(404, "ID not found")
     list_ecritures = []
     for ecriture in ecritures:
-        list_ecritures.append({'id': ecriture.Ecriture.id,
-                               'nom': ecriture.Ecriture.nom,
-                               'date': datetime.strftime(ecriture.Ecriture.date, "%Y/%m/%d"),
-                               'dc': ecriture.Ecriture.dc,
-                               'type': ecriture.Ecriture.type,
-                               'valide': ecriture.Ecriture.valide,
-                               'compte_id': ecriture.Ecriture.compte_id,
-                               'categorie': ecriture.Categorie.nom,
-                               'montant': "%0.2f" %(ecriture.EcritureCategorie.montant/100,),
-                               'description': ecriture.EcritureCategorie.description,
+        list_ecritures.append({'id': ecriture.id,
+                               'nom': ecriture.nom,
+                               'date': datetime.strftime(ecriture.date, "%Y/%m/%d"),
+                               #'dc': ecriture.Ecriture.dc,
+                               'type': ecriture.type,
+                               #'valide': ecriture.Ecriture.valide,
+                               #'compte_id': ecriture.Ecriture.compte_id,
+                               'categorie': ecriture.categorie,
+                               'montant': "%0.2f" %(ecriture.montant/100,),
+                               'description': ecriture.description,
                               })
     return dumps(list_ecritures)
 
