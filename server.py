@@ -3,6 +3,7 @@
 """ Application to create server for compta """
 
 import re
+import locale
 
 from bottle import Bottle
 from bottle import response, request, abort
@@ -29,7 +30,8 @@ app = Bottle()
 
 def main():
     """ Main Page """
-    engine = create_engine('sqlite:///./db/compta.db', echo=False)
+    locale.setlocale(locale.LC_ALL, '')
+    engine = create_engine('sqlite:///./db/compta.test', echo=False)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     plugin = sqlalchemy.Plugin(engine, Base.metadata, create=False)
@@ -354,7 +356,6 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
             elif lst_sort == 'categorie':
                 ecritures = ecritures.order_by(Categorie.nom)
         ecritures = ecritures.order_by(desc(Ecriture.date))
-        print ecritures
         ecritures = ecritures.all()
 
         if re.match(r"^\d+$", filter):
@@ -466,7 +467,7 @@ def insert_ecriture(db):
     except IntegrityError:
         abort(404, 'Integrity Error')
 
-    ecriture_categorie = EcritureCategorie(montant=int(Decimal(entity["montant"])*100),
+    ecriture_categorie = EcritureCategorie(montant=int(locale.atof(entity["montant"])*100),
                                            ecriture_id=ecriture.id,)
     if entity.has_key('description'):
         ecriture_categorie.description = entity["description"]
@@ -500,12 +501,12 @@ def list_categorie(db, id=None, nom=None, id_compte=None):
         categories = categories.filter(Categorie.nom == nom)
     if id:
         categories = categories.filter(Categorie.id == id)
-    if sort == "id":
-        categories = categories.order_by(Categorie.id)
-    elif sort == "count":
-        categories = categories.order_by(desc('count'))
-    else:
-        categories = categories.order_by(Categorie.nom)
+    for lst_sort in sort.split(','):
+        if sort == "id":
+            categories = categories.order_by(Categorie.id)
+        elif sort == "count":
+            categories = categories.order_by(desc('count'))
+    categories = categories.order_by(Categorie.nom)
     try:
         categories = categories.all()
     except NoResultFound:

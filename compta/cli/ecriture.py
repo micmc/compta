@@ -3,6 +3,7 @@
 """ Class to manage ecriture table by cli command """
 
 import re
+import locale
 
 from json import dumps
 from datetime import date
@@ -59,7 +60,7 @@ class Ecriture(object):
         data['nom'] = raw_input("nom :")
 
         data['montant'] = unicode(raw_input("montant :"))
-        if not re.match(r"^\d+(\.\d{1,2})?$", data['montant']):
+        if not re.match(r"^\d+([\.,]\d{1,2})?$", data['montant']):
             raise Exception("Erreur dans le montant")
 
         if not self.options.dc:
@@ -88,7 +89,7 @@ class Ecriture(object):
             raise Exception("Erreur dans la date")
         if re.match(r"^\d{2}\/\d{2}$", data['date']):
             data['date'] = str(date.today().year) + "/" + data['date']
-        response = RequestServer.get_method("categorie", sort="?sort=count")
+        response = RequestServer.get_method("categorie", filter="", sort="count")
         list_categorie = response.json()
         for i in range(1, 4):
             tmp_str = ""
@@ -106,6 +107,9 @@ class Ecriture(object):
 
 
 def main():
+    locale.setlocale(locale.LC_ALL, '')
+    # print local configuration 
+    #locale.getlocale()
     ecriture = Ecriture()
     if ecriture.options.cmd == 'list':
         ecriture.list_ecriture()
