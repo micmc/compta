@@ -24,7 +24,7 @@ def main():
     """ Main Page """
 
     #Initialize database engine
-    engine = create_engine('sqlite:///./db/compta.test', echo=False)
+    engine = create_engine('sqlite:///./db/compta.db', echo=False)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
 
@@ -61,7 +61,7 @@ def main():
     #Read xml file
     tree = ElementTree()
     tree.parse(options.file_import)
-    xml_lines = tree.getiterator('Requete_export')
+    xml_lines = tree.getiterator(u'Requête_export')
     #compte = Compte(pk=options.compte_index)
     tmp_cpt = 1
     for xml_line in xml_lines:

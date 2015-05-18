@@ -70,9 +70,9 @@ class RequestServer(object):
                 str_url += "/%s" % (categorie,)
         if filter:
             str_filter = "?filter=%s" % filter
-        if sort and filter:
+        elif sort and filter:
             str_filter += "&sort=%s" % sort
-        else:
+        elif sort:
             str_filter += "?sort=%s" % sort
         return rqst.get(url=str_url, filter=str_filter)
 
