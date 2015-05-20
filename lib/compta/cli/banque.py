@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
+""" module to manage banque """
 
-from argparser import ParseArgs
-from http_server import RequestServer
+from compta.cli.argparser import ParseArgs
+from compta.cli.http_server import RequestServer
 
 class Banque(object):
     """ Default class to manage banque """
@@ -27,8 +28,9 @@ class Banque(object):
                                             banque["code_banque"],
                                             banque["code_guichet"]
                                            )
-    
+
 def main():
+    """ Main function """
     banque = Banque()
     if banque.options.cmd == 'list':
         banque.list_banque()

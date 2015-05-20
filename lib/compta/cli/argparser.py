@@ -76,7 +76,10 @@ class ParseCompte(ParseArgs):
                                         help='Type',
                                        )
         self.parser_compte.add_argument('-a', '--archive', action='store_true',
-                                        help='show archive also, default [no]'
+                                        help='show only archive default [no]'
+                                       )
+        self.parser_compte.add_argument('--all', action='store_true',
+                                        help='show all default [no]'
                                        )
         self.parser_compte.add_argument('-s', '--sort',
                                         help='sort for compte',
@@ -120,6 +123,12 @@ class ParseEcriture(ParseArgs):
         self.parser_ecriture.add_argument('-t', '--type',
                                           choices=["Pr", "Vr", "Cb", "Re", "Ch", "Li"],
                                           help='Type',
+                                         )
+        self.parser_ecriture.add_argument('-n', '--unvalid', action='store_true',
+                                          help='show only no-valid, default [all]'
+                                         )
+        self.parser_ecriture.add_argument('-v', '--valid', action='store_true',
+                                          help='show only valid, default [all]'
                                          )
     def get_args(self):
         """ Return argument """

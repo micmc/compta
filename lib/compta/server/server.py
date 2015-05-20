@@ -31,7 +31,7 @@ app = Bottle()
 def main():
     """ Main Page """
     locale.setlocale(locale.LC_ALL, '')
-    engine = create_engine('sqlite:///./db/compta.db', echo=False)
+    engine = create_engine('sqlite:///../../../db/compta.db', echo=False)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     plugin = sqlalchemy.Plugin(engine, Base.metadata, create=False)

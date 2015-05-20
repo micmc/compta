@@ -24,31 +24,35 @@ class Ecriture(object):
 
         id = None
         compte = None
-        filter = None
-        sort = None
+        filter = {}
         if self.options.id:
             id = self.options.id
         if self.options.compte:
             compte = self.options.compte
         if self.options.filter:
-            filter = self.options.filter
+            filter["filter"] = self.options.filter
+        if self.options.valid:
+            filter["valide"] = "yes"
+        if self.options.unvalid:
+            filter["valide"] = "no"
         if self.options.sort:
-            sort = self.options.sort
+            sort["sort"] = self.options.sort
         #rqst = RequestServer('localhost', '8080')
         #print rqst.get('ecriture')
+        if not filter:
+            filter = None
         response = RequestServer.get_method("ecriture",
                                             ecriture=id,
                                             compte=compte,
-                                            filter=filter,
-                                            sort=sort
+                                            filter=filter
                                            )
         tmp_response = response.json()
         if isinstance(tmp_response, list):
             for response in tmp_response:
                 print response
         elif isinstance(tmp_response, dict):
-            for k,v in tmp_response.iteritems():
-                print "%s -> %s" % (k,v)
+            for k, v in tmp_response.iteritems():
+                print "%s -> %s" % (k, v)
         else:
             print tmp_response
 
@@ -107,8 +111,9 @@ class Ecriture(object):
 
 
 def main():
+    """ Main function """
     locale.setlocale(locale.LC_ALL, '')
-    # print local configuration 
+    # print local configuration
     #locale.getlocale()
     ecriture = Ecriture()
     if ecriture.options.cmd == 'list':

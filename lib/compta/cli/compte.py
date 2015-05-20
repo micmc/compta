@@ -1,8 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
+""" Module to manage compte """
 
-from argparser import ParseArgs
-from http_server import RequestServer
+from compta.cli.argparser import ParseArgs
+from compta.cli.http_server import RequestServer
 
 class Compte(object):
     """ Default class to manage compte """
@@ -17,17 +18,17 @@ class Compte(object):
 
         id = None
         filter = {}
-        sort = None
         if self.options.id:
             id = self.options.id
         if self.options.type:
             filter["filter"] = self.options.type
         if self.options.sort:
             filter["sort"] = self.options.sort
-        if self.options.archive:
-            filter["archive"] = "yes"
-        else:
-            filter["archive"] = "no"
+        if not self.options.all:
+            if self.options.archive:
+                filter["archive"] = "yes"
+            else:
+                filter["archive"] = "no"
         #rqst = RequestServer('localhost', '8080')
         #print rqst.get('compte')
         rqst = RequestServer.get_method("compte",
@@ -42,6 +43,7 @@ class Compte(object):
                                         )
 
 def main():
+    """ Main function """
     compte = Compte()
     if compte.options.cmd == 'list':
         compte.list_compte()
