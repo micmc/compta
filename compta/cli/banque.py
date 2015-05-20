@@ -1,18 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 
-import sys     
-import os      
-import string
-
-from decimal import Decimal
-from datetime import datetime
-
 from argparser import ParseArgs
 from http_server import RequestServer
 
 class Banque(object):
-    """ Default class to manage compte """
+    """ Default class to manage banque """
 
     def __init__(self):
         """ Init class to manage parse argument """
@@ -20,6 +13,7 @@ class Banque(object):
         self.options = ParseArgs.get_method("banque")
 
     def list_banque(self):
+        """ List banque account """
         if self.options.id:
             pass
         #rqst = RequestServer('localhost', '8080')
