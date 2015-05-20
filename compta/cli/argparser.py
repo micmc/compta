@@ -28,6 +28,8 @@ class ParseArgs(object):
 
         if method == "banque":
             return ParseBanque().get_args()
+        elif method == "compte":
+            return ParseCompte().get_args()
         elif method == "ecriture":
             return ParseEcriture().get_args()
 
@@ -40,7 +42,6 @@ class ParseBanque(ParseArgs):
 
         # Create banque object
         self.parser_banque = self.subparsers.add_parser('banque', help='banque help')
-        self.parser_test = self.subparsers.add_parser('test', help='banque help')
         self.parser_banque.add_argument('cmd',
                                         help='command to pass [list, update, delete, insert]',
                                         choices=('list', 'insert', 'update', 'delete'))
@@ -52,6 +53,28 @@ class ParseBanque(ParseArgs):
         """ Return argument """
         sys.argv[0] = 'banque'
         return self.parser.parse_args(sys.argv)
+
+class ParseCompte(ParseArgs):
+    """ Class for create compte object """
+
+    def __init__(self, **kwargs):
+        """ Initialize default class """
+        ParseArgs.__init__(self, **kwargs)
+
+        # Create compte object
+        self.parser_compte = self.subparsers.add_parser('compte', help='compte help')
+        self.parser_compte.add_argument('cmd',
+                                        help='command to pass [list, update, delete, insert]',
+                                        choices=('list', 'insert', 'update', 'delete'))
+        self.parser_compte.add_argument('-i', '--id', type=int,
+                                        help='id of the compte',
+                                        nargs=1)
+
+    def get_args(self):
+        """ Return argument """
+        sys.argv[0] = 'compte'
+        return self.parser.parse_args(sys.argv)
+
 
 class ParseEcriture(ParseArgs):
     """ Class for create ecriture object """
