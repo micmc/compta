@@ -61,7 +61,8 @@ class Ecriture(object):
 
         data = {}
         data['compte_id'] = self.options.compte
-        data['nom'] = raw_input("nom :")
+        if not self.options.type in ["Pr", "Vr"]:
+           data['nom'] = raw_input("nom :")
 
         data['montant'] = unicode(raw_input("montant :"))
         if not re.match(r"^\d+([\.,]\d{1,2})?$", data['montant']):
@@ -88,12 +89,36 @@ class Ecriture(object):
         else:
             data['type'] = self.options.type
 
+        if data['type'] == 'Pr':
+            return_prv = RequestServer.get_method("compte",
+                                                  filter="prv"
+                                                 )
+            i = 1
+            list_prv = []
+            for prs in return_prv.json():
+                print "%d - %s" % (i, prs['nom'])
+                list_prv.append(prs['nom'])
+                i += 1
+            input_type = raw_input("Prélèvement :")
+            data['nom'] = list_prv[int(input_type)-1]
+        if data['type'] == 'Vr':
+            return_vir = RequestServer.get_method("compte",
+                                                  filter="vir"
+                                                 )
+            i = 1
+            list_vir = []
+            for vir in return_vir.json():
+                print "%d - %s" % (i, vir['nom'])
+                list_vir.append(vir['nom'])
+                i += 1
+            input_type = raw_input("Virement :")
+            data['nom'] = list_vir[int(input_type)-1]
         data['date'] = unicode(raw_input("date [YYYY/]DD/MM] :"))
         if not re.match(r"^(201[0-9]\/)?\d{1,2}\/\d{1,2}$", data['date']):
             raise Exception("Erreur dans la date")
         if re.match(r"^\d{2}\/\d{2}$", data['date']):
             data['date'] = str(date.today().year) + "/" + data['date']
-        response = RequestServer.get_method("categorie", filter="", sort="count")
+        response = RequestServer.get_method("categorie", filter={"sort": "count"})
         list_categorie = response.json()
         for i in range(1, 4):
             tmp_str = ""
