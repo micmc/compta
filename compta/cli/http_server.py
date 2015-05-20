@@ -40,8 +40,8 @@ class RequestServer(object):
                    compte=None,
                    ecriture=None,
                    categorie=None,
-                   filter=None,
-                   sort=None):
+                   filter=None
+                  ):
         """ Static fabric method """
 
         str_url = ""
@@ -69,11 +69,13 @@ class RequestServer(object):
             if categorie:
                 str_url += "/%s" % (categorie,)
         if filter:
-            str_filter = "?filter=%s" % filter
-        elif sort and filter:
-            str_filter += "&sort=%s" % sort
-        elif sort:
-            str_filter += "?sort=%s" % sort
+            if isinstance(filter, str):
+                str_filter = "?filter=%s" % filter
+            elif isinstance(filter, dict):
+                str_filter = "?"
+                for k, v in filter.iteritems():
+                    str_filter += "%s=%s&" % (k, v)
+                str_filter = str_filter[:-1]
         return rqst.get(url=str_url, filter=str_filter)
 
 

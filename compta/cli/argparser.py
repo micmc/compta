@@ -65,10 +65,22 @@ class ParseCompte(ParseArgs):
         self.parser_compte = self.subparsers.add_parser('compte', help='compte help')
         self.parser_compte.add_argument('cmd',
                                         help='command to pass [list, update, delete, insert]',
-                                        choices=('list', 'insert', 'update', 'delete'))
+                                        choices=('list', 'insert', 'update', 'delete')
+                                       )
         self.parser_compte.add_argument('-i', '--id', type=int,
                                         help='id of the compte',
-                                        nargs=1)
+                                        nargs=1
+                                       )
+        self.parser_compte.add_argument('-t', '--type',
+                                        choices=['dif', 'div', 'prs', 'prv', 'vir'],
+                                        help='Type',
+                                       )
+        self.parser_compte.add_argument('-a', '--archive', action='store_true',
+                                        help='show archive also, default [no]'
+                                       )
+        self.parser_compte.add_argument('-s', '--sort',
+                                        help='sort for compte',
+                                       )
 
     def get_args(self):
         """ Return argument """
@@ -99,7 +111,7 @@ class ParseEcriture(ParseArgs):
                                           help='filter for compte, must be a number to print or sum',
                                          )
         self.parser_ecriture.add_argument('-s', '--sort',
-                                          help='sort for compte',
+                                          help='sort for ecriture',
                                          )
         self.parser_ecriture.add_argument('-d', '--dc',
                                           choices=["d", "c"],

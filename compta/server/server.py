@@ -174,7 +174,15 @@ def delete_banque(db, id=None):
 @app.get(r'/banque/<id:int>/compte/<id_compte:int>')
 @app.get('/banque/<id:int>/compte/<nom:re:[a-zA-Z\ ]+>')
 def list_compte(db, id=None, nom=None, id_compte=None):
-    """ List compte """
+    """ List compte 
+        filter to use :
+        filter = ['dif', 'div', 'prs', 'prv', 'vir']
+        archive = yes / no : print archive or not archive
+    """
+ 
+    filter = request.query.filter
+    archive = request.query.archive
+
     comptes = db.query(Compte)
     if id:
         comptes = comptes.join(Compte.banque).\
@@ -183,6 +191,19 @@ def list_compte(db, id=None, nom=None, id_compte=None):
         comptes = comptes.filter(Compte.nom == nom)
     if id_compte:
         comptes = comptes.filter(Compte.id == id_compte)
+
+    if filter:
+        type_compte = ['dif', 'div', 'prs', 'prv', 'vir']
+        if filter in type_compte:
+            comptes = comptes.filter(Compte.type == filter)
+        else:
+            abort(404, "filter not found")
+
+    if archive == "yes":
+        comptes = comptes.filter(Compte.archive == True)
+    elif archive == "no":
+        comptes = comptes.filter(Compte.archive == False)
+
     try:
         comptes = comptes.order_by(Compte.nom).\
                           all()
