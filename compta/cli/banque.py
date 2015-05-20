@@ -25,8 +25,14 @@ class Banque(object):
         #rqst = RequestServer('localhost', '8080')
         #print rqst.get('banque')
         rqst = RequestServer.get_method("banque")
-        print rqst.json()
-
+        for banque in rqst.json():
+            print "%s, %s %s %s - %s %s" % (banque["nom"],
+                                            banque["adresse"],
+                                            banque["cp"],
+                                            banque["ville"],
+                                            banque["code_banque"],
+                                            banque["code_guichet"]
+                                           )
     
 def main():
     banque = Banque()
