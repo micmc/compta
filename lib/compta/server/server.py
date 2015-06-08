@@ -485,6 +485,9 @@ def insert_ecriture(db):
             ecriture.valide = False
     else:
         ecriture.valide = False
+    if entity.has_key('nom_id'):
+        ecriture.nom_id = entity["nom_id"]
+
     db.add(ecriture)
     try:
         db.commit()
@@ -505,6 +508,7 @@ def insert_ecriture(db):
                        one()
         ecriture_categorie.categorie_id = categorie.id
     db.add(ecriture_categorie)
+
     try:
         db.commit()
     except IntegrityError:
