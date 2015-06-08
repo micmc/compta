@@ -30,4 +30,7 @@ class Compte(Base):
     type = Column(Enum('dif','div','prs','prv','vir', name="compte_type_enum"), nullable=False)
     archive = Column(Boolean, default=False)
     banque_id = Column(Integer, ForeignKey('banque.id'), nullable=False)
-    ecritures= relationship('Ecriture', backref='compte')
+    ecritures= relationship('Ecriture',
+                            foreign_keys='Ecriture.compte_id',
+                            backref='compte'
+                           )
