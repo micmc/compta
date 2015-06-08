@@ -9,7 +9,7 @@ from bottle import Bottle
 from bottle import response, request, abort
 from json import dumps, loads
 from datetime import datetime
-from decimal import Decimal
+#from decimal import Decimal
 
 from bottle.ext import sqlalchemy
 #from sqlalchemy import create_engine, Column, Integer, Sequence, String
@@ -30,7 +30,10 @@ app = Bottle()
 
 def main():
     """ Main Page """
-    locale.setlocale(locale.LC_ALL, '')
+    if locale.getdefaultlocale()[0] != 'fr_FR':
+        locale.setlocale(locale.LC_ALL,'fr_FR.utf8')
+    else:
+        locale.setlocale(locale.LC_ALL, '')
     engine = create_engine('sqlite:///../../../db/compta.db', echo=False)
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
@@ -396,7 +399,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                                #'valide': ecriture.Ecriture.valide,
                                #'compte_id': ecriture.Ecriture.compte_id,
                                'categorie': ecriture.categorie,
-                               'montant': "%0.2f" %(ecriture.montant/100,),
+                               'montant': "%0.2f" %(ecriture.montant/100.0,),
                                'description': ecriture.description,
                               })
     return dumps(list_ecritures)
@@ -437,7 +440,7 @@ def update_ecriture(db, id=None):
         else:
             ecriture.Ecriture.valide = False
     if entity.has_key('montant'):
-        ecriture.EcritureCategorie.montant = (int(Decimal(entity["montant"])*100))
+        ecriture.EcritureCategorie.montant = (int(locale.atof(entity["montant"])*100))
     if entity.has_key('type'):
         ecriture.Ecriture.type = entity["type"]
     if entity.has_key('description'):
