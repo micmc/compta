@@ -46,6 +46,8 @@ class Ecriture(object):
                                             compte=compte,
                                             filter=filter
                                            )
+        if response.status_code == 404:
+            return 1
         tmp_response = response.json()
         if isinstance(tmp_response, list):
             for response in tmp_response:

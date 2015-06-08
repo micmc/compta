@@ -36,11 +36,12 @@ class Compte(object):
                                         filter=filter
                                        )
         for compte in rqst.json():
-            print "%s / %s, %s -  %s" % (compte["nom"],
-                                         compte["type"],
-                                         compte["numero"],
-                                         compte["cle"]
-                                        )
+            print "(%2d) - %s / %s, %s -  %s" % (compte["id"],
+                                                 compte["nom"],
+                                                 compte["type"],
+                                                 compte["numero"],
+                                                 compte["cle"]
+                                               )
 
 def main():
     """ Main function """
