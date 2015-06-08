@@ -121,7 +121,7 @@ class ParseEcriture(ParseArgs):
                                           help='Débit/Crédit',
                                          )
         self.parser_ecriture.add_argument('-t', '--type',
-                                          choices=["Pr", "Vr", "Cb", "Re", "Ch", "Li"],
+                                          choices=["Pr", "Vr", "Cb", "Re", "Ch", "Li","Prs"],
                                           help='Type',
                                          )
         self.parser_ecriture.add_argument('-n', '--unvalid', action='store_true',
@@ -129,6 +129,9 @@ class ParseEcriture(ParseArgs):
                                          )
         self.parser_ecriture.add_argument('-v', '--valid', action='store_true',
                                           help='show only valid, default [all]'
+                                         )
+        self.parser_ecriture.add_argument('--description',
+                                          help='Description',
                                          )
     def get_args(self):
         """ Return argument """

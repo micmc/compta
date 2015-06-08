@@ -3,13 +3,13 @@
 """ Class to manage ecriture table by cli command """
 
 import re
-import locale
+#import locale
 
 from json import dumps
 from datetime import date
 
-from argparser import ParseArgs
-from http_server import RequestServer
+from compta.cli.argparser import ParseArgs
+from compta.cli.http_server import RequestServer
 
 class Ecriture(object):
     """ Default class to manage compte """
@@ -36,7 +36,7 @@ class Ecriture(object):
         if self.options.unvalid:
             filter["valide"] = "no"
         if self.options.sort:
-            sort["sort"] = self.options.sort
+            sort = self.options.sort
         #rqst = RequestServer('localhost', '8080')
         #print rqst.get('ecriture')
         if not filter:
@@ -44,7 +44,8 @@ class Ecriture(object):
         response = RequestServer.get_method("ecriture",
                                             ecriture=id,
                                             compte=compte,
-                                            filter=filter
+                                            filter=filter,
+                                            sort=sort,
                                            )
         if response.status_code == 404:
             return 1
@@ -63,8 +64,8 @@ class Ecriture(object):
 
         data = {}
         data['compte_id'] = self.options.compte
-        if not self.options.type in ["Pr", "Vr"]:
-           data['nom'] = raw_input("nom :")
+        if not self.options.type in ["Pr", "Vr", "Prs"]:
+            data['nom'] = raw_input("nom :")
 
         data['montant'] = unicode(raw_input("montant :"))
         if not re.match(r"^\d+([\.,]\d{1,2})?$", data['montant']):
@@ -90,31 +91,30 @@ class Ecriture(object):
                 raise Exception("Erreur dans le type")
         else:
             data['type'] = self.options.type
-
-        if data['type'] == 'Pr':
-            return_prv = RequestServer.get_method("compte",
-                                                  filter="prv"
-                                                 )
+            if self.options.type == 'Pr':
+                return_compte = RequestServer.get_method("compte",
+                                                         filter="prv"
+                                                        )
+            elif self.options.type == 'Vr':
+                return_compte = RequestServer.get_method("compte",
+                                                         filter="vir"
+                                                        )
+            elif self.options.type == 'Prs':
+                return_compte = RequestServer.get_method("compte",
+                                                         filter="prs"
+                                                        )
+                data['type'] = 'Vr'
             i = 1
-            list_prv = []
-            for prs in return_prv.json():
+            list_compte = []
+            for prs in return_compte.json():
                 print "%d - %s" % (i, prs['nom'])
-                list_prv.append(prs['nom'])
-                i += 1
-            input_type = raw_input("Prélèvement :")
-            data['nom'] = list_prv[int(input_type)-1]
-        if data['type'] == 'Vr':
-            return_vir = RequestServer.get_method("compte",
-                                                  filter="vir"
-                                                 )
-            i = 1
-            list_vir = []
-            for vir in return_vir.json():
-                print "%d - %s" % (i, vir['nom'])
-                list_vir.append(vir['nom'])
+                list_compte.append((prs['nom'], prs['id']))
                 i += 1
             input_type = raw_input("Virement :")
-            data['nom'] = list_vir[int(input_type)-1]
+            data['nom'] = list_compte[int(input_type)-1][0]
+            data['nom_id'] = list_compte[int(input_type)-1][1]
+        if self.options.description:
+            date['description'] = self.options.description
         data['date'] = unicode(raw_input("date [YYYY/]DD/MM] :"))
         if not re.match(r"^(201[0-9]\/)?\d{1,2}\/\d{1,2}$", data['date']):
             raise Exception("Erreur dans la date")
@@ -139,7 +139,7 @@ class Ecriture(object):
 
 def main():
     """ Main function """
-    locale.setlocale(locale.LC_ALL, '')
+    #locale.setlocale(locale.LC_ALL, '')
     # print local configuration
     #locale.getlocale()
     ecriture = Ecriture()
