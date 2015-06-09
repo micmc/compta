@@ -36,7 +36,7 @@ class Ecriture(object):
         if self.options.unvalid:
             filter["valide"] = "no"
         if self.options.sort:
-            sort = self.options.sort
+            filter["sort"] = self.options.sort
         #rqst = RequestServer('localhost', '8080')
         #print rqst.get('ecriture')
         if not filter:
@@ -45,7 +45,6 @@ class Ecriture(object):
                                             ecriture=id,
                                             compte=compte,
                                             filter=filter,
-                                            sort=sort,
                                            )
         if response.status_code == 404:
             return 1
@@ -89,13 +88,14 @@ class Ecriture(object):
             data['type'] = unicode(raw_input("Typr [Pr, Vr, Cb, Re, Ch, Li] : "))
             if not re.match(r"^(Pr|Vr|Cb|Re|Ch|Li)$", data['type']):
                 raise Exception("Erreur dans le type")
-        else:
-            data['type'] = self.options.type
+        elif self.options.type in ["Pr", "Vr", "Prs"]:
             if self.options.type == 'Pr':
+                data['type'] = 'Pr'
                 return_compte = RequestServer.get_method("compte",
                                                          filter="prv"
                                                         )
             elif self.options.type == 'Vr':
+                data['type'] = 'Vr'
                 return_compte = RequestServer.get_method("compte",
                                                          filter="vir"
                                                         )
@@ -113,6 +113,8 @@ class Ecriture(object):
             input_type = raw_input("Virement :")
             data['nom'] = list_compte[int(input_type)-1][0]
             data['nom_id'] = list_compte[int(input_type)-1][1]
+        else:
+            data['type'] = self.options.type
         if self.options.description:
             date['description'] = self.options.description
         data['date'] = unicode(raw_input("date [YYYY/]DD/MM] :"))
