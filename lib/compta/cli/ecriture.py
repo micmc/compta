@@ -6,7 +6,7 @@ import re
 #import locale
 
 from json import dumps
-from datetime import date
+from datetime import date, datetime
 
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
@@ -51,7 +51,12 @@ class Ecriture(object):
         tmp_response = response.json()
         if isinstance(tmp_response, list):
             for response in tmp_response:
-                print response
+                print "%s - %40s | %8s | %2s | %15s " % (response["date"],
+                                                   response["nom"],
+                                                   response["montant"],
+                                                   response["type"],
+                                                   response["categorie"],
+                                                  )
         elif isinstance(tmp_response, dict):
             for k, v in tmp_response.iteritems():
                 print "%s -> %s" % (k, v)
@@ -122,13 +127,16 @@ class Ecriture(object):
             raise Exception("Erreur dans la date")
         if re.match(r"^\d{2}\/\d{2}$", data['date']):
             data['date'] = str(date.today().year) + "/" + data['date']
+        date_now = datetime.now()
+        if date_now < datetime.strptime(data["date"], "%Y/%m/%d"):
+            raise Exception("La date ne doit pas être dans le future")
         response = RequestServer.get_method("categorie", filter={"sort": "count"})
         list_categorie = response.json()
-        for i in range(1, 4):
+        for i in range(1, 5):
             tmp_str = ""
             for categorie in list_categorie[(i-1)*5:i*5]:
-                tmp_str += "%d - %12s, " % (categorie['id'], categorie['nom'])
-            print tmp_str[:-2]
+                tmp_str += "%2d - %16s | " % (categorie['id'], categorie['nom'].strip())
+            print tmp_str[:-3]
 
         data['categorie'] = unicode(raw_input("categorie [consommation : 5] :"))
         if not data['categorie'].isnumeric():

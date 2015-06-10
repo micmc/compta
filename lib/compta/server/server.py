@@ -4,6 +4,9 @@
 
 import re
 import locale
+import sys
+import os
+import ConfigParser
 
 from bottle import Bottle
 from bottle import response, request, abort
@@ -34,12 +37,42 @@ def main():
         locale.setlocale(locale.LC_ALL,'fr_FR.utf8')
     else:
         locale.setlocale(locale.LC_ALL, '')
-    engine = create_engine('sqlite:///../../../db/compta.db', echo=False)
+    dict_config = config()
+    engine = create_engine("sqlite:///%s/%s" % (dict_config["database_path"],
+                                                dict_config["database_name"]
+                                               ),
+                           echo=False
+                          )
     Base.metadata.bind = engine
     Base.metadata.create_all(engine)
     plugin = sqlalchemy.Plugin(engine, Base.metadata, create=False)
     app.install(plugin)
     app.run(host='localhost', port=8080, debug=True)
+
+def config():
+    """ Read config """
+    path = os.path.dirname(__file__)
+    config = ConfigParser.RawConfigParser()
+    if os.path.exists("%s/server.cfg" % path):
+        dict_config = {}
+        try :
+            config.read("%s/server.cfg" % path)
+        except ConfigPArser.ParsingError as error:
+            print error
+            sys.exit(1)
+        try:
+            dict_config["database_path"] = config.get("Database","path")
+            dict_config["database_name"] = config.get("Database","name")
+        except ConfigParser.NoSectionError as error:
+            print error
+            sys.exit(1)
+        except ConfigParser.NoOptionError as error:
+            print error
+            sys.exit(1)
+        return dict_config
+    else:
+        print "No config files found"
+        sys.exit(1)
 
 @app.hook('after_request')
 def enable_cors():
