@@ -51,11 +51,12 @@ class Ecriture(object):
         tmp_response = response.json()
         if isinstance(tmp_response, list):
             for response in tmp_response:
-                print "%s - %40s | %8s | %2s | %15s " % (response["date"],
+                print "%s - %40s | %8s | %2s | %15s / (%s)" % (response["date"],
                                                    response["nom"],
                                                    response["montant"],
                                                    response["type"],
                                                    response["categorie"],
+                                                   response["id"],
                                                   )
         elif isinstance(tmp_response, dict):
             for k, v in tmp_response.iteritems():
@@ -121,7 +122,7 @@ class Ecriture(object):
         else:
             data['type'] = self.options.type
         if self.options.description:
-            date['description'] = self.options.description
+            data['description'] = self.options.description
         data['date'] = unicode(raw_input("date [YYYY/]DD/MM] :"))
         if not re.match(r"^(201[0-9]\/)?\d{1,2}\/\d{1,2}$", data['date']):
             raise Exception("Erreur dans la date")
