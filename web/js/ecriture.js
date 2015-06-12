@@ -10,6 +10,7 @@ $('document').ready(function(){
     //$("table tbody tr").click(function(event) {
     //    alert("test");
     //});
+    id_compte = $(location).attr("search").replace("?id=","");
 });
 
 function put_update(thisObj) {
@@ -48,7 +49,7 @@ function set_update(thisObj) {
          $.ajax(
         {
             method: "PUT",
-            url: "http://localhost:8080/compte/10/ecriture" + ecriture_id,
+            url: "http://localhost:8080/compte/" + id_compte + "/ecriture" + ecriture_id,
             dataType: "html",
             contentType: "application/json",
             data: JSON.stringify(data_ecriture),
@@ -87,7 +88,7 @@ $("table.ecriture").ready(function(e) {
     $.ajax(
     {
         method: "GET",
-        url: "http://localhost:8080/compte/10/ecriture?filter=10",
+        url: "http://localhost:8080/compte/" + id_compte + "/ecriture?filter=10",
         dataType: "json",
         success: function(data) {
             for(i=0; i< data.length; i++) {
