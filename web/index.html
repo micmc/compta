@@ -3,22 +3,34 @@
   <head>
     <meta charset="UTF-8">
     <title>Page web</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+    <script type="text/javascript" src="js/jquery-1.11.2.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.js"></script>
   </head>
   <body>
     <p><h1>Index</h1></p>
-    <p>
+    <section>
       <h3>Administrations</h3>
       <ul>
-        <li><a href="liste_banque.html">Listes des banques</a><br /></li>
-        <li><a href="liste_compte.html">Listes des comptes</a><br /></li>
-        <li><a href="liste_categorie.html">Listes des categories</a><br /></li>
+        <li><a id="ref_banque" href="liste_banque.html">Listes des banques</a><br /></li>
+        <li><a id="ref_compte" href="liste_compte.html">Listes des comptes</a><br /></li>
+        <li><a id="ref_categorie" href="liste_categorie.html">Listes des categories</a><br /></li>
       </ul>
+    </section>
+    <section>
       <h3>Gestion des comptes</h3>
+      Choix du compte :
+         <select name="compte">
+         </select>
+      <div id="somme">
+      </div>
       <ul>
-        <li><a href="liste_ecriture.html">Gestion des ecritures</a></li>
-      </ul> 
-    </p>
-  </body>
+        <li><a id="ref_ecriture" href="liste_ecriture.html">Gestion des ecritures</a></li>
+      </ul>
+    </section>
+    <script type="text/javascript" src="js/index.js"></script>
+</body>
 </html>
 
 
