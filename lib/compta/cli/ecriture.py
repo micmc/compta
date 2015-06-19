@@ -150,7 +150,7 @@ class Ecriture(object):
         print response
 
     def update_ecriture(self):
-        """ Update an ecritue"""
+        """ Update an ecriture"""
 
         data = {}
         data['compte_id'] = self.options.compte
@@ -175,8 +175,33 @@ class Ecriture(object):
             data['categorie'] = self.options.categorie
 
         print data
-        response = RequestServer.put_method("ecriture", data['id'], dumps(data))
+        response = RequestServer.put_method("ecriture", dumps(data))
         print response
+
+    def split_ecriture(self):
+        """ Update an ecriture"""
+
+        data = {}
+        data['compte_id'] = self.options.compte
+        data['id'] = self.options.id
+        if not self.options.ec:
+            raise Exception("Ecriture categorie obligatoire")
+        data['ecriture_categorie_id'] = self.options.ec
+        if not self.options.montant:
+            raise Exception("Montant obligatoire")
+        if not re.match(r"^\d+([\.,]\d{1,2})?$", self.options.montant):
+            raise Exception("Erreur dans le montant")
+        data['montant'] = self.options.montant
+        if not self.options.categorie:
+            raise Exception("Categorie obligatoire")
+        if not re.match(r"^\d{1,2}$",self.options.categorie):
+            raise Exception("Erreur de categorie")
+        data['categorie'] = self.options.categorie
+
+        print data
+        response = RequestServer.put_method("split", dumps(data))
+        print response
+
 
 def main():
     """ Main function """
@@ -190,6 +215,8 @@ def main():
         ecriture.insert_ecriture()
     elif ecriture.options.cmd == 'update':
         ecriture.update_ecriture()
+    elif ecriture.options.cmd == 'split':
+        ecriture.split_ecriture()
 
 if __name__ == '__main__':
     main()

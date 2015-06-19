@@ -4,7 +4,7 @@
 
 #import sys
 import requests
-#from json import dumps, loads
+from json import loads
 
 class RequestServer(object):
     """ Default class to manage parse argument """
@@ -100,14 +100,17 @@ class RequestServer(object):
     @classmethod
     def put_method(cls,
                    method,
-                   ecriture,
                    data
                   ):
         """ Static fabric method """
-
+        entity = loads(data)
         if method == "ecriture":
             rqst = RequestServerEcriture()
-            str_url = "/%s" % (ecriture,)
+            str_url = "/%s" % (entity['id'],)
+            return rqst.put(url=str_url, data=data)
+        elif method == "split":
+            rqst = RequestServerEcriture()
+            str_url = "/%s/ec/%s" % (entity['id'],entity['ecriture_categorie_id'])
             return rqst.put(url=str_url, data=data)
 
 class RequestServerBanque(RequestServer):

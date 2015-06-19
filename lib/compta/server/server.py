@@ -500,11 +500,12 @@ def update_ecriture(db, id=None, ec_id=None):
             abort(404, 'montant supérieur')
         #Create a new categorie
         new_categorie = EcritureCategorie(ecriture_id=id,
-                                          categorie_id=categorie,
+                                          categorie_id=entity["categorie"],
                                           montant=int(locale.atof(entity["montant"])*100)
                                          )
         if entity.has_key('description'):
             ecriture.EcritureCategorie.description = entity["description"]
+        db.add(new_categorie)
         ecriture_categorie.montant = ecriture_categorie.montant - int(locale.atof(entity["montant"])*100)
         try:
             db.commit()

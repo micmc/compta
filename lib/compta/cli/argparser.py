@@ -102,7 +102,7 @@ class ParseEcriture(ParseArgs):
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
         self.parser_ecriture.add_argument('cmd',
                                           help='command to pass [list, update, delete, insert, split]',
-                                          choices=('list', 'insert', 'update', 'delete, split'))
+                                          choices=('list', 'insert', 'update', 'delete', 'split'))
         self.parser_ecriture.add_argument('-i', '--id', type=int,
                                           help='id of ecriture',
                                          )
@@ -144,6 +144,9 @@ class ParseEcriture(ParseArgs):
                                          )
         self.parser_ecriture.add_argument('--categorie',
                                           help='Categorie',
+                                         )
+        self.parser_ecriture.add_argument('--ec',
+                                          help='Ecriture Categorie id',
                                          )
     def get_args(self):
         """ Return argument """
