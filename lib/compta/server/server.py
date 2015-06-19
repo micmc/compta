@@ -26,7 +26,7 @@ from sqlalchemy.sql import func
 from compta.db.base import Base
 from compta.db.banque import Banque
 from compta.db.compte import Compte
-from compta.db.ecriture import Ecriture, EcritureCategorie
+from compta.db.ecriture import Ecriture, EcritureCategorie, Tag
 from compta.db.categorie import Categorie
 
 app = Bottle()
@@ -377,7 +377,9 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                          (EcritureCategorie.montant * Ecriture.dc).label("montant"),
                          Ecriture.type.label("type"),
                          Categorie.nom.label("categorie"),
-                         EcritureCategorie.description.label("description")
+                         EcritureCategorie.description.label("description"),
+                         EcritureCategorie.id.label("ecriture_categorie_id"),
+                         Ecriture.valide.label("valide"),
                         ).\
                    join(Ecriture.categories).\
                    join(EcritureCategorie.categorie)
@@ -429,16 +431,17 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                                'date': datetime.strftime(ecriture.date, "%Y/%m/%d"),
                                #'dc': ecriture.Ecriture.dc,
                                'type': ecriture.type,
-                               #'valide': ecriture.Ecriture.valide,
-                               #'compte_id': ecriture.Ecriture.compte_id,
+                               'valide': ecriture.valide,
                                'categorie': ecriture.categorie,
                                'montant': "%0.2f" %(ecriture.montant/100.0,),
                                'description': ecriture.description,
+                               'ecriture_categorie_id' : ecriture.ecriture_categorie_id,
                               })
     return dumps(list_ecritures)
 
 @app.put(r'/ecriture/<id:int>')
-def update_ecriture(db, id=None):
+@app.put(r'/ecriture/<id:int>/ec/<ec_id:int>')
+def update_ecriture(db, id=None, ec_id=None):
     """ Update information for an ecriture """
     if not id:
         abort(404, 'no id received')
@@ -459,31 +462,54 @@ def update_ecriture(db, id=None):
     except NoResultFound:
         abort(404, "ID not found")
 
-    if entity.has_key('nom'):
-        ecriture.Ecriture.nom = entity["nom"]
-    if entity.has_key('date'):
-        ecriture.Ecriture.date = datetime.strptime(entity["date"], "%Y/%m/%d")
-    if entity.has_key('dc'):
-        ecriture.Ecriture.dc = entity["dc"]
-    if entity.has_key('valide'):
-        if entity["valide"].isnumeric():
-            ecriture.Ecriture.valide = entity["valide"]
-        elif entity["valide"].lower() == "true":
-            ecriture.Ecriture.valide = True
-        else:
-            ecriture.Ecriture.valide = False
-    if entity.has_key('montant'):
-        ecriture.EcritureCategorie.montant = (int(locale.atof(entity["montant"])*100))
-    if entity.has_key('type'):
-        ecriture.Ecriture.type = entity["type"]
-    if entity.has_key('description'):
-        ecriture.EcritureCategorie.description = entity["description"]
-    if entity.has_key('categorie'):
-        ecriture.EcritureCategorie.categorie_id = entity["categorie"]
-    try:
-        db.commit()
-    except IntegrityError:
-        abort(404, 'Integrity Error')
+    if id and not ec_id:
+        if entity.has_key('nom'):
+            ecriture.Ecriture.nom = entity["nom"]
+        if entity.has_key('date'):
+            ecriture.Ecriture.date = datetime.strptime(entity["date"], "%Y/%m/%d")
+        if entity.has_key('dc'):
+            ecriture.Ecriture.dc = entity["dc"]
+        if entity.has_key('valide'):
+            if entity["valide"].isnumeric():
+                ecriture.Ecriture.valide = entity["valide"]
+            elif entity["valide"].lower() == "true":
+                ecriture.Ecriture.valide = True
+            else:
+                ecriture.Ecriture.valide = False
+        if entity.has_key('montant'):
+            ecriture.EcritureCategorie.montant = (int(locale.atof(entity["montant"])*100))
+        if entity.has_key('type'):
+            ecriture.Ecriture.type = entity["type"]
+        if entity.has_key('description'):
+            ecriture.EcritureCategorie.description = entity["description"]
+        if entity.has_key('categorie'):
+            ecriture.EcritureCategorie.categorie_id = entity["categorie"]
+        try:
+            db.commit()
+        except IntegrityError:
+            abort(404, 'Integrity Error')
+    elif id and ec_id:
+        if not entity.has_key('montant'):
+            abort(404, 'montant : non spécifié')
+        if not entity.has_key('categorie'):
+            abort(404, 'categorie : non spécifié')
+        ecriture_categorie = db.query(EcritureCategorie).\
+                                filter(EcritureCategorie.id == ec_id).\
+                                one()
+        if (int(locale.atof(entity["montant"])*100) >= ecriture_categorie.montant):
+            abort(404, 'montant supérieur')
+        #Create a new categorie
+        new_categorie = EcritureCategorie(ecriture_id=id,
+                                          categorie_id=categorie,
+                                          montant=int(locale.atof(entity["montant"])*100)
+                                         )
+        if entity.has_key('description'):
+            ecriture.EcritureCategorie.description = entity["description"]
+        ecriture_categorie.montant = ecriture_categorie.montant - int(locale.atof(entity["montant"])*100)
+        try:
+            db.commit()
+        except IntegrityError:
+            abort(404, 'Integrity Error')
 
 @app.post('/ecriture')
 def insert_ecriture(db):

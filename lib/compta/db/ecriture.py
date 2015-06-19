@@ -38,6 +38,9 @@ class Ecriture(Base):
     categories = relationship('EcritureCategorie',
                               backref='ecriture'
                              )
+    tags = relationship('Tag',
+                        backref='ecriture'
+                       )
 
 class EcritureCategorie(Base):
     __tablename__ = 'ecriture_categorie'
@@ -47,4 +50,11 @@ class EcritureCategorie(Base):
     ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=True)
     categorie = relationship('Categorie')
+
+class Tag(Base):
+    __tablename__ = 'tag'
+    id = Column(Integer, primary_key=True)
+    nom = Column(String(), nullable=False)
+    valeur = Column(String(), nullable=False)
+    ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
 
