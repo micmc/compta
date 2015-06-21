@@ -101,8 +101,8 @@ class ParseEcriture(ParseArgs):
         # Create ecriture object
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
         self.parser_ecriture.add_argument('cmd',
-                                          help='command to pass [list, update, delete, insert]',
-                                          choices=('list', 'insert', 'update', 'delete'))
+                                          help='command to pass [list, update, delete, insert, split]',
+                                          choices=('list', 'insert', 'update', 'delete', 'split'))
         self.parser_ecriture.add_argument('-i', '--id', type=int,
                                           help='id of ecriture',
                                          )
@@ -121,7 +121,7 @@ class ParseEcriture(ParseArgs):
                                           help='Débit/Crédit',
                                          )
         self.parser_ecriture.add_argument('-t', '--type',
-                                          choices=["Pr", "Vr", "Cb", "Re", "Ch", "Li","Prs"],
+                                          choices=["Pr", "Vr", "Cb", "Re", "Ch", "Li", "Prs"],
                                           help='Type',
                                          )
         self.parser_ecriture.add_argument('-n', '--unvalid', action='store_true',
@@ -132,6 +132,21 @@ class ParseEcriture(ParseArgs):
                                          )
         self.parser_ecriture.add_argument('--description',
                                           help='Description',
+                                         )
+        self.parser_ecriture.add_argument('--nom',
+                                          help='Nom',
+                                         )
+        self.parser_ecriture.add_argument('--montant',
+                                          help='Montant',
+                                         )
+        self.parser_ecriture.add_argument('--date',
+                                          help='Date [YYYY/MM/DD]',
+                                         )
+        self.parser_ecriture.add_argument('--categorie',
+                                          help='Categorie',
+                                         )
+        self.parser_ecriture.add_argument('--ec',
+                                          help='Ecriture Categorie id',
                                          )
     def get_args(self):
         """ Return argument """

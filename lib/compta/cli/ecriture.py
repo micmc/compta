@@ -51,12 +51,13 @@ class Ecriture(object):
         tmp_response = response.json()
         if isinstance(tmp_response, list):
             for response in tmp_response:
-                print "%s - %40s | %8s | %2s | %15s / (%s)" % (response["date"],
+                print "%s - %40s | %8s | %2s | %15s / (%s/%s)" % (response["date"],
                                                    response["nom"],
                                                    response["montant"],
                                                    response["type"],
                                                    response["categorie"],
                                                    response["id"],
+                                                   response["ecriture_categorie_id"],
                                                   )
         elif isinstance(tmp_response, dict):
             for k, v in tmp_response.iteritems():
@@ -91,7 +92,7 @@ class Ecriture(object):
                 data['dc'] = 1
 
         if not self.options.type:
-            data['type'] = unicode(raw_input("Typr [Pr, Vr, Cb, Re, Ch, Li] : "))
+            data['type'] = unicode(raw_input("Typr [Pr, Vr, Cb, Re, Ch, Li]: "))
             if not re.match(r"^(Pr|Vr|Cb|Re|Ch|Li)$", data['type']):
                 raise Exception("Erreur dans le type")
         elif self.options.type in ["Pr", "Vr", "Prs"]:
@@ -147,6 +148,59 @@ class Ecriture(object):
         response = RequestServer.post_method("ecriture", dumps(data))
         print response
 
+    def update_ecriture(self):
+        """ Update an ecriture"""
+
+        data = {}
+        data['compte_id'] = self.options.compte
+        data['id'] = self.options.id
+        if self.options.montant:
+            data['montant'] = self.options.montant
+        if self.options.type:
+            data['type'] = self.options.type
+        if self.options.dc and self.options.dc == "d":
+            data['dc'] = -1
+        elif self.options.dc and  self.options.dc == "c":
+            data['dc'] = 1
+        if self.options.nom:
+            data['nom'] = self.options.nom
+        if self.options.description:
+            data['description'] = self.options.description
+        if self.options.date:
+            if not re.match(r"^201[0-9]\/\d{1,2}\/\d{1,2}$", self.options.date):
+                raise Exception("format non valide de date")
+            data['date'] = self.options.date
+        if self.options.categorie:
+            data['categorie'] = self.options.categorie
+
+        print data
+        response = RequestServer.put_method("ecriture", dumps(data))
+        print response
+
+    def split_ecriture(self):
+        """ Update an ecriture"""
+
+        data = {}
+        data['compte_id'] = self.options.compte
+        data['id'] = self.options.id
+        if not self.options.ec:
+            raise Exception("Ecriture categorie obligatoire")
+        data['ecriture_categorie_id'] = self.options.ec
+        if not self.options.montant:
+            raise Exception("Montant obligatoire")
+        if not re.match(r"^\d+([\.,]\d{1,2})?$", self.options.montant):
+            raise Exception("Erreur dans le montant")
+        data['montant'] = self.options.montant
+        if not self.options.categorie:
+            raise Exception("Categorie obligatoire")
+        if not re.match(r"^\d{1,2}$",self.options.categorie):
+            raise Exception("Erreur de categorie")
+        data['categorie'] = self.options.categorie
+
+        print data
+        response = RequestServer.put_method("split", dumps(data))
+        print response
+
 
 def main():
     """ Main function """
@@ -156,8 +210,12 @@ def main():
     ecriture = Ecriture()
     if ecriture.options.cmd == 'list':
         ecriture.list_ecriture()
-    if ecriture.options.cmd == 'insert':
+    elif ecriture.options.cmd == 'insert':
         ecriture.insert_ecriture()
+    elif ecriture.options.cmd == 'update':
+        ecriture.update_ecriture()
+    elif ecriture.options.cmd == 'split':
+        ecriture.split_ecriture()
 
 if __name__ == '__main__':
     main()

@@ -4,7 +4,7 @@
 
 #import sys
 import requests
-#from json import dumps, loads
+from json import loads
 
 class RequestServer(object):
     """ Default class to manage parse argument """
@@ -29,9 +29,16 @@ class RequestServer(object):
         return self.__request
 
     def post(self, data):
-        """Put url data"""
+        """Post url data"""
         url_data = self._url_data
         self.__request = self.__session.post(url_data, data)
+        return self.__request
+
+    def put(self, url, data):
+        """Put url data"""
+
+        url_data = self._url_data + url
+        self.__request = self.__session.put(url_data, data)
         return self.__request
 
     @staticmethod
@@ -73,19 +80,38 @@ class RequestServer(object):
                 str_filter = "?filter=%s" % filter
             elif isinstance(filter, dict):
                 str_filter = "?"
-                for k, v in filter.iteritems():
-                    str_filter += "%s=%s&" % (k, v)
+                for keys, values in filter.iteritems():
+                    str_filter += "%s=%s&" % (keys, values)
                 str_filter = str_filter[:-1]
         return rqst.get(url=str_url, filter=str_filter)
 
 
     @classmethod
-    def post_method(cls, method, data):
+    def post_method(cls,
+                    method,
+                    data
+                   ):
         """ Static fabric method """
 
         if method == "ecriture":
             rqst = RequestServerEcriture()
             return rqst.post(data)
+
+    @classmethod
+    def put_method(cls,
+                   method,
+                   data
+                  ):
+        """ Static fabric method """
+        entity = loads(data)
+        if method == "ecriture":
+            rqst = RequestServerEcriture()
+            str_url = "/%s" % (entity['id'],)
+            return rqst.put(url=str_url, data=data)
+        elif method == "split":
+            rqst = RequestServerEcriture()
+            str_url = "/%s/ec/%s" % (entity['id'],entity['ecriture_categorie_id'])
+            return rqst.put(url=str_url, data=data)
 
 class RequestServerBanque(RequestServer):
     """ Class for create banque object """
