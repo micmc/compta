@@ -414,6 +414,8 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                 ecritures = ecritures.order_by(EcritureCategorie.montant)
             elif lst_sort == 'categorie':
                 ecritures = ecritures.order_by(Categorie.nom)
+            elif lst_sort == 'ecriture_categorie':
+                ecritures = ecritures.order_by(EcritureCategorie.id)
         ecritures = ecritures.order_by(desc(Ecriture.date))
         ecritures = ecritures.all()
 

@@ -184,8 +184,17 @@ class Ecriture(object):
         data['compte_id'] = self.options.compte
         data['id'] = self.options.id
         if not self.options.ec:
-            raise Exception("Ecriture categorie obligatoire")
-        data['ecriture_categorie_id'] = self.options.ec
+            response = RequestServer.get_method("ecriture",
+                                                ecriture=data['id'],
+                                                compte=data['compte_id'],
+                                                filter={"sort": "ecriture_categorie",}
+                                               )
+            if response.status_code == 404:
+                raise Exception("Impossible de trouver ecriture categorie")
+            tmp_response = response.json()
+            data['ecriture_categorie_id'] = tmp_response[0]["ecriture_categorie_id"]
+        else:    
+            data['ecriture_categorie_id'] = self.options.ec
         if not self.options.montant:
             raise Exception("Montant obligatoire")
         if not re.match(r"^\d+([\.,]\d{1,2})?$", self.options.montant):
