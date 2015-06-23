@@ -1,8 +1,12 @@
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+""" Manage Database """
+
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Enum
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
-from base import Base
+from compta.db.base import Base
 
 #CREATE TABLE "compte" (
 #    "id" integer NOT NULL PRIMARY KEY,
@@ -27,10 +31,14 @@ class Compte(Base):
     nom = Column(String(50), nullable=False)
     numero = Column(String(12), nullable=True)
     cle = Column(String(3), nullable=True)
-    type = Column(Enum('dif','div','prs','prv','vir', name="compte_type_enum"), nullable=False)
+    type = Column(Enum('dif', 'div', 'prs', 'prv', 'vir',
+                       name="compte_type_enum"
+                      ),
+                  nullable=False
+                 )
     archive = Column(Boolean, default=False)
     banque_id = Column(Integer, ForeignKey('banque.id'), nullable=False)
-    ecritures= relationship('Ecriture',
+    ecritures = relationship('Ecriture',
                             foreign_keys='Ecriture.compte_id',
                             backref='compte'
-                           )
+

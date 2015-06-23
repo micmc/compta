@@ -1,8 +1,11 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
-#from sqlalchemy.ext.declarative import declarative_base
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+""" Manage Database """
+
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from base import Base
+from compta.db.base import Base
 
 #CREATE TABLE "banque" (
 #    "id" integer NOT NULL PRIMARY KEY,
@@ -17,6 +20,7 @@ from base import Base
 #);
 
 class Banque(Base):
+    """ Class to manage banque table """
     __tablename__ = 'banque'
     id = Column(Integer, primary_key=True)
     nom = Column(String(50), nullable=False)

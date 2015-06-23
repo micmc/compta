@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+""" Manage Database """
+
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
@@ -26,6 +30,7 @@ from base import Base
 #CREATE INDEX "ecriture_categorie_507077e5" ON "ecriture_categorie" ("ecri
 
 class Ecriture(Base):
+    """ Class to manage ecriture table """
     __tablename__ = 'ecriture'
     id = Column(Integer, primary_key=True)
     date = Column('date', Date, nullable=False)
@@ -35,14 +40,16 @@ class Ecriture(Base):
     valide = Column(Boolean, default=False)
     compte_id = Column(Integer, ForeignKey('compte.id'), nullable=False)
     nom_id = Column(Integer, ForeignKey('compte.id'), nullable=True)
-    categories = relationship('EcritureCategorie',
-                              backref='ecriture'
-                             )
+    montant = relationship('Montant',
+                           backref='ecritures'
+                          )
     tags = relationship('Tag',
-                        backref='ecriture'
+                        secondary='ecriture_tag',
+                        backref='ecritures'
                        )
 
-class EcritureCategorie(Base):
+class Montant(Base):
+    """ Class to manage montant table """
     __tablename__ = 'ecriture_categorie'
     id = Column(Integer, primary_key=True)
     montant = Column(Integer, nullable=False)
@@ -51,10 +58,16 @@ class EcritureCategorie(Base):
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=True)
     categorie = relationship('Categorie')
 
+class EcritureTag(Base):
+    """ Class to manage ecriture_tag table """
+    __tablename__ = 'ecriture_tag'
+    ecriture_id = Column(Integer, ForeignKey('ecriture.id'), primary_key=True)
+    tag_id = Column(Integer, ForeignKey('tag.id'), primary_key=True)
+
 class Tag(Base):
+    """ Class to manage tag table """
     __tablename__ = 'tag'
     id = Column(Integer, primary_key=True)
     nom = Column(String(), nullable=False)
     valeur = Column(String(), nullable=False)
-    ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
 
