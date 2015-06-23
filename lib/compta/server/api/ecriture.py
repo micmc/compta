@@ -16,7 +16,7 @@ from compta.server.api.bottle import response, request, abort
 
 from compta.db.banque import Banque
 from compta.db.compte import Compte
-from compta.db.ecriture import Ecriture
+from compta.db.ecriture import Ecriture, Montant
 
 from compta.server.api.server import App
 
@@ -47,15 +47,15 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
     ecritures = db.query(Ecriture.id.label("id"),
                          func.trim(Ecriture.nom).label("nom"),
                          Ecriture.date.label("date"),
-                         (EcritureCategorie.montant * Ecriture.dc).label("montant"),
+                         (Montant.montant * Ecriture.dc).label("montant"),
                          Ecriture.type.label("type"),
                          Categorie.nom.label("categorie"),
-                         EcritureCategorie.description.label("description"),
-                         EcritureCategorie.id.label("ecriture_categorie_id"),
+                         Montant.description.label("description"),
+                         Montant.id.label("ecriture_categorie_id"),
                          Ecriture.valide.label("valide"),
                         ).\
                    join(Ecriture.categories).\
-                   join(EcritureCategorie.categorie)
+                   join(Montant.categorie)
     if id_compte:
         ecritures = ecritures.filter(Ecriture.compte_id == id_compte)
     if nom:
@@ -69,7 +69,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
             ecritures = ecritures.filter(Ecriture.valide == False)
         if filter == 'sum':
             ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
-                                 (func.sum(Ecriture.dc * EcritureCategorie.montant).label("somme")/100.0).label("somme")).\
+                                 (func.sum(Ecriture.dc * Montant.montant).label("somme")/100.0).label("somme")).\
                            join(Ecriture.categories)
             if id_compte:
                 ecritures = ecritures.filter(Ecriture.compte_id == id_compte)
@@ -84,11 +84,11 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
             elif lst_sort == 'type':
                 ecritures = ecritures.order_by(Ecriture.type)
             elif lst_sort == 'montant':
-                ecritures = ecritures.order_by(EcritureCategorie.montant)
+                ecritures = ecritures.order_by(Montant.montant)
             elif lst_sort == 'categorie':
                 ecritures = ecritures.order_by(Categorie.nom)
             elif lst_sort == 'ecriture_categorie':
-                ecritures = ecritures.order_by(EcritureCategorie.id)
+                ecritures = ecritures.order_by(Montant.id)
         ecritures = ecritures.order_by(desc(Ecriture.date))
         ecritures = ecritures.all()
 
@@ -130,7 +130,7 @@ def update_ecriture(db, id=None, ec_id=None):
         print "erreur chargement json %s" % (data,)
         abort(404, 'Error on loading data')
     try:
-        ecriture = db.query(Ecriture, EcritureCategorie).\
+        ecriture = db.query(Ecriture, Montant).\
                       join(Ecriture.categories).\
                       filter(Ecriture.id == id).\
                       one()
@@ -152,13 +152,13 @@ def update_ecriture(db, id=None, ec_id=None):
             else:
                 ecriture.Ecriture.valide = False
         if entity.has_key('montant'):
-            ecriture.EcritureCategorie.montant = (int(locale.atof(entity["montant"])*100))
+            ecriture.Montant.montant = (int(locale.atof(entity["montant"])*100))
         if entity.has_key('type'):
             ecriture.Ecriture.type = entity["type"]
         if entity.has_key('description'):
-            ecriture.EcritureCategorie.description = entity["description"]
+            ecriture.Montant.description = entity["description"]
         if entity.has_key('categorie'):
-            ecriture.EcritureCategorie.categorie_id = entity["categorie"]
+            ecriture.Montant.categorie_id = entity["categorie"]
         try:
             db.commit()
         except IntegrityError:
@@ -168,18 +168,18 @@ def update_ecriture(db, id=None, ec_id=None):
             abort(404, 'montant : non spécifié')
         if not entity.has_key('categorie'):
             abort(404, 'categorie : non spécifié')
-        ecriture_categorie = db.query(EcritureCategorie).\
-                                filter(EcritureCategorie.id == ec_id).\
+        ecriture_categorie = db.query(Montant).\
+                                filter(Montant.id == ec_id).\
                                 one()
         if (int(locale.atof(entity["montant"])*100) >= ecriture_categorie.montant):
             abort(404, 'montant supérieur')
         #Create a new categorie
-        new_categorie = EcritureCategorie(ecriture_id=id,
+        new_categorie = Montant(ecriture_id=id,
                                           categorie_id=entity["categorie"],
                                           montant=int(locale.atof(entity["montant"])*100)
                                          )
         if entity.has_key('description'):
-            ecriture.EcritureCategorie.description = entity["description"]
+            ecriture.Montant.description = entity["description"]
         db.add(new_categorie)
         ecriture_categorie.montant = ecriture_categorie.montant - int(locale.atof(entity["montant"])*100)
         try:
@@ -229,7 +229,7 @@ def insert_ecriture(db):
     except IntegrityError:
         abort(404, 'Integrity Error')
 
-    ecriture_categorie = EcritureCategorie(montant=int(locale.atof(entity["montant"])*100),
+    ecriture_categorie = Montant(montant=int(locale.atof(entity["montant"])*100),
                                            ecriture_id=ecriture.id,)
     if entity.has_key('description'):
         ecriture_categorie.description = entity["description"]
