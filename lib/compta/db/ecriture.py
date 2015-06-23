@@ -50,7 +50,7 @@ class Ecriture(Base):
 
 class Montant(Base):
     """ Class to manage montant table """
-    __tablename__ = 'ecriture_categorie'
+    __tablename__ = 'montant'
     id = Column(Integer, primary_key=True)
     montant = Column(Integer, nullable=False)
     description = Column(String(), nullable=True)

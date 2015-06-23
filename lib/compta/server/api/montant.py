@@ -23,14 +23,24 @@ app = App().server
 
 @app.get('/montant')
 @app.get(r'/montant/<id:int>')
-def list_montant(db, id=None):
+@app.get(r'/ecriture/<ecriture_id:int>/montant')
+@app.get(r'/ecriture/<ecriture_id:int>/montant/<id:int>')
+def list_montant(db, id=None, ecriture_id=None):
     """ List categorie """
-    sort = request.query.sort
-    montants = db.query(Montant.id, Montant.montant, Montant.description. Montant.categorie_id, Categorie.nom).\
+    montants = db.query(Montant.id,
+                        Montant.montant,
+                        Montant.description,
+                        Montant.categorie_id,
+                        Montant.ecriture_id,
+                        Categorie.nom.label("categorie_nom")
+                       ).\
                     join(Categorie).\
                     group_by(Montant.id)
     if id:
         montants = montants.filter(Montant.id == id)
+    if ecriture_id:
+        montants = montants.filter(Montant.ecriture_id == ecriture_id)
+
     try:
         montants = montants.all()
     except NoResultFound:
@@ -39,10 +49,13 @@ def list_montant(db, id=None):
         abort(404, "ID not found")
     list_montants = []
     for montant in montants:
+        print montant
         list_montants.append({'id': montant.id,
+                              'montant': montant.montant,
                               'description': montant.description,
                               'categorie_id': montant.categorie_id,
                               'categorie_nom': montant.categorie_nom,
+                              'ecriture_id': montant.ecriture_id,
                              })
     return dumps(list_montants)
 

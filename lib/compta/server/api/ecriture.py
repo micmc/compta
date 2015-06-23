@@ -17,6 +17,7 @@ from compta.server.api.bottle import response, request, abort
 from compta.db.banque import Banque
 from compta.db.compte import Compte
 from compta.db.ecriture import Ecriture, Montant
+from compta.db.categorie import Categorie
 
 from compta.server.api.server import App
 
@@ -54,7 +55,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                          Montant.id.label("ecriture_categorie_id"),
                          Ecriture.valide.label("valide"),
                         ).\
-                   join(Ecriture.categories).\
+                   join(Ecriture.montant).\
                    join(Montant.categorie)
     if id_compte:
         ecritures = ecritures.filter(Ecriture.compte_id == id_compte)
@@ -70,7 +71,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
         if filter == 'sum':
             ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
                                  (func.sum(Ecriture.dc * Montant.montant).label("somme")/100.0).label("somme")).\
-                           join(Ecriture.categories)
+                           join(Ecriture.montant)
             if id_compte:
                 ecritures = ecritures.filter(Ecriture.compte_id == id_compte)
             ecritures = ecritures.order_by(Ecriture.date).\
@@ -131,7 +132,7 @@ def update_ecriture(db, id=None, ec_id=None):
         abort(404, 'Error on loading data')
     try:
         ecriture = db.query(Ecriture, Montant).\
-                      join(Ecriture.categories).\
+                      join(Ecriture.montant).\
                       filter(Ecriture.id == id).\
                       one()
     except NoResultFound:
