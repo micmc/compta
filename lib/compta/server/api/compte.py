@@ -2,15 +2,15 @@
 # -*- coding: utf8 -*-
 """ Application to create server for compta """
 
-from bottle import response, request, abort
+from compta.server.api.bottle import response, request, abort
 from json import dumps, loads
 
-from sqlalchemy import desc
+#from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql import func
+#from sqlalchemy.sql import func
 
-from compta.db.base import Base
+#from compta.db.base import Base
 from compta.db.banque import Banque
 from compta.db.compte import Compte
 

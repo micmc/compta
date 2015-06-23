@@ -8,8 +8,6 @@ import sys
 import os
 import ConfigParser
 
-from bottle import Bottle
-from bottle import response, request, abort
 from json import dumps, loads
 from datetime import datetime
 #from decimal import Decimal
@@ -22,6 +20,9 @@ from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
+
+from compta.server.api.bottle import Bottle
+from compta.server.api.bottle import response, request, abort
 
 from compta.db.base import Base
 from compta.db.banque import Banque

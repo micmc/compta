@@ -12,7 +12,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
 
-from compta.server.bottle import response, request, abort
+from compta.server.api.bottle import response, request, abort
 
 from compta.db.banque import Banque
 from compta.db.compte import Compte

@@ -2,31 +2,32 @@
 # -*- coding: utf8 -*-
 """ Application to create server for compta """
 
-import re
+#import re
 import locale
-import sys
-import os
-import ConfigParser
+#import sys
+#import os
+#import ConfigParser
 
-from bottle import Bottle
-from bottle import response, request, abort
-from json import dumps, loads
-from datetime import datetime
+#from json import dumps, loads
+#from datetime import datetime
 #from decimal import Decimal
 
-from bottle.ext import sqlalchemy
+#from bottle.ext import sqlalchemy
 #from sqlalchemy import create_engine, Column, Integer, Sequence, String
 #from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy import desc
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql import func
+#from sqlalchemy import create_engine
+#from sqlalchemy import desc
+#from sqlalchemy.orm.exc import NoResultFound
+#from sqlalchemy.exc import IntegrityError
+#from sqlalchemy.sql import func
 
-from compta.db.base import Base
-from compta.db.banque import Banque
-from compta.db.compte import Compte
-from compta.db.ecriture import Ecriture, EcritureCategorie, Tag
+#from compta.server.api.bottle import Bottle
+from compta.server.api.bottle import response
+
+#from compta.db.base import Base
+#from compta.db.banque import Banque
+#from compta.db.compte import Compte
+#from compta.db.ecriture import Ecriture, EcritureCategorie, Tag
 
 from compta.server.api.server import App
 from compta.server.api.banque import app as app_banque
@@ -40,10 +41,10 @@ def main():
     """ Main Page """
     #Set local value for server
     if locale.getdefaultlocale()[0] != 'fr_FR':
-        locale.setlocale(locale.LC_ALL,'fr_FR.utf8')
+        locale.setlocale(locale.LC_ALL, 'fr_FR.utf8')
     else:
         locale.setlocale(locale.LC_ALL, '')
-   
+
     app.mount('/api/', app_banque)
     app.mount('/api/', app_compte)
     app.mount('/api/', app_ecriture)
@@ -61,7 +62,6 @@ def enable_cors():
 def default_banque(id):
     """ For firefox, ignore OPTIONS method """
     return {}
-
 
 if __name__ == "__main__":
     main()
