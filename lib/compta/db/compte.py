@@ -39,6 +39,7 @@ class Compte(Base):
     archive = Column(Boolean, default=False)
     banque_id = Column(Integer, ForeignKey('banque.id'), nullable=False)
     ecritures = relationship('Ecriture',
-                            foreign_keys='Ecriture.compte_id',
-                            backref='compte'
+                             foreign_keys='Ecriture.compte_id',
+                             backref='compte'
+                            )
 

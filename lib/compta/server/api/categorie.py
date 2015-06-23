@@ -15,6 +15,7 @@ from sqlalchemy.sql import func
 from compta.server.api.bottle import response, request, abort
 
 from compta.db.categorie import Categorie
+from compta.db.ecriture import Montant
 
 from compta.server.api.server import App
 
@@ -27,7 +28,7 @@ def list_categorie(db, id=None, nom=None, id_compte=None):
     """ List categorie """
     sort = request.query.sort
     categories = db.query(Categorie.id, Categorie.nom, func.count(Categorie.nom).label("count")).\
-                    join(EcritureCategorie).\
+                    join(Montant).\
                     group_by(Categorie.nom)
     if nom:
         categories = categories.filter(Categorie.nom == nom)

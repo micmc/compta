@@ -2,33 +2,33 @@
 # -*- coding: utf8 -*-
 """ Application to create server for compta """
 
-import re
-import locale
+#import re
+#import locale
 import sys
 import os
 import ConfigParser
 
-from json import dumps, loads
-from datetime import datetime
+#from json import dumps, loads
+#from datetime import datetime
 #from decimal import Decimal
 
-from bottle.ext import sqlalchemy
 #from sqlalchemy import create_engine, Column, Integer, Sequence, String
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from sqlalchemy import desc
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql import func
+#from sqlalchemy import desc
+#from sqlalchemy.orm.exc import NoResultFound
+#from sqlalchemy.exc import IntegrityError
+#from sqlalchemy.sql import func
 
-from compta.server.api.bottle import Bottle
-from compta.server.api.bottle import response, request, abort
+from bottle import Bottle
+from bottle.ext import sqlalchemy
+#bottle import response, request, abort
 
 from compta.db.base import Base
-from compta.db.banque import Banque
-from compta.db.compte import Compte
-from compta.db.ecriture import Ecriture, EcritureCategorie, Tag
-from compta.db.categorie import Categorie
+#from compta.db.banque import Banque
+#from compta.db.compte import Compte
+#from compta.db.ecriture import Ecriture, EcritureCategorie, Tag
+#from compta.db.categorie import Categorie
 
 class App(object):
     """ Singleton to create App instance """
