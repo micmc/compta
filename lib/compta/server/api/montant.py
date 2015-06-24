@@ -35,8 +35,7 @@ def list_montant(db, id=None, ecriture_id=None):
                         Montant.ecriture_id,
                         Categorie.nom.label("categorie_nom")
                        ).\
-                    join(Categorie).\
-                    group_by(Montant.id)
+                    join(Categorie)
     if id:
         montants = montants.filter(Montant.id == id)
     if ecriture_id:

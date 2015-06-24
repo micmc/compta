@@ -17,7 +17,7 @@ from compta.server.api.bottle import response, request, abort
 
 from compta.db.banque import Banque
 from compta.db.compte import Compte
-from compta.db.ecriture import Ecriture, Montant
+from compta.db.ecriture import Ecriture, Montant, Tag, EcritureTag
 from compta.db.categorie import Categorie
 
 from compta.server.api.server import App

@@ -35,6 +35,7 @@ from compta.server.api.compte import app as app_compte
 from compta.server.api.ecriture import app as app_ecriture
 from compta.server.api.categorie import app as app_categorie
 from compta.server.api.montant import app as app_montant
+from compta.server.api.tag import app as app_tag
 
 app = App().server
 
@@ -51,6 +52,7 @@ def main():
     app.mount('/api/', app_ecriture)
     app.mount('/api/', app_categorie)
     app.mount('/api/', app_montant)
+    app.mount('/api/', app_tag)
     app.run(host='localhost', port=8080, debug=True)
 
 @app.hook('after_request')

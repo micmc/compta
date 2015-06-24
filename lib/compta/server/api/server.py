@@ -25,10 +25,10 @@ from bottle.ext import sqlalchemy
 #bottle import response, request, abort
 
 from compta.db.base import Base
-#from compta.db.banque import Banque
-#from compta.db.compte import Compte
-#from compta.db.ecriture import Ecriture, EcritureCategorie, Tag
-#from compta.db.categorie import Categorie
+from compta.db.banque import Banque
+from compta.db.compte import Compte
+from compta.db.ecriture import Ecriture, Montant, EcritureTag, Tag
+from compta.db.categorie import Categorie
 
 class App(object):
     """ Singleton to create App instance """
@@ -47,7 +47,7 @@ class App(object):
                                          )
             Base.metadata.bind = self.__engine
             Base.metadata.create_all(self.__engine)
-            plugin = sqlalchemy.Plugin(self.__engine, Base.metadata, create=False)
+            plugin = sqlalchemy.Plugin(self.__engine, Base.metadata, create=True)
 
             self._app = Bottle()
             self._app.install(plugin)
