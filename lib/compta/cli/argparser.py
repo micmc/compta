@@ -11,9 +11,7 @@ class ParseArgs(object):
     def __init__(self, **kwargs):
         """Initialize default initialisation parser"""
         self.parser = ArgumentParser(**kwargs)
-
         self.parser.add_argument('-d', help='Debug')
-
         self.subparsers = self.parser.add_subparsers(help='Medthod to get information')
 
     def get_args(self):
@@ -22,25 +20,8 @@ class ParseArgs(object):
         options = self.parser.parse_args()
         return options
 
-    @staticmethod
-    def get_method(method):
-        """ Static method to create fabric """
-
-        if method == "banque":
-            return ParseBanque().get_args()
-        elif method == "compte":
-            return ParseCompte().get_args()
-        elif method == "ecriture":
-            return ParseEcriture().get_args()
-
-class ParseBanque(ParseArgs):
-    """ Class for create banque object """
-
-    def __init__(self, **kwargs):
-        """ Initialize default class """
-        ParseArgs.__init__(self, **kwargs)
-
-        # Create banque object
+    def set_banque(self):
+        """ Initialize banque """
         self.parser_banque = self.subparsers.add_parser('banque', help='banque help')
         self.parser_banque.add_argument('cmd',
                                         help='command to pass [list, update, delete, insert]',
@@ -49,19 +30,13 @@ class ParseBanque(ParseArgs):
                                         help='id of the compte',
                                         nargs=1)
 
-    def get_args(self):
-        """ Return argument """
+    def get_banque(self):
+        """ Return argument banque """
         sys.argv[0] = 'banque'
         return self.parser.parse_args(sys.argv)
 
-class ParseCompte(ParseArgs):
-    """ Class for create compte object """
-
-    def __init__(self, **kwargs):
-        """ Initialize default class """
-        ParseArgs.__init__(self, **kwargs)
-
-        # Create compte object
+    def set_compte(self):
+        """ Initialize compte """
         self.parser_compte = self.subparsers.add_parser('compte', help='compte help')
         self.parser_compte.add_argument('cmd',
                                         help='command to pass [list, update, delete, insert]',
@@ -85,11 +60,30 @@ class ParseCompte(ParseArgs):
                                         help='sort for compte',
                                        )
 
-    def get_args(self):
+    def get_compte(self):
         """ Return argument """
         sys.argv[0] = 'compte'
         return self.parser.parse_args(sys.argv)
 
+    @staticmethod
+    def get_method(method):
+        """ Static method to create fabric """
+
+        if method == "banque":
+            banque = ParseArgs()
+            banque.set_banque()
+            return banque.get_banque()
+        elif method == "compte":
+            compte = ParseArgs()
+            compte.set_compte()
+            return compte.get_compte()
+        elif method == "ecriture":
+            return ParseEcriture().get_args()
+        else:
+            default = ParseArgs()
+            default.get_banque()
+            default.get_compte()
+            return default.get_args()
 
 class ParseEcriture(ParseArgs):
     """ Class for create ecriture object """
