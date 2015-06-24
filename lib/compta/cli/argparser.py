@@ -65,32 +65,8 @@ class ParseArgs(object):
         sys.argv[0] = 'compte'
         return self.parser.parse_args(sys.argv)
 
-    @staticmethod
-    def get_method(method):
-        """ Static method to create fabric """
-
-        if method == "banque":
-            banque = ParseArgs()
-            banque.set_banque()
-            return banque.get_banque()
-        elif method == "compte":
-            compte = ParseArgs()
-            compte.set_compte()
-            return compte.get_compte()
-        elif method == "ecriture":
-            return ParseEcriture().get_args()
-        else:
-            default = ParseArgs()
-            default.get_banque()
-            default.get_compte()
-            return default.get_args()
-
-class ParseEcriture(ParseArgs):
-    """ Class for create ecriture object """
-
-    def __init__(self, **kwargs):
-        """ Initialize default class """
-        ParseArgs.__init__(self, **kwargs)
+    def set_ecriture(self):
+        """ Initialize ecriture """
 
         # Create ecriture object
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
@@ -142,9 +118,36 @@ class ParseEcriture(ParseArgs):
         self.parser_ecriture.add_argument('--ec',
                                           help='Ecriture Categorie id',
                                          )
-    def get_args(self):
+    def get_ecriture(self):
         """ Return argument """
         sys.argv[0] = 'ecriture'
         return self.parser.parse_args(sys.argv)
+
+    @staticmethod
+    def get_method(method):
+        """ Static method to create fabric """
+
+        parse = ParseArgs()
+        if method == "banque":
+            parse.set_banque()
+            return parse.get_banque()
+        elif method == "compte":
+            parse.set_compte()
+            return parse.get_compte()
+        elif method == "ecriture":
+            parse.set_ecriture()
+            return parse.get_ecriture()
+        else:
+            parse.get_banque()
+            parse.get_compte()
+            parse.get_ecriture()
+            return parse.get_args()
+
+class ParseEcriture(ParseArgs):
+    """ Class for create ecriture object """
+
+    def __init__(self, **kwargs):
+        """ Initialize default class """
+        ParseArgs.__init__(self, **kwargs)
 
 
