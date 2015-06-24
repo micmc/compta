@@ -3,6 +3,7 @@
 """ Application to create api to manage banque """
 
 import re
+import locale
 
 from json import dumps, loads
 from datetime import datetime
@@ -109,7 +110,7 @@ def list_ecriture(db, id=None, nom=None, id_compte=None):
                                'type': ecriture.type,
                                'valide': ecriture.valide,
                                'categorie': ecriture.categorie,
-                               'montant': "%0.2f" %(ecriture.montant/100.0,),
+                               'montant': "%0.2f" % (ecriture.montant/100.0,),
                                'description': ecriture.description,
                                'ecriture_categorie_id' : ecriture.ecriture_categorie_id,
                               })

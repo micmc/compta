@@ -3,14 +3,15 @@
 """ Application to create api to manage montant """
 
 #import re
+import locale
 
 from json import dumps, loads
 #from datetime import datetime
 
-from sqlalchemy import desc
+#from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql import func
+#from sqlalchemy.sql import func
 
 from compta.server.api.bottle import response, request, abort
 
@@ -51,7 +52,7 @@ def list_montant(db, id=None, ecriture_id=None):
     for montant in montants:
         print montant
         list_montants.append({'id': montant.id,
-                              'montant': montant.montant,
+                              'montant': "%0.2f" % (montant.montant/100.0,),
                               'description': montant.description,
                               'categorie_id': montant.categorie_id,
                               'categorie_nom': montant.categorie_nom,
@@ -59,22 +60,32 @@ def list_montant(db, id=None, ecriture_id=None):
                              })
     return dumps(list_montants)
 
-#@app.post('/montant')
-#def insert_montant(db):
-#    """ Insert a new categorie """
-#    data = request.body.readline()
-#    if not data:
-#        abort(204, 'No data received')
-#    entity = loads(data)
-#    if not entity.has_key('nom'):
-#        abort(404, 'Nom : non spécifié')
-#    categorie = Categorie(nom=entity["nom"])
-#    db.add(categorie)
-#    try:
-#        db.commit()
-#    except IntegrityError:
-#        abort(404, 'Integrity Error')
-#    response.status = 201
-#    response.headers["Location"] = "/categorie/%s" % (categorie.id,)
+@app.post('/montant')
+def insert_montant(db):
+    """ Insert a new montant """
+    data = request.body.readline()
+    if not data:
+        abort(204, 'No data received')
+    entity = loads(data)
+    print entity
+    if not entity.has_key('montant'):
+        abort(404, 'Nom : non spécifié')
+    if not entity.has_key('categorie_id'):
+        abort(404, 'Categorie (id) : non spécifié')
+    if not entity.has_key('ecriture_id'):
+        abort(404, 'Ecriture (id) : non spécifié')
+    montant = Montant(montant=(locale.atof(entity['montant'])*100),
+                      categorie_id=entity['categorie_id'],
+                      ecriture_id=entity['ecriture_id']
+                     )
+    if entity.has_key('description'):
+        montant['description'] = entity['description']
+    db.add(montant)
+    try:
+        db.commit()
+    except IntegrityError:
+        abort(404, 'Integrity Error')
+    response.status = 201
+    response.headers["Montant"] = "/montant/%s" % (montant.id,)
 
 
