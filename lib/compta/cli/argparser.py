@@ -11,8 +11,11 @@ class ParseArgs(object):
     def __init__(self, **kwargs):
         """Initialize default initialisation parser"""
         self.parser = ArgumentParser(**kwargs)
-        self.parser.add_argument('-d', help='Debug')
-        self.subparsers = self.parser.add_subparsers(help='Medthod to get information')
+        self.parser.add_argument('-d', '--debug', help='Debug', action='store_true')
+        self.subparsers = self.parser.add_subparsers(title='database',
+                                                     dest='database',
+                                                     help='Medthod to get information'
+                                                    )
 
     def get_args(self):
         """ Return argument """
@@ -26,9 +29,15 @@ class ParseArgs(object):
         self.parser_banque.add_argument('cmd',
                                         help='command to pass [list, update, delete, insert]',
                                         choices=('list', 'insert', 'update', 'delete'))
-        self.parser_banque.add_argument('-i', '--id', type=int,
-                                        help='id of the compte',
-                                        nargs=1)
+        self.parser_banque.add_argument('-f', '--filter', 
+                                        help='filter to apply',
+                                        nargs='+')
+        self.parser_banque.add_argument('-a', '--attribut', 
+                                        help='filter on attribut',
+                                        nargs='+')
+        self.parser_banque.add_argument('-s', '--sort', 
+                                        help='filter on sort',
+                                        nargs='+')
 
     def get_banque(self):
         """ Return argument banque """
@@ -42,23 +51,16 @@ class ParseArgs(object):
                                         help='command to pass [list, update, delete, insert]',
                                         choices=('list', 'insert', 'update', 'delete')
                                        )
-        self.parser_compte.add_argument('-i', '--id', type=int,
-                                        help='id of the compte',
-                                        nargs=1
-                                       )
-        self.parser_compte.add_argument('-t', '--type',
-                                        choices=['dif', 'div', 'prs', 'prv', 'vir'],
-                                        help='Type',
-                                       )
-        self.parser_compte.add_argument('-a', '--archive', action='store_true',
-                                        help='show only archive default [no]'
-                                       )
-        self.parser_compte.add_argument('--all', action='store_true',
-                                        help='show all default [no]'
-                                       )
-        self.parser_compte.add_argument('-s', '--sort',
-                                        help='sort for compte',
-                                       )
+        self.parser_compte.add_argument('-f', '--filter', 
+                                        help='filter to apply',
+                                        nargs='+')
+        self.parser_compte.add_argument('-a', '--attribut', 
+                                        help='filter on attribut',
+                                        nargs='+')
+        self.parser_compte.add_argument('-s', '--sort', 
+                                        help='filter on sort',
+                                        nargs='+')
+
 
     def get_compte(self):
         """ Return argument """
@@ -138,9 +140,9 @@ class ParseArgs(object):
             parse.set_ecriture()
             return parse.get_ecriture()
         else:
-            parse.get_banque()
-            parse.get_compte()
-            parse.get_ecriture()
+            parse.set_banque()
+            parse.set_compte()
+            parse.set_ecriture()
             return parse.get_args()
 
 class ParseEcriture(ParseArgs):
