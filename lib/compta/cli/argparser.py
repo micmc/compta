@@ -16,7 +16,6 @@ class ParseArgs(object):
                                                      dest='database',
                                                      help='Medthod to get information'
                                                     )
-
     def get_args(self):
         """ Return argument """
 
@@ -61,9 +60,8 @@ class ParseArgs(object):
                                         help='filter on sort',
                                         nargs='+')
 
-
     def get_compte(self):
-        """ Return argument """
+        """ Return argument compte"""
         sys.argv[0] = 'compte'
         return self.parser.parse_args(sys.argv)
 

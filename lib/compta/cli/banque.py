@@ -1,41 +1,45 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
-""" module to manage banque """
+""" Module to manage banque """
+
+from simplejson.scanner import JSONDecodeError
 
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
+from compta.cli.server import Server
 
-class Banque(object):
-    """ Default class to manage banque """
+class Banque(Server):
+    """ List compte account """
 
-    def __init__(self):
+    def __init__(self, parser=None):
         """ Init class to manage parse argument """
 
-        self.options = ParseArgs.get_method("banque")
+        Server.__init__(self, parser)
+        self.rest_method = "banque"
 
-    def list_banque(self):
-        """ List banque account """
-        if self.options.id:
-            pass
-        #rqst = RequestServer('localhost', '8080')
-        #print rqst.get('banque')
-        rqst = RequestServer.get_method("banque")
-        for banque in rqst.json():
-            print "%s, %s %s %s - %s %s" % (banque["nom"],
-                                            banque["adresse"],
-                                            banque["cp"],
-                                            banque["ville"],
-                                            banque["code_banque"],
-                                            banque["code_guichet"]
-                                           )
+    def list(self):
+        """ Redefine list to print """
+        Server.list(self)
+        try:
+            for banque in self.rqst.json():
+                print "%s, %s %s %s - %s %s" % (banque["nom"],
+                                                banque["adresse"],
+                                                banque["cp"],
+                                                banque["ville"],
+                                                banque["code_banque"],
+                                                banque["code_guichet"]
+                                               )
+        except JSONDecodeError as ex:
+            print ex
 
 def main():
     """ Main function """
-    banque = Banque()
-    if banque.options.cmd == 'list':
-        banque.list_banque()
+    parse_args = ParseArgs.get_method("banque")
+    banque = Banque(parse_args)
+    banque.launch_cmd()
 
 if __name__ == '__main__':
     main()
+
 
 

@@ -23,8 +23,8 @@ class RequestServer(object):
         url_data = self._url_data
         if url is not None:
             url_data += url
-        if filter is not None:
-            url_data += filter
+        if filter:
+            url_data += "?" + ",".join(["%s" % values for values in filter])
         self.__request = self.__session.get(url_data)
         return self.__request
 
@@ -43,27 +43,29 @@ class RequestServer(object):
 
     @staticmethod
     def get_method(method,
-                   banque=None,
-                   compte=None,
-                   ecriture=None,
-                   categorie=None,
-                   filter=None
+                   filter,
+                   sort,
+                   attribut
                   ):
         """ Static fabric method """
 
         str_url = ""
-        str_filter = ""
+        lst_filter = []
+        #Create URL
         if method == "banque":
             rqst = RequestServerBanque()
-            if banque:
+            if filter.has_key('id'):
                 str_url = "/%s" % (banque,)
-            return rqst.get(url=str_url)
         elif method == "compte":
             rqst = RequestServerCompte()
-            if banque:
-                str_url = "/%s/compte" % (banque,)
-            elif compte:
-                str_url += "/%s" % (compte,)
+            if filter.has_key('banque_id'):
+                str_url = "banque/%s/compte" % (filter['banque_id'],)
+                del(filter['banque_id'])
+            if filter.has_key('id'):
+                str_url += "/%s" % (filter['id'],)
+                del(filter['id'])
+            else:
+                str_url = "compte"
         elif method == "ecriture":
             rqst = RequestServerEcriture()
             if compte:
@@ -75,15 +77,14 @@ class RequestServer(object):
             rqst = RequestServerCategorie()
             if categorie:
                 str_url += "/%s" % (categorie,)
+        #Create filter
         if filter:
-            if isinstance(filter, str):
-                str_filter = "?filter=%s" % filter
-            elif isinstance(filter, dict):
-                str_filter = "?"
-                for keys, values in filter.iteritems():
-                    str_filter += "%s=%s&" % (keys, values)
-                str_filter = str_filter[:-1]
-        return rqst.get(url=str_url, filter=str_filter)
+            lst_filter.append('filter=' + ','.join(["%s=%s" % (keys, values) for keys, values in filter.iteritems()]))
+        if sort:
+            lst_filter.append('sort=' + ','.join(["%s" % values for values in sort]))
+        if attribut:
+            lst_filter.append('attribut=' + ','.join(["%s" % values for values in attribut]))
+        return rqst.get(url=str_url, filter=lst_filter)
 
 
     @classmethod
@@ -129,7 +130,7 @@ class RequestServerCompte(RequestServer):
         """ Initialize default class """
 
         RequestServer.__init__(self, address, port)
-        self._url_data = self._url_data + "compte"
+        #self._url_data = self._url_data + "compte"
 
 
 class RequestServerEcriture(RequestServer):

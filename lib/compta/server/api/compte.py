@@ -19,36 +19,36 @@ from compta.server.api.server import App
 app = App().server
 
 @app.get('/compte')
-@app.get(r'/compte/<id_compte:int>')
+@app.get(r'/compte/<id:int>')
 @app.get(r'/compte/<nom:re:[a-zA-Z\ ]+>')
-@app.get(r'/banque/<id:int>/compte')
-@app.get(r'/banque/<id:int>/compte/<id_compte:int>')
-@app.get('/banque/<id:int>/compte/<nom:re:[a-zA-Z\ ]+>')
-def list_compte(db, id=None, nom=None, id_compte=None):
+@app.get(r'/banque/<banque_id:int>/compte')
+@app.get(r'/banque/<banque_id:int>/compte/<id:int>')
+@app.get('/banque/<banque_id:int>/compte/<nom:re:[a-zA-Z\ ]+>')
+def list_compte(db, id=None, nom=None, banque_id=None):
     """ List compte 
         filter to use :
-        filter = ['dif', 'div', 'prs', 'prv', 'vir']
+        type = ['dif', 'div', 'prs', 'prv', 'vir']
         archive = yes / no : print archive or not archive
     """
  
-    filter = request.query.filter
+    type = request.query.type
     archive = request.query.archive
 
     comptes = db.query(Compte)
-    if id:
+    if banque_id:
         comptes = comptes.join(Compte.banque).\
-                          filter(Banque.id == id)
+                          filter(Banque.id == banque_id)
     if nom:
         comptes = comptes.filter(Compte.nom == nom)
-    if id_compte:
-        comptes = comptes.filter(Compte.id == id_compte)
+    if id:
+        comptes = comptes.filter(Compte.id == id)
 
-    if filter:
+    if type:
         type_compte = ['dif', 'div', 'prs', 'prv', 'vir']
-        if filter in type_compte:
-            comptes = comptes.filter(Compte.type == filter)
+        if type in type_compte:
+            comptes = comptes.filter(Compte.type == type)
         else:
-            abort(404, "filter not found")
+            abort(404, "type not found")
 
     if archive == "yes":
         comptes = comptes.filter(Compte.archive == True)
