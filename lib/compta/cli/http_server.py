@@ -55,7 +55,7 @@ class RequestServer(object):
         if method == "banque":
             rqst = RequestServerBanque()
             if filter.has_key('id'):
-                str_url = "/%s" % (banque,)
+                str_url = "/%s" % (filter['id'],)
         elif method == "compte":
             rqst = RequestServerCompte()
             if filter.has_key('banque_id'):
@@ -66,6 +66,10 @@ class RequestServer(object):
                 del(filter['id'])
             else:
                 str_url = "compte"
+        elif method == "categorie":
+            rqst = RequestServerCategorie()
+            if filter.has_key('id'):
+                str_url = "/%s" % (filter['id'],)
         elif method == "ecriture":
             rqst = RequestServerEcriture()
             if compte:

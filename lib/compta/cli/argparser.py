@@ -60,6 +60,28 @@ class ParseArgs(object):
                                         help='filter on sort',
                                         nargs='+')
 
+    def get_categorie(self):
+        """ Return argument categorie"""
+        sys.argv[0] = 'categorie'
+        return self.parser.parse_args(sys.argv)
+
+    def set_categorie(self):
+        """ Initialize categorie """
+        self.parser_categorie = self.subparsers.add_parser('categorie', help='categorie help')
+        self.parser_categorie.add_argument('cmd',
+                                        help='command to pass [list, update, delete, insert]',
+                                        choices=('list', 'insert', 'update', 'delete')
+                                       )
+        self.parser_categorie.add_argument('-f', '--filter', 
+                                        help='filter to apply',
+                                        nargs='+')
+        self.parser_categorie.add_argument('-a', '--attribut', 
+                                        help='filter on attribut',
+                                        nargs='+')
+        self.parser_categorie.add_argument('-s', '--sort', 
+                                        help='filter on sort',
+                                        nargs='+')
+
     def get_compte(self):
         """ Return argument compte"""
         sys.argv[0] = 'compte'
@@ -137,9 +159,13 @@ class ParseArgs(object):
         elif method == "ecriture":
             parse.set_ecriture()
             return parse.get_ecriture()
+        elif method == "categorie":
+            parse.set_categorie()
+            return parse.get_categorie()
         else:
             parse.set_banque()
             parse.set_compte()
+            parse.set_categorie()
             parse.set_ecriture()
             return parse.get_args()
 

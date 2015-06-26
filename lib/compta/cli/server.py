@@ -71,6 +71,10 @@ def main():
         from compta.cli.banque import Banque
         banque = Banque(parse_args)
         banque.launch_cmd()
+    if parse_args.database == 'categorie':        
+        from compta.cli.categorie import Categorie
+        categorie = Categorie(parse_args)
+        categorie.launch_cmd()
 
 if __name__ == '__main__':
     main()
