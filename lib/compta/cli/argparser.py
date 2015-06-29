@@ -26,8 +26,8 @@ class ParseArgs(object):
         """ Initialize banque """
         self.parser_banque = self.subparsers.add_parser('banque', help='banque help')
         self.parser_banque.add_argument('cmd',
-                                        help='command to pass [list, update, delete, insert]',
-                                        choices=('list', 'insert', 'update', 'delete'))
+                                        help='command to pass [list, update, delete, create]',
+                                        choices=('list', 'create', 'update', 'delete'))
         self.parser_banque.add_argument('-f', '--filter', 
                                         help='filter to apply',
                                         nargs='+')
@@ -47,8 +47,8 @@ class ParseArgs(object):
         """ Initialize compte """
         self.parser_compte = self.subparsers.add_parser('compte', help='compte help')
         self.parser_compte.add_argument('cmd',
-                                        help='command to pass [list, update, delete, insert]',
-                                        choices=('list', 'insert', 'update', 'delete')
+                                        help='command to pass [list, update, delete, create]',
+                                        choices=('list', 'create', 'update', 'delete')
                                        )
         self.parser_compte.add_argument('-f', '--filter', 
                                         help='filter to apply',
@@ -69,8 +69,8 @@ class ParseArgs(object):
         """ Initialize categorie """
         self.parser_categorie = self.subparsers.add_parser('categorie', help='categorie help')
         self.parser_categorie.add_argument('cmd',
-                                        help='command to pass [list, update, delete, insert]',
-                                        choices=('list', 'insert', 'update', 'delete')
+                                        help='command to pass [list, update, delete, create]',
+                                        choices=('list', 'create', 'update', 'delete')
                                        )
         self.parser_categorie.add_argument('-f', '--filter', 
                                         help='filter to apply',
@@ -93,8 +93,8 @@ class ParseArgs(object):
         # Create ecriture object
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
         self.parser_ecriture.add_argument('cmd',
-                                          help='command to pass [list, update, delete, insert, split]',
-                                          choices=('list', 'insert', 'update', 'delete', 'split'))
+                                          help='command to pass [list, update, delete, create, split]',
+                                          choices=('list', 'create', 'update', 'delete', 'split'))
         self.parser_ecriture.add_argument('-i', '--id', type=int,
                                           help='id of ecriture',
                                          )
