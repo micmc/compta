@@ -55,10 +55,36 @@ class Server(object):
             print "%s : information non trouvé" % (self.rest_method)
             sys.exit(1)
 
-    def launch_cmd(self):
+    def create(self, data):
+        """ create data by rest method """
+        json_data = dumps(data)
+        self.rqst = RequestServer.post_method(self.rest_method,
+                                              json_data,
+                                             )
+        if self.rqst.status_code == 404:
+            print "%s : information non trouvé" % (self.rest_method)
+            sys.exit(1)
+
+    def update(self, data):
+        """ create data by rest method """
+        json_data = dumps(data)
+        self.rqst = RequestServer.put_method(self.rest_method,
+                                             json_data,
+                                            )
+        if self.rqst.status_code == 404:
+            print "%s : information non trouvé" % (self.rest_method)
+            sys.exit(1)
+
+    def launch_cmd(self, cmd=None):
         """ launch command to execute """
+        if not cmd:
+            cmd = self.options.cmd
         if self.options.cmd == "list":
             self.list()
+        elif self.options.cmd == "create":
+            self.create(self.attribut)
+        elif self.options.cmd == "update":
+            self.update(self.attribut)
                                         
 def main():
     """ Main function """
