@@ -29,7 +29,7 @@ class RequestServer(object):
         if self.__request.status_code != 200:
             return False
         else:
-            return self.__request
+            return self.__request.json()
 
     def post(self, data):
         """Post url data"""
@@ -64,25 +64,26 @@ class RequestServer(object):
         elif method == "compte":
             rqst = RequestServerCompte()
             if filter.has_key('banque_id'):
-                str_url = "banque/%s/compte" % (filter['banque_id'],)
+                rqst = RequestServerBanque()
+                str_url = "/%s/compte" % (filter['banque_id'],)
                 del(filter['banque_id'])
             if filter.has_key('id'):
                 str_url += "/%s" % (filter['id'],)
                 del(filter['id'])
-            else:
-                str_url = "compte"
+        elif method == "ecriture":
+            rqst = RequestServerEcriture()
+            if filter.has_key('compte_id'):
+                rqst = RequestServerCompte()
+                str_url = "/%s/ecriture" % (filter['compte_id'],)
+                del(filter['compte_id'])
+            if filter.has_key('id'):
+                str_url += "/%s" % (filter['id'],)
+                del(filter['id'])
         elif method == "categorie":
             rqst = RequestServerCategorie()
             if filter.has_key('id'):
                 str_url = "/%s" % (filter['id'],)
                 del(filter['id'])
-        elif method == "ecriture":
-            rqst = RequestServerEcriture()
-            if compte:
-                rqst = RequestServerCompte()
-                str_url = "/%s/ecriture" % (compte,)
-            if ecriture:
-                str_url += "/%s" % (ecriture,)
         #Create filter
         if filter:
             lst_filter.append('filter=' + ','.join(["%s:%s" % (keys, values) for keys, values in filter.iteritems()]))
@@ -157,7 +158,7 @@ class RequestServerCompte(RequestServer):
         """ Initialize default class """
 
         RequestServer.__init__(self, address, port)
-        #self._url_data = self._url_data + "compte"
+        self._url_data = self._url_data + "compte"
 
 
 class RequestServerEcriture(RequestServer):

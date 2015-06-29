@@ -19,7 +19,7 @@ class Categorie(Server):
         """ Redefine list to print """
         Server.list(self)
         try:
-            for categorie in self.rqst.json():
+            for categorie in self.rqst:
                 print "%s, %s, %s" % (categorie["id"],
                                       categorie["nom"],
                                       categorie["count"]
@@ -35,6 +35,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-

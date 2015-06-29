@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 """ Module to manage banque """
 
-from simplejson.scanner import JSONDecodeError
+#from simplejson.scanner import JSONDecodeError
 
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
@@ -21,7 +21,7 @@ class Banque(Server):
         """ Redefine list to print """
         Server.list(self)
         try:
-            for banque in self.rqst.json():
+            for banque in self.rqst:
                 print "%s, %s %s %s - %s %s" % (banque["nom"],
                                                 banque["adresse"],
                                                 banque["cp"],
@@ -29,7 +29,7 @@ class Banque(Server):
                                                 banque["code_banque"],
                                                 banque["code_guichet"]
                                                )
-        except JSONDecodeError as ex:
+        except Exception as ex:
             print ex
 
 def main():

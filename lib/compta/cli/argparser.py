@@ -89,6 +89,23 @@ class ParseArgs(object):
 
     def set_ecriture(self):
         """ Initialize ecriture """
+        self.parser_categorie = self.subparsers.add_parser('ecriture', help='ecriture help')
+        self.parser_categorie.add_argument('cmd',
+                                        help='command to pass [list, update, delete, create]',
+                                        choices=('list', 'create', 'update', 'delete')
+                                       )
+        self.parser_categorie.add_argument('-f', '--filter', 
+                                        help='filter to apply',
+                                        nargs='+')
+        self.parser_categorie.add_argument('-a', '--attribut', 
+                                        help='filter on attribut',
+                                        nargs='+')
+        self.parser_categorie.add_argument('-s', '--sort', 
+                                        help='filter on sort',
+                                        nargs='+')
+
+    def set_ecriture_old(self):
+        """ Initialize ecriture """
 
         # Create ecriture object
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')

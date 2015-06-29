@@ -97,6 +97,10 @@ def main():
         from compta.cli.banque import Banque
         banque = Banque(parse_args)
         banque.launch_cmd()
+    if parse_args.database == 'ecriture':
+        from compta.cli.ecriture import Ecriture
+        ecriture = Ecriture(parse_args)
+        ecriture.launch_cmd()
     if parse_args.database == 'categorie':
         from compta.cli.categorie import Categorie
         categorie = Categorie(parse_args)
