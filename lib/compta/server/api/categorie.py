@@ -28,7 +28,7 @@ def list_categorie(db, id=None, nom=None, id_compte=None):
     """ List categorie """
     sort = request.query.sort
     categories = db.query(Categorie.id, Categorie.nom, func.count(Categorie.nom).label("count")).\
-                    join(Montant).\
+                    outerjoin(Montant).\
                     group_by(Categorie.nom)
     if nom:
         categories = categories.filter(Categorie.nom == nom)
@@ -63,6 +63,7 @@ def insert_categorie(db):
     entity = loads(data)
     if not entity.has_key('nom'):
         abort(404, 'Nom : non spécifié')
+    print entity
     categorie = Categorie(nom=entity["nom"])
     db.add(categorie)
     try:
@@ -71,5 +72,34 @@ def insert_categorie(db):
         abort(404, 'Integrity Error')
     response.status = 201
     response.headers["Location"] = "/categorie/%s" % (categorie.id,)
+
+@app.put(r'/categorie/<id:int>')
+def update_categorie(db, id=None, ec_id=None):
+    """ Update information for an ecriture """
+    if not id:
+        abort(404, 'no id received')
+    data = request.body.readline()
+    if not data:
+        abort(204, 'No data received')
+    entity = {}
+    try:
+        entity = loads(data)
+    except:
+        print "erreur chargement json %s" % (data,)
+        abort(404, 'Error on loading data')
+    try:
+        categorie = db.query(Categorie).\
+                      filter(Categorie.id == id).\
+                      one()
+    except NoResultFound:
+        abort(404, "ID not found")
+
+    if entity.has_key('nom'):
+        categorie.nom = entity["nom"]
+    try:
+        db.commit()
+        print Categorie
+    except IntegrityError:
+        abort(404, 'Integrity Error')
 
 

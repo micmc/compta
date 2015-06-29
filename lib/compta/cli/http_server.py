@@ -4,7 +4,7 @@
 
 #import sys
 import requests
-from json import loads
+from json import loads, dumps
 
 class RequestServer(object):
     """ Default class to manage parse argument """
@@ -26,7 +26,10 @@ class RequestServer(object):
         if filter:
             url_data += "?" + ",".join(["%s" % values for values in filter])
         self.__request = self.__session.get(url_data)
-        return self.__request
+        if self.__request.status_code != 200:
+            return False
+        else:
+            return self.__request
 
     def post(self, data):
         """Post url data"""
@@ -41,8 +44,9 @@ class RequestServer(object):
         self.__request = self.__session.put(url_data, data)
         return self.__request
 
-    @staticmethod
-    def get_method(method,
+    @classmethod
+    def get_method(cls,
+                   method,
                    filter,
                    sort,
                    attribut
@@ -56,6 +60,7 @@ class RequestServer(object):
             rqst = RequestServerBanque()
             if filter.has_key('id'):
                 str_url = "/%s" % (filter['id'],)
+                del(filter['id'])
         elif method == "compte":
             rqst = RequestServerCompte()
             if filter.has_key('banque_id'):
@@ -70,6 +75,7 @@ class RequestServer(object):
             rqst = RequestServerCategorie()
             if filter.has_key('id'):
                 str_url = "/%s" % (filter['id'],)
+                del(filter['id'])
         elif method == "ecriture":
             rqst = RequestServerEcriture()
             if compte:
@@ -77,13 +83,9 @@ class RequestServer(object):
                 str_url = "/%s/ecriture" % (compte,)
             if ecriture:
                 str_url += "/%s" % (ecriture,)
-        elif method == "categorie":
-            rqst = RequestServerCategorie()
-            if categorie:
-                str_url += "/%s" % (categorie,)
         #Create filter
         if filter:
-            lst_filter.append('filter=' + ','.join(["%s=%s" % (keys, values) for keys, values in filter.iteritems()]))
+            lst_filter.append('filter=' + ','.join(["%s:%s" % (keys, values) for keys, values in filter.iteritems()]))
         if sort:
             lst_filter.append('sort=' + ','.join(["%s" % values for values in sort]))
         if attribut:
@@ -98,25 +100,46 @@ class RequestServer(object):
                    ):
         """ Static fabric method """
 
-        if method == "ecriture":
+        if method == "banque":
+            rqst = RequestServerBanque()
+        elif method == "compte":
+            rqst = RequestServerCompte()
+        elif method == "categorie":
+            rqst = RequestServerCategorie()
+        elif method == "Ecriture":
             rqst = RequestServerEcriture()
-            return rqst.post(data)
+        else:
+            return False
+        return rqst.post(dumps(data))
 
     @classmethod
     def put_method(cls,
                    method,
+                   filter,
                    data
                   ):
         """ Static fabric method """
-        entity = loads(data)
-        if method == "ecriture":
+
+        #entity = loads(data)
+        print method, filter, data
+        if not filter.has_key("id"):
+            return False
+        if method == "banque":
+            rqst = RequestServerBanque()
+        elif method == "compte":
+            rqst = RequestServerCompte()
+        elif method == "categorie":
+            rqst = RequestServerCategorie()
+        elif method == "Ecriture":
             rqst = RequestServerEcriture()
-            str_url = "/%s" % (entity['id'],)
-            return rqst.put(url=str_url, data=data)
-        elif method == "split":
-            rqst = RequestServerEcriture()
-            str_url = "/%s/ec/%s" % (entity['id'],entity['ecriture_categorie_id'])
-            return rqst.put(url=str_url, data=data)
+        else:
+            return False
+        str_url = "/%s" % (filter["id"])
+        return rqst.put(url=str_url, data=dumps(data))
+        #if method == "split":
+        #    rqst = RequestServerEcriture()
+        #    str_url = "/%s/ec/%s" % (entity['id'],entity['ecriture_categorie_id'])
+        #    return rqst.put(url=str_url, data=data)
 
 class RequestServerBanque(RequestServer):
     """ Class for create banque object """

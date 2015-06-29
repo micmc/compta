@@ -4,7 +4,8 @@
 
 import sys
 
-from simplejson.scanner import JSONDecodeError
+#from simplejson.scanner import JSONDecodeError
+#from json import dumps
 
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
@@ -27,22 +28,22 @@ class Server(object):
 
     def parse_args(self):
         """ parse data """
+        self.filter = {}
+        if self.options.filter:
+            for filter in self.options.filter:
+                tmp_filter = filter.split('=')
+                if len(tmp_filter) == 1:
+                    self.filter['filter'] = tmp_filter[0]
+                else:
+                    self.filter[tmp_filter[0]] = tmp_filter[1]
         if self.options.cmd == 'list':
-            self.filter = {}
-            if self.options.filter:
-                for filter in self.options.filter:
-                    tmp_filter = filter.split('=')
-                    if len(tmp_filter) == 1:
-                        self.filter['filter'] = tmp_filter[0]
-                    else:
-                        self.filter[tmp_filter[0]]=tmp_filter[1]
-            if self.options.sort:
+           if self.options.sort:
                 self.sort = self.options.sort
         if self.options.cmd != 'list':
             self.attribut = {}
             for attribut in self.options.attribut:
                 tmp_attr = attribut.split('=')
-                self.attribut[tmp_attr[0]]=tmp_attr[1]
+                self.attribut[tmp_attr[0]] = tmp_attr[1]
 
     def list(self):
         """ get data by rest method """
@@ -51,29 +52,28 @@ class Server(object):
                                              self.sort,
                                              self.attribut
                                             )
-        if self.rqst.status_code == 404:
-            print "%s : information non trouvé" % (self.rest_method)
-            sys.exit(1)
+        #if self.rqst.status_code == 404:
+        #    print "%s : information non trouvé" % (self.rest_method)
+        #    sys.exit(1)
 
-    def create(self, data):
+    def create(self):
         """ create data by rest method """
-        json_data = dumps(data)
         self.rqst = RequestServer.post_method(self.rest_method,
-                                              json_data,
+                                              self.attribut,
                                              )
-        if self.rqst.status_code == 404:
-            print "%s : information non trouvé" % (self.rest_method)
-            sys.exit(1)
+        #if self.rqst.status_code == 404:
+        #    print "%s : information non trouvé" % (self.rest_method)
+        #    sys.exit(1)
 
-    def update(self, data):
+    def update(self):
         """ create data by rest method """
-        json_data = dumps(data)
         self.rqst = RequestServer.put_method(self.rest_method,
-                                             json_data,
+                                             self.filter,
+                                             self.attribut
                                             )
-        if self.rqst.status_code == 404:
-            print "%s : information non trouvé" % (self.rest_method)
-            sys.exit(1)
+        #if self.rqst.status_code == 404:
+        #    print "%s : information non trouvé" % (self.rest_method)
+        #    sys.exit(1)
 
     def launch_cmd(self, cmd=None):
         """ launch command to execute """
@@ -82,22 +82,22 @@ class Server(object):
         if self.options.cmd == "list":
             self.list()
         elif self.options.cmd == "create":
-            self.create(self.attribut)
+            self.create()
         elif self.options.cmd == "update":
-            self.update(self.attribut)
-                                        
+            self.update()
+
 def main():
     """ Main function """
     parse_args = ParseArgs.get_method("all")
-    if parse_args.database == 'compte':        
+    if parse_args.database == 'compte':
         from compta.cli.compte import Compte
         compte = Compte(parse_args)
         compte.launch_cmd()
-    if parse_args.database == 'banque':        
+    if parse_args.database == 'banque':
         from compta.cli.banque import Banque
         banque = Banque(parse_args)
         banque.launch_cmd()
-    if parse_args.database == 'categorie':        
+    if parse_args.database == 'categorie':
         from compta.cli.categorie import Categorie
         categorie = Categorie(parse_args)
         categorie.launch_cmd()
