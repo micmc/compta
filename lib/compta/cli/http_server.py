@@ -105,10 +105,10 @@ class RequestServer(object):
             rqst = RequestServerBanque()
         elif method == "compte":
             rqst = RequestServerCompte()
+        elif method == "ecriture":
+            rqst = RequestServerEcriture()
         elif method == "categorie":
             rqst = RequestServerCategorie()
-        elif method == "Ecriture":
-            rqst = RequestServerEcriture()
         else:
             return False
         return rqst.post(dumps(data))
