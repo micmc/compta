@@ -70,7 +70,7 @@ class App(object):
     @classmethod
     def check_data(cls, database, data):
         """ Check data if valid
-            
+
             return data in dict
             else False
         """
@@ -92,6 +92,36 @@ class App(object):
             else:
                 return False
         return entity
+
+    @classmethod
+    def get_filter(cls, filter):
+        """ Get filter in dict
+
+            return  dict of filter
+            else false
+        """
+
+        if filter:
+            dict_filter = {}
+            for lst_attribut in filter.split(','):
+                attribut = lst_attribut.split(':')
+                dict_filter[attribut[0]] = attribut[1]
+            return dict_filter
+        return False
+
+    @classmethod
+    def get_sort(cls, sort):
+        """ Get sort in list
+
+            return  dict of filter
+            else false
+        """
+
+        if sort:
+            lst_sort = ["%s" % value for value in sort.split(',')]
+            return lst_sort
+        return False
+
 
 class Config(object):
     """ Read config """
