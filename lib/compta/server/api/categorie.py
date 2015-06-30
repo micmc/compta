@@ -56,15 +56,12 @@ def list_categorie(db, id=None, nom=None, id_compte=None):
 
 @app.post('/categorie')
 def insert_categorie(db):
-    """ Insert a new categorie """
-    data = request.body.readline()
-    if not data:
-        abort(204, 'No data received')
-    entity = loads(data)
-    if not entity.has_key('nom'):
-        abort(404, 'Nom : non spécifié')
-    print entity
-    categorie = Categorie(nom=entity["nom"])
+    """ Create a categorie """
+    entity = App.check_data(Categorie, request.body.readline())
+    if entity:
+        categorie = Categorie()
+    for column,value in entity.iteritems():
+        setattr(categorie, column, value)
     db.add(categorie)
     try:
         db.commit()
@@ -74,28 +71,19 @@ def insert_categorie(db):
     response.headers["Location"] = "/categorie/%s" % (categorie.id,)
 
 @app.put(r'/categorie/<id:int>')
-def update_categorie(db, id=None, ec_id=None):
+def update_categorie(db, id):
     """ Update information for an ecriture """
-    if not id:
-        abort(404, 'no id received')
-    data = request.body.readline()
-    if not data:
-        abort(204, 'No data received')
-    entity = {}
-    try:
-        entity = loads(data)
-    except:
-        print "erreur chargement json %s" % (data,)
-        abort(404, 'Error on loading data')
-    try:
-        categorie = db.query(Categorie).\
-                      filter(Categorie.id == id).\
-                      one()
-    except NoResultFound:
-        abort(404, "ID not found")
-
-    if entity.has_key('nom'):
-        categorie.nom = entity["nom"]
+    entity = App.check_data(Categorie, request.body.readline())
+    if entity:
+        try:
+            categorie = db.query(Categorie).\
+                           filter(Categorie.id == id).\
+                           one()
+        except NoResultFound:
+            abort(404, "ID not found")
+    print dir(categorie), type(categorie)
+    for column,value in entity.iteritems():
+        setattr(categorie, column, value)
     try:
         db.commit()
         print Categorie

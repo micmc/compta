@@ -8,7 +8,7 @@ import sys
 import os
 import ConfigParser
 
-#from json import dumps, loads
+from json import loads
 #from datetime import datetime
 #from decimal import Decimal
 
@@ -19,10 +19,11 @@ from sqlalchemy import create_engine
 #from sqlalchemy.orm.exc import NoResultFound
 #from sqlalchemy.exc import IntegrityError
 #from sqlalchemy.sql import func
+from sqlalchemy import inspect
 
 from bottle import Bottle
 from bottle.ext import sqlalchemy
-#bottle import response, request, abort
+from bottle import abort
 
 from compta.db.base import Base
 from compta.db.banque import Banque
@@ -65,6 +66,32 @@ class App(object):
         if not App.instance:
             App.instance = App.__OnlyApp(debug)
         return App.instance
+
+    @classmethod
+    def check_data(cls, database, data):
+        """ Check data if valid
+            
+            return data in dict
+            else False
+        """
+        if not data:
+            abort(204, 'No data received')
+        entity = {}
+        try:
+            entity = loads(data)
+        except:
+            print "erreur chargement json %s" % (data,)
+            abort(404, 'Error on loading data')
+        mapper = inspect(database)
+        orm_data = {}
+        for column in mapper.attrs:
+            orm_data[column.key] = column.columns[0].nullable
+        for column in entity.iterkeys():
+            if orm_data.has_key(column):
+                del(orm_data[column])
+            else:
+                return False
+        return entity
 
 class Config(object):
     """ Read config """
