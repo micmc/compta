@@ -20,6 +20,7 @@ from sqlalchemy import create_engine
 #from sqlalchemy.exc import IntegrityError
 #from sqlalchemy.sql import func
 from sqlalchemy import inspect
+from sqlalchemy.orm.properties import ColumnProperty
 
 from bottle import Bottle
 from bottle.ext import sqlalchemy
@@ -85,7 +86,8 @@ class App(object):
         mapper = inspect(database)
         orm_data = {}
         for column in mapper.attrs:
-            orm_data[column.key] = column.columns[0].nullable
+            if isinstance(column, ColumnProperty):
+                orm_data[column.key] = column.columns[0].nullable
         for column in entity.iterkeys():
             if orm_data.has_key(column):
                 del(orm_data[column])

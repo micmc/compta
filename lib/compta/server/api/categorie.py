@@ -28,9 +28,9 @@ def list_categorie(db, id=None, nom=None):
     """ List categorie """
     filter = {}
     if id:
-        filter['id']=id
+        filter['id'] = id
     elif nom:
-        filter['nim']=nom
+        filter['nom'] = nom
     else:
         filter = App.get_filter(request.query.filter)
 
@@ -60,7 +60,8 @@ def list_categorie(db, id=None, nom=None):
         list_categories.append({'id': categorie.id,
                                 'nom': categorie.nom,
                                 'count': categorie.count,
-                               })
+                               }
+                              )
     return dumps(list_categories)
 
 @app.post('/categorie')
@@ -74,8 +75,8 @@ def insert_categorie(db):
     db.add(categorie)
     try:
         db.commit()
-    except IntegrityError:
-        abort(404, 'Integrity Error')
+    except IntegrityError as ex:
+        abort(404, ex.args)
     response.status = 201
     response.headers["Location"] = "/categorie/%s" % (categorie.id,)
 
@@ -90,13 +91,23 @@ def update_categorie(db, id):
                            one()
         except NoResultFound:
             abort(404, "ID not found")
-    print dir(categorie), type(categorie)
     for column, value in entity.iteritems():
         setattr(categorie, column, value)
     try:
         db.commit()
-        print Categorie
-    except IntegrityError:
-        abort(404, 'Integrity Error')
+    except IntegrityError as ex:
+        abort(404, ex.args)
+
+@app.delete(r'/categorie/<id:int>')
+def delete_categorie(db, id=None):
+    """ Delete a categorie """
+    try:
+        categorie = db.query(Categorie).\
+                    filter(Categorie.id == id).\
+                    one()
+    except NoResultFound:
+        abort(404, "ID not found")
+    db.delete(categorie)
+    db.commit()
 
 
