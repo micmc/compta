@@ -24,9 +24,16 @@ app = App().server
 @app.get('/categorie')
 @app.get(r'/categorie/<id:int>')
 @app.get(r'/categorie/<nom:re:[a-zA-Z\ ]+>')
-def list_categorie(db, id=None, nom=None, id_compte=None):
+def list_categorie(db, id=None, nom=None):
     """ List categorie """
-    filter = App.get_filter(request.query.filter)
+    filter = {}
+    if id:
+        filter['id']=id
+    elif nom:
+        filter['nim']=nom
+    else:
+        filter = App.get_filter(request.query.filter)
+
     sort = App.get_sort(request.query.sort)
 
     categories = db.query(Categorie.id, Categorie.nom, func.count(Categorie.nom).label("count")).\
