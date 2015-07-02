@@ -82,7 +82,7 @@ def insert_categorie(db):
 
 @app.put(r'/categorie/<id:int>')
 def update_categorie(db, id):
-    """ Update information for an ecriture """
+    """ Update information for an categorie """
     entity = App.check_data(Categorie, request.body.readline())
     if entity:
         try:

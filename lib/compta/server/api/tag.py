@@ -23,26 +23,43 @@ app = App().server
 
 @app.get('/tag')
 @app.get(r'/tag/<id:int>')
+@app.get(r'/tag/<nom:re:[a-zA-Z\ ]+>')
 @app.get(r'/ecriture/<ecriture_id:int>/tag')
 @app.get(r'/ecriture/<ecriture_id:int>/tag/<id:int>')
-def list_tag(db, id=None, ecriture_id=None):
-    """ List categorie """
+@app.get(r'/ecriture/<ecriture_id:int>/tag/<nom:re:[a-zA-Z\ ]+>')
+def list_tag(db, id=None, nom=None, ecriture_id=None):
+    """ List tag """
+    filter = {}
+    if id:
+        filter['id'] = id
+    elif nom:
+        filter['nom'] = nom
+    elif ecriture_id:
+        filter['ecriture_id'] = ecriture_id
+    else:
+        filter = App.get_filter(request.query.filter)
+
+    sort = App.get_sort(request.query.sort)
+
     tags = db.query(Tag.id,
                     Tag.nom,
                     Tag.valeur,
                    )
-    if id:
-        tags = tags.filter(Tag.id == id)
-    if ecriture_id:
-        tags = tags.join(Ecriture.tags).\
-                    filter(Ecriture.id == ecriture_id)
-
+    if filter:
+        for column, value in filter.iteritems():
+            tags = tags.filter(getattr(Tag, column) == value)
+    if sort:
+        for column in sort:
+            tags = tags.order_by(getattr(Tag, column))
+    else:
+        tags = tags.order_by(Tag.nom)
     try:
         tags = tags.all()
     except NoResultFound:
         abort(404, "ID not found")
     if not tags:
         abort(404, "ID not found")
+
     list_tags = []
     for tag in tags:
         print tag
@@ -56,24 +73,47 @@ def list_tag(db, id=None, ecriture_id=None):
 @app.post('/tag')
 def insert_tag(db):
     """ Insert a new tag """
-    data = request.body.readline()
-    if not data:
-        abort(204, 'No data received')
-    entity = loads(data)
-    print entity
-    if not entity.has_key('nom'):
-        abort(404, 'Nom : non spécifié')
-    if not entity.has_key('valeur'):
-        abort(404, 'Valeur : non spécifié')
-    tag = Tag(nom=entity['nom'],
-              valeur=entity['valeur'],
-             )
+    entity = App.check_data(Tag, request.body.readline())
+    if entity:
+        tag = Tag()
+    for column, value in entity.iteritems():
+        setattr(tag, column, value)
     db.add(tag)
     try:
         db.commit()
-    except IntegrityError:
-        abort(404, 'Integrity Error')
+    except IntegrityError as ex:
+        abort(404, ex.args)
     response.status = 201
     response.headers["Tag"] = "/tag/%s" % (tag.id,)
+
+@app.put(r'/tag/<id:int>')
+def update_tag(db, id):
+    """ Update information for a tag """
+    entity = App.check_data(Tag, request.body.readline())
+    if entity:
+        try:
+            tag = db.query(Tag).\
+                           filter(Tag.id == id).\
+                           one()
+        except NoResultFound:
+            abort(404, "ID not found")
+    for column, value in entity.iteritems():
+        setattr(tag, column, value)
+    try:
+        db.commit()
+    except IntegrityError as ex:
+        abort(404, ex.args)
+
+@app.delete(r'/tag/<id:int>')
+def delete_tag(db, id=None):
+    """ Delete a tag """
+    try:
+        tag = db.query(Tag).\
+                    filter(Tag.id == id).\
+                    one()
+    except NoResultFound:
+        abort(404, "ID not found")
+    db.delete(tag)
+    db.commit()
 
 
