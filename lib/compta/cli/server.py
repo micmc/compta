@@ -3,12 +3,19 @@
 """ Module to manage compte """
 
 import sys
-
+import re
 #from simplejson.scanner import JSONDecodeError
 #from json import dumps
 
+from sqlalchemy import inspect
+from sqlalchemy.orm.properties import ColumnProperty
+from sqlalchemy.sql.sqltypes import String as DBString
+
+#from compta.db.categorie import Categorie
+
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
+
 
 class Server(object):
     """ Default class to manage database """
@@ -58,9 +65,10 @@ class Server(object):
 
     def create(self):
         """ create data by rest method """
-        self.rqst = RequestServer.post_method(self.rest_method,
-                                              self.attribut,
-                                             )
+        if self.check_args():
+            self.rqst = RequestServer.post_method(self.rest_method,
+                                                  self.attribut,
+                                                 )
         #if self.rqst.status_code == 404:
         #    print "%s : information non trouvé" % (self.rest_method)
         #    sys.exit(1)
@@ -86,7 +94,7 @@ class Server(object):
         elif self.options.cmd == "update":
             self.update()
 
-    def check_args(self, prompt=False)
+    def check_args(self, prompt=False):
         """ Method to check wich argument is mandatory
 
             Do an introspection in database
@@ -96,7 +104,33 @@ class Server(object):
             return True if OK
             else False
         """
-        pass
+        mapper = inspect(self.database)
+        orm_data = {}
+        for column in mapper.attrs:
+            if isinstance(column, ColumnProperty) and not column.columns[0].primary_key:
+                if not column.columns[0].nullable:
+                    orm_data[column.key] = column.columns[0].type
+        if self.attribut:
+            for column,value in orm_data.iteritems():
+                if self.attribut.has_key(column):
+                    if self.check_type_data(value,self.attribut[column]):
+                        print "OK"
+                elif not prompt:
+                    return False
+            return True
+        return False
+    
+    def check_type_data(self, type_data, data):
+        """Check datatype to see if is correct before to send to database"""
+        print type_data, data, type(type_data)
+        if isinstance(type_data, DBString):
+            print dir(type_data), type_data.length
+            if len(data) <= type_data.length:
+                return True
+        return False
+        #Do for integer
+        #Do for date
+        #Do for boolean
 
 def main():
     """ Main function """

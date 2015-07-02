@@ -2,6 +2,8 @@
 # -*- coding: utf8 -*-
 """ Module to manage banque """
 
+from compta.db.categorie import Categorie as DBCategorie
+
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
 from compta.cli.server import Server
@@ -14,6 +16,7 @@ class Categorie(Server):
 
         Server.__init__(self, parser)
         self.rest_method = "categorie"
+        self.database = DBCategorie
 
     def list(self):
         """ Redefine list to print """
