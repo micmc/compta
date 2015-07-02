@@ -63,7 +63,6 @@ def list_montant(db, id=None, ecriture_id=None):
         abort(404, "ID not found")
     list_montants = []
     for montant in montants:
-        print montant
         list_montants.append({'id': montant.id,
                               'montant': "%0.2f" % (montant.montant/100.0,),
                               'description': montant.description,
@@ -80,7 +79,10 @@ def insert_montant(db):
     if entity:
         montant = Montant()
     for column, value in entity.iteritems():
-        setattr(montant, column, value)
+        if column == 'montant':
+           montant.montant = int(locale.atof(entity["montant"])*100)
+        else:
+            setattr(montant, column, value)
     db.add(montant)
     try:
         db.commit()
@@ -101,7 +103,10 @@ def update_montant(db, id):
         except NoResultFound:
             abort(404, "ID not found")
     for column, value in entity.iteritems():
-        setattr(montant, column, value)
+        if column == 'montant':
+           montant.montant = int(locale.atof(entity["montant"])*100)
+        else:
+            setattr(montant, column, value)
     try:
         db.commit()
     except IntegrityError as ex:

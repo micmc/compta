@@ -62,7 +62,6 @@ def list_tag(db, id=None, nom=None, ecriture_id=None):
 
     list_tags = []
     for tag in tags:
-        print tag
         list_tags.append({'id': tag.id,
                           'nom': tag.nom,
                           'valeur': tag.valeur,

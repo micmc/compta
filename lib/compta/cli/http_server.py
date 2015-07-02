@@ -79,6 +79,9 @@ class RequestServer(object):
             if filter.has_key('id'):
                 str_url += "/%s" % (filter['id'],)
                 del(filter['id'])
+            if filter.has_key('filter'):
+                if filter['filter'] == 'sum':
+                    str_url += "/%s" % (filter['filter'])
         elif method == "categorie":
             rqst = RequestServerCategorie()
             if filter.has_key('id'):
@@ -122,7 +125,6 @@ class RequestServer(object):
         """ Static fabric method """
 
         #entity = loads(data)
-        print method, filter, data
         if not filter.has_key("id"):
             return False
         if method == "banque":

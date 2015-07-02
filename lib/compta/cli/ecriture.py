@@ -29,7 +29,7 @@ class Ecriture(Server):
                                                                       response["type"],
                                                                       response["categorie"],
                                                                       response["id"],
-                                                                      response["ecriture_categorie_id"],
+                                                                      response["montant_id"],
                                                                      )
             elif isinstance(self.rqst, dict):
                 for k, v in self.rqst.iteritems():
