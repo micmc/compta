@@ -86,6 +86,18 @@ class Server(object):
         elif self.options.cmd == "update":
             self.update()
 
+    def check_args(self, prompt=False)
+        """ Method to check wich argument is mandatory
+
+            Do an introspection in database
+            Check for witch argument give by parse_arg if arugment is missing
+            
+            If prompt is True, display en prompt to give argument, test it and save it
+            return True if OK
+            else False
+        """
+        pass
+
 def main():
     """ Main function """
     parse_args = ParseArgs.get_method("all")
