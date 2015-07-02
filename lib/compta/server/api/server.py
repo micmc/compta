@@ -22,9 +22,13 @@ from sqlalchemy import create_engine
 from sqlalchemy import inspect
 from sqlalchemy.orm.properties import ColumnProperty
 
-from bottle import Bottle
-from bottle.ext import sqlalchemy
-from bottle import abort
+from compta.server.api.bottle import Bottle
+
+# Equivalent of this form
+#from compta.server.api.bottle.ext import sqlalchemy
+import compta.server.api.bottle_sqlalchemy as sqlalchemy
+
+from compta.server.api.bottle import abort
 
 from compta.db.base import Base
 from compta.db.banque import Banque
