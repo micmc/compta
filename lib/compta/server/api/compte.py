@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 #from sqlalchemy.sql import func
 
 #from compta.db.base import Base
-from compta.db.banque import Banque
+from compta.db.compte import Compte
 from compta.db.compte import Compte
 
 from compta.server.api.server import App
@@ -25,39 +25,33 @@ app = App().server
 @app.get(r'/banque/<banque_id:int>/compte/<id:int>')
 @app.get('/banque/<banque_id:int>/compte/<nom:re:[a-zA-Z\ ]+>')
 def list_compte(db, id=None, nom=None, banque_id=None):
-    """ List compte 
-        filter to use :
-        type = ['dif', 'div', 'prs', 'prv', 'vir']
-        archive = yes / no : print archive or not archive
-    """
- 
-    type = request.query.type
-    archive = request.query.archive
+    """ List compte """
+
+    filter = {}
+    if id:
+        filter['id'] = id
+    elif nom:
+        filter['nom'] = nom
+    elif banque_id:
+        filter['banque_id'] = banque_id
+    else:
+        filter = App.get_filter(request.query.filter)
+
+    sort = App.get_sort(request.query.sort)
 
     comptes = db.query(Compte)
-    if banque_id:
-        comptes = comptes.join(Compte.banque).\
-                          filter(Banque.id == banque_id)
-    if nom:
-        comptes = comptes.filter(Compte.nom == nom)
-    if id:
-        comptes = comptes.filter(Compte.id == id)
 
-    if type:
-        type_compte = ['dif', 'div', 'prs', 'prv', 'vir']
-        if type in type_compte:
-            comptes = comptes.filter(Compte.type == type)
-        else:
-            abort(404, "type not found")
-
-    if archive == "yes":
-        comptes = comptes.filter(Compte.archive == True)
-    elif archive == "no":
-        comptes = comptes.filter(Compte.archive == False)
+    if filter:
+        for column, value in filter.iteritems():
+            comptes = comptes.filter(getattr(Compte, column) == value)
+    if sort:
+        for column in sort:
+            comptes = comptes.order_by(getattr(Compte, column))
+    else:
+        comptes = comptes.order_by(Compte.nom)
 
     try:
-        comptes = comptes.order_by(Compte.nom).\
-                          all()
+        comptes = comptes.all()
     except NoResultFound:
         abort(404, "ID not found")
     if not comptes:
@@ -74,83 +68,39 @@ def list_compte(db, id=None, nom=None, banque_id=None):
                             })
     return dumps(list_comptes)
 
-@app.put(r'/compte/<id:int>')
-def update_compte(db, id=None):
-    """ Update information for a compte """
-    if not id:
-        abort(404, 'no id received')
-    data = request.body.readline()
-    if not data:
-        abort(204, 'No data received')
-    entity = {}
-    try:
-        entity = loads(data)
-    except:
-        print "erreur chargement json %s" % (data,)
-        abort(404, 'Error on loading data')
-    try:
-        compte = db.query(Compte).\
-                    filter(Compte.id == id).\
-                    one()
-    except NoResultFound:
-        abort(404, "ID not found")
-    if entity.has_key('nom'):
-        compte.nom = entity["nom"]
-    if entity.has_key('numero'):
-        compte.numero = entity["numero"]
-    if entity.has_key('cle'):
-        compte.cle = entity["cle"]
-    if entity.has_key('type'):
-        compte.type = entity["type"]
-    if entity.has_key('archive'):
-        if entity["archive"].isnumeric():
-            compte.archive = entity["archive"]
-        elif entity["archive"].lower() == "true":
-            compte.archive = True
-        else:
-            compte.archive = False
-    try:
-        db.commit()
-    except IntegrityError:
-        abort(404, 'Integrity Error')
-
-
 @app.post('/compte')
 def insert_compte(db):
-    """ Insert a new compte """
-    data = request.body.readline()
-    if not data:
-        abort(204, 'No data received')
-    entity = loads(data)
-    if not entity.has_key('nom'):
-        abort(404, 'Nom : non spécifié')
-    if not entity.has_key('numero'):
-        abort(404, 'numero : non spécifié')
-    if not entity.has_key('cle'):
-        abort(404, 'cle : non spécifié')
-    if not entity.has_key('type'):
-        abort(404, 'Type : non spécifié')
-    if not entity.has_key('banque_id'):
-        abort(404, 'banque_id : non spécifié')
-    compte = Compte(nom=entity["nom"],
-                    numero=entity["numero"],
-                    cle=entity["cle"],
-                    type=entity["type"],
-                    banque_id=entity["banque_id"])
-    if entity.has_key('archive'):
-        if entity["archive"].isnumeric():
-            compte.archive = entity["archive"]
-        elif entity["archive"].lower() == "true":
-            compte.archive = True
-        else:
-            compte.archive = False
+    """ Create a  compte """
+    entity = App.check_data(Compte, request.body.readline())
+    if entity:
+        compte = Compte()
+    for column, value in entity.iteritems():
+        setattr(compte, column, value)
     db.add(compte)
     try:
         db.commit()
-    except IntegrityError:
-        abort(404, 'Integrity Error')
+    except IntegrityError as ex:
+        abort(404, ex.args)
     response.status = 201
     response.headers["Location"] = "/compte/%s" % (compte.id,)
+
+@app.put(r'/compte/<id:int>')
+def update_compte(db, id=None):
+    """ Update information for a compte """
+    entity = App.check_data(Compte, request.body.readline())
+    if entity:
+        try:
+            compte = db.query(Compte).\
+                           filter(Compte.id == id).\
+                           one()
+        except NoResultFound:
+            abort(404, "ID not found")
+    for column, value in entity.iteritems():
+        setattr(compte, column, value)
+    try:
+        db.commit()
+    except IntegrityError as ex:
+        abort(404, ex.args)
 
 @app.delete(r'/compte/<id:int>')
 def delete_compte(db, id=None):
