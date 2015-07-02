@@ -27,7 +27,17 @@ app = App().server
 @app.get(r'/ecriture/<ecriture_id:int>/montant')
 @app.get(r'/ecriture/<ecriture_id:int>/montant/<id:int>')
 def list_montant(db, id=None, ecriture_id=None):
-    """ List categorie """
+    """ List montant """
+    filter = {}
+    if id:
+        filter['id'] = id
+    elif ecriture_id:
+        filter['ecriture_id'] = ecriture_id
+    else:
+        filter = App.get_filter(request.query.filter)
+
+    sort = App.get_sort(request.query.sort)
+
     montants = db.query(Montant.id,
                         Montant.montant,
                         Montant.description,
@@ -36,11 +46,15 @@ def list_montant(db, id=None, ecriture_id=None):
                         Categorie.nom.label("categorie_nom")
                        ).\
                     join(Categorie)
-    if id:
-        montants = montants.filter(Montant.id == id)
-    if ecriture_id:
-        montants = montants.filter(Montant.ecriture_id == ecriture_id)
-
+    if filter:
+        for column, value in filter.iteritems():
+            montants = montants.filter(getattr(Montant, column) == value)
+    if sort:
+        for column in sort:
+            montants = montants.order_by(getattr(Montant, column))
+    else:
+        montants = montants.order_by(Montant.montant)
+ 
     try:
         montants = montants.all()
     except NoResultFound:
@@ -61,30 +75,48 @@ def list_montant(db, id=None, ecriture_id=None):
 
 @app.post('/montant')
 def insert_montant(db):
-    """ Insert a new montant """
-    data = request.body.readline()
-    if not data:
-        abort(204, 'No data received')
-    entity = loads(data)
-    print entity
-    if not entity.has_key('montant'):
-        abort(404, 'Nom : non spécifié')
-    if not entity.has_key('categorie_id'):
-        abort(404, 'Categorie (id) : non spécifié')
-    if not entity.has_key('ecriture_id'):
-        abort(404, 'Ecriture (id) : non spécifié')
-    montant = Montant(montant=(locale.atof(entity['montant'])*100),
-                      categorie_id=entity['categorie_id'],
-                      ecriture_id=entity['ecriture_id']
-                     )
-    if entity.has_key('description'):
-        montant['description'] = entity['description']
+    """ Create a montant """
+    entity = App.check_data(Montant, request.body.readline())
+    if entity:
+        montant = Montant()
+    for column, value in entity.iteritems():
+        setattr(montant, column, value)
     db.add(montant)
     try:
         db.commit()
-    except IntegrityError:
-        abort(404, 'Integrity Error')
+    except IntegrityError as ex:
+        abort(404, ex.args)
     response.status = 201
     response.headers["Montant"] = "/montant/%s" % (montant.id,)
+
+@app.put(r'/montant/<id:int>')
+def update_montant(db, id):
+    """ Update information for a montant """
+    entity = App.check_data(Montant, request.body.readline())
+    if entity:
+        try:
+            montant = db.query(Montant).\
+                           filter(Montant.id == id).\
+                           one()
+        except NoResultFound:
+            abort(404, "ID not found")
+    for column, value in entity.iteritems():
+        setattr(montant, column, value)
+    try:
+        db.commit()
+    except IntegrityError as ex:
+        abort(404, ex.args)
+
+@app.delete(r'/montant/<id:int>')
+def delete_tag(db, id=None):
+    """ Delete a montant """
+    try:
+        montant = db.query(Montant).\
+                    filter(Montant.id == id).\
+                    one()
+    except NoResultFound:
+        abort(404, "ID not found")
+    db.delete(montant)
+    db.commit()
 
 
