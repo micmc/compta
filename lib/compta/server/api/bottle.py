@@ -1809,7 +1809,6 @@ class _ImportRedirect(object):
         if fullname in sys.modules: return sys.modules[fullname]
         modname = fullname.rsplit('.', 1)[1]
         realname = self.impmask % modname
-        print modname,realname
         __import__(realname)
         module = sys.modules[fullname] = sys.modules[realname]
         setattr(self.module, modname, module)
