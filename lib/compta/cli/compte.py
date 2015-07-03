@@ -4,6 +4,8 @@
 
 #from simplejson.scanner import JSONDecodeError
 
+from compta.db.compte import Compte as DBCompte
+
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
 from compta.cli.server import Server
@@ -16,6 +18,7 @@ class Compte(Server):
 
         Server.__init__(self, parser)
         self.rest_method = "compte"
+        self.database = (DBCompte,)
 
     def list(self):
         """ Redefine list to print """

@@ -3,6 +3,7 @@
 """ Module to manage banque """
 
 #from simplejson.scanner import JSONDecodeError
+from compta.db.banque import Banque as DBBanque
 
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
@@ -16,6 +17,7 @@ class Banque(Server):
 
         Server.__init__(self, parser)
         self.rest_method = "banque"
+        self.database = (DBBanque,)
 
     def list(self):
         """ Redefine list to print """
