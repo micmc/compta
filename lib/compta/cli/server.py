@@ -10,6 +10,10 @@ import re
 from sqlalchemy import inspect
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.sql.sqltypes import String as DBString
+from sqlalchemy.sql.sqltypes import Integer as DBInteger
+from sqlalchemy.sql.sqltypes import Date as DBdate
+from sqlalchemy.sql.sqltypes import Boolean as DBBoolean
+#from sqlalchemy.sql.sqltypes import float as DBFloat
 
 #from compta.db.categorie import Categorie
 
@@ -44,7 +48,7 @@ class Server(object):
                 else:
                     self.filter[tmp_filter[0]] = tmp_filter[1]
         if self.options.cmd == 'list':
-           if self.options.sort:
+            if self.options.sort:
                 self.sort = self.options.sort
         if self.options.cmd != 'list':
             if self.options.attribut:
@@ -54,34 +58,25 @@ class Server(object):
 
     def list(self):
         """ get data by rest method """
-        self.rqst = RequestServer.get_method(self.rest_method,
-                                             self.filter,
-                                             self.sort,
-                                             self.attribut
-                                            )
-        #if self.rqst.status_code == 404:
-        #    print "%s : information non trouvé" % (self.rest_method)
-        #    sys.exit(1)
+        rqst = RequestServer.get_method(self.rest_method,
+                                        self.filter,
+                                        self.sort,
+                                        self.attribut
+                                       )
 
     def create(self):
         """ create data by rest method """
         if self.check_args(True):
-            self.rqst = RequestServer.post_method(self.rest_method,
-                                                  self.attribut,
-                                                 )
-        #if self.rqst.status_code == 404:
-        #    print "%s : information non trouvé" % (self.rest_method)
-        #    sys.exit(1)
+            rqst = RequestServer.post_method(self.rest_method,
+                                             self.attribut,
+                                            )
 
     def update(self):
         """ create data by rest method """
-        self.rqst = RequestServer.put_method(self.rest_method,
-                                             self.filter,
-                                             self.attribut
-                                            )
-        #if self.rqst.status_code == 404:
-        #    print "%s : information non trouvé" % (self.rest_method)
-        #    sys.exit(1)
+        rqst = RequestServer.put_method(self.rest_method,
+                                        self.filter,
+                                        self.attribut
+                                       )
 
     def launch_cmd(self, cmd=None):
         """ launch command to execute """
@@ -99,7 +94,7 @@ class Server(object):
 
             Do an introspection in database
             Check for witch argument give by parse_arg if arugment is missing
-            
+
             If prompt is True, display en prompt to give argument, test it and save it
             return True if OK
             else False
@@ -107,25 +102,42 @@ class Server(object):
         mapper = inspect(self.database)
         orm_data = {}
         for column in mapper.attrs:
-            print type(column), column.columns[0].primary_key, column.columns[0].nullable, column.key
+            #print type(column), column.columns[0].primary_key, column.columns[0].nullable, column.key
+            attribut = self.attribut.copy()
             if isinstance(column, ColumnProperty) and \
-               not column.columns[0].primary_key and \
-               not column.columns[0].nullable and \
-               not self.attribut.has_key(column.key):
-                   if prompt:
-                       data = unicode(raw_input("%s: " % column.key))
-                       if not self.check_type_data(column.columns[0].type, data):
-                           return False
-                       self.attribut[column.key] = data
-                       print self.attribut[column.key]
-                   else:
-                       return False
+                    not column.columns[0].primary_key and \
+                    not column.columns[0].nullable:
+                if not attribut.has_key(column.key):
+                    if prompt:
+                        data = unicode(raw_input("%s: " % column.key))
+                        if not self.check_type_data(column.columns[0].type, data):
+                            print "Type non reconnue pour %s (%s)" % (column.key, column.columns[0].type)
+                            return False
+                        self.attribut[column.key] = data
+                    else:
+                        return False
+                else:
+                    del(attribut[column.key])
+        if attribut:
+            print "champs non reconnu %s" % attribut
+            return False
         return True
-    
+
     def check_type_data(self, type_data, data):
         """Check datatype to see if is correct before to send to database"""
         if isinstance(type_data, DBString):
             if len(data) <= type_data.length:
+                return True
+        elif isinstance(type_data, DBInteger):
+            if re.match(r"^\d+$", data):
+                return True
+            elif re.match(r"^\d+([\.,]\d{1,2})?$", data):
+                return True
+        elif isinstance(type_data, DBDate):
+            if re.match(r"^(201[0-9]\/)?\d{1,2}\/\d{1,2}$", data):
+                return True
+        elif isinstance(type_data, DBBoolean):
+            if re.match(r"(True|False)", data):
                 return True
         return False
         #Do for integer
