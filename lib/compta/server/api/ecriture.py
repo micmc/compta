@@ -118,7 +118,10 @@ def insert_ecriture(db):
     if entity:
         ecriture = Ecriture()
     for column, value in entity.iteritems():
-        setattr(ecriture, column, value)
+        if column == 'date':
+            ecriture.date = datetime.strptime(value, "%Y/%m/%d")
+        else:
+            setattr(ecriture, column, value)
     db.add(ecriture)
     try:
         db.commit()
@@ -140,7 +143,10 @@ def update_ecriture(db, id=None, ec_id=None):
         except NoResultFound:
             abort(404, "ID not found")
     for column, value in entity.iteritems():
-        setattr(ecriture, column, value)
+        if column == 'date':
+            ecriture.date = datetime.strptime(value, "%Y/%m/%d")
+        else:
+            setattr(ecriture, column, value)
     try:
         db.commit()
     except IntegrityError as ex:
