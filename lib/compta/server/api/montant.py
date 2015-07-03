@@ -78,18 +78,18 @@ def insert_montant(db):
     entity = App.check_data(Montant, request.body.readline())
     if entity:
         montant = Montant()
-    for column, value in entity.iteritems():
-        if column == 'montant':
-           montant.montant = int(locale.atof(entity["montant"])*100)
-        else:
-            setattr(montant, column, value)
-    db.add(montant)
-    try:
-        db.commit()
-    except IntegrityError as ex:
-        abort(404, ex.args)
-    response.status = 201
-    response.headers["Montant"] = "/montant/%s" % (montant.id,)
+        for column, value in entity.iteritems():
+            if column == 'montant':
+               montant.montant = int(locale.atof(entity["montant"])*100)
+            else:
+                setattr(montant, column, value)
+        db.add(montant)
+        try:
+            db.commit()
+        except IntegrityError as ex:
+            abort(404, ex.args)
+        response.status = 201
+        response.headers["Montant"] = "/montant/%s" % (montant.id,)
 
 @app.put(r'/montant/<id:int>')
 def update_montant(db, id):

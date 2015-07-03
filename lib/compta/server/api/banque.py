@@ -71,15 +71,15 @@ def insert_banque(db):
     entity = App.check_data(Banque, request.body.readline())
     if entity:
         banque = Banque()
-    for column, value in entity.iteritems():
-        setattr(banque, column, value)
-    db.add(banque)
-    try:
-        db.commit()
-    except IntegrityError as ex:
-        abort(404, ex.args)
-    response.status = 201
-    response.headers["Location"] = "/banque/%s" % (banque.id,)
+        for column, value in entity.iteritems():
+            setattr(banque, column, value)
+        db.add(banque)
+        try:
+            db.commit()
+        except IntegrityError as ex:
+            abort(404, ex.args)
+        response.status = 201
+        response.headers["Location"] = "/banque/%s" % (banque.id,)
 
 @app.put(r'/banque/<id:int>')
 def update_banque(db, id=None):

@@ -117,18 +117,18 @@ def insert_ecriture(db):
     entity = App.check_data(Ecriture, request.body.readline())
     if entity:
         ecriture = Ecriture()
-    for column, value in entity.iteritems():
-        if column == 'date':
-            ecriture.date = datetime.strptime(value, "%Y/%m/%d")
-        else:
-            setattr(ecriture, column, value)
-    db.add(ecriture)
-    try:
-        db.commit()
-    except IntegrityError as ex:
-        abort(404, ex.args)
-    response.status = 201
-    response.headers["Location"] = "/ecriture/%s/" % (ecriture.id,)
+        for column, value in entity.iteritems():
+            if column == 'date':
+                ecriture.date = datetime.strptime(value, "%Y/%m/%d")
+            else:
+                setattr(ecriture, column, value)
+        db.add(ecriture)
+        try:
+            db.commit()
+        except IntegrityError as ex:
+            abort(404, ex.args)
+        response.status = 201
+        response.headers["Location"] = "/ecriture/%s/" % (ecriture.id,)
 
 
 @app.put(r'/ecriture/<id:int>')

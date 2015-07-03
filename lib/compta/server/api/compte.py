@@ -74,15 +74,15 @@ def insert_compte(db):
     entity = App.check_data(Compte, request.body.readline())
     if entity:
         compte = Compte()
-    for column, value in entity.iteritems():
-        setattr(compte, column, value)
-    db.add(compte)
-    try:
-        db.commit()
-    except IntegrityError as ex:
-        abort(404, ex.args)
-    response.status = 201
-    response.headers["Location"] = "/compte/%s" % (compte.id,)
+        for column, value in entity.iteritems():
+            setattr(compte, column, value)
+        db.add(compte)
+        try:
+            db.commit()
+        except IntegrityError as ex:
+            abort(404, ex.args)
+        response.status = 201
+        response.headers["Location"] = "/compte/%s" % (compte.id,)
 
 @app.put(r'/compte/<id:int>')
 def update_compte(db, id=None):

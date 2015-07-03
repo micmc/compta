@@ -70,15 +70,15 @@ def insert_categorie(db):
     entity = App.check_data(Categorie, request.body.readline())
     if entity:
         categorie = Categorie()
-    for column, value in entity.iteritems():
-        setattr(categorie, column, value)
-    db.add(categorie)
-    try:
-        db.commit()
-    except IntegrityError as ex:
-        abort(404, ex.args)
-    response.status = 201
-    response.headers["Location"] = "/categorie/%s" % (categorie.id,)
+        for column, value in entity.iteritems():
+            setattr(categorie, column, value)
+        db.add(categorie)
+        try:
+            db.commit()
+        except IntegrityError as ex:
+            abort(404, ex.args)
+        response.status = 201
+        response.headers["Location"] = "/categorie/%s" % (categorie.id,)
 
 @app.put(r'/categorie/<id:int>')
 def update_categorie(db, id):

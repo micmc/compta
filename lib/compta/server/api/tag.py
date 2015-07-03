@@ -75,15 +75,15 @@ def insert_tag(db):
     entity = App.check_data(Tag, request.body.readline())
     if entity:
         tag = Tag()
-    for column, value in entity.iteritems():
-        setattr(tag, column, value)
-    db.add(tag)
-    try:
-        db.commit()
-    except IntegrityError as ex:
-        abort(404, ex.args)
-    response.status = 201
-    response.headers["Tag"] = "/tag/%s" % (tag.id,)
+        for column, value in entity.iteritems():
+            setattr(tag, column, value)
+        db.add(tag)
+        try:
+            db.commit()
+        except IntegrityError as ex:
+            abort(404, ex.args)
+        response.status = 201
+        response.headers["Tag"] = "/tag/%s" % (tag.id,)
 
 @app.put(r'/tag/<id:int>')
 def update_tag(db, id):
