@@ -4,6 +4,9 @@
 
 import sys
 import re
+import copy
+from datetime import date,datetime
+
 #from simplejson.scanner import JSONDecodeError
 #from json import dumps
 
@@ -11,7 +14,7 @@ from sqlalchemy import inspect
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.sql.sqltypes import String as DBString
 from sqlalchemy.sql.sqltypes import Integer as DBInteger
-from sqlalchemy.sql.sqltypes import Date as DBdate
+from sqlalchemy.sql.sqltypes import Date as DBDate
 from sqlalchemy.sql.sqltypes import Boolean as DBBoolean
 #from sqlalchemy.sql.sqltypes import float as DBFloat
 
@@ -100,49 +103,76 @@ class Server(object):
             else False
         """
         mapper = inspect(self.database)
-        orm_data = {}
+        #attrs = dict((key,value) for key,value in self.attribut.items())
+        attrs = copy.deepcopy(self.attribut)
         for column in mapper.attrs:
-            #print type(column), column.columns[0].primary_key, column.columns[0].nullable, column.key
-            attribut = self.attribut.copy()
             if isinstance(column, ColumnProperty) and \
                     not column.columns[0].primary_key and \
                     not column.columns[0].nullable:
-                if not attribut.has_key(column.key):
+                if not attrs.has_key(column.key):
                     if prompt:
-                        data = unicode(raw_input("%s: " % column.key))
-                        if not self.check_type_data(column.columns[0].type, data):
+                        data = unicode(raw_input("%s [%s]: " % (column.key,
+                                                                column.columns[0].key
+                                                               )
+                                                )
+                                      )
+                        data = self.check_type_data(column.columns[0], data)
+                        if data is None:
                             print "Type non reconnue pour %s (%s)" % (column.key, column.columns[0].type)
                             return False
                         self.attribut[column.key] = data
                     else:
                         return False
                 else:
-                    del(attribut[column.key])
-        if attribut:
-            print "champs non reconnu %s" % attribut
+                    del(attrs[column.key])
+        if attrs:
+            print "champs non reconnu %s" % attrs
             return False
         return True
 
     def check_type_data(self, type_data, data):
         """Check datatype to see if is correct before to send to database"""
-        if isinstance(type_data, DBString):
-            if len(data) <= type_data.length:
-                return True
-        elif isinstance(type_data, DBInteger):
+        if isinstance(type_data.type, DBString):
+            if type_data.key:
+                lst_enums = ["%s" % enum for enum in type_data.key.split(",")]
+                if data in lst_enums:
+                    return data
+            if len(data) <= type_data.type.length:
+                return data
+        elif isinstance(type_data.type, DBInteger):
             if re.match(r"^\d+$", data):
-                return True
+                return data
             elif re.match(r"^\d+([\.,]\d{1,2})?$", data):
+                return data
+        elif isinstance(type_data.type, DBDate):
+            date_now = datetime.now()
+            date_data = None
+            re_date = re.match(r"^(?P<year>201[0-9])\/(?P<month>\d{1,2})\/(?P<day>\d{1,2})$", data)
+            if re_date:
+                date_data = "%s/%s/%s" % (re_date.group('year'),
+                                          re_date.group('month'),
+                                          re_date.group('day')
+                                         )
+            re_date = re.match(r"^(?P<day>\d{1,2})\/(?P<month>\d{1,2})(\/(?P<year>201[0-9]))?$", data)
+            if re_date:
+                if re_date.group('year'):
+                    date_data = "%s/" % re_date.group('year')
+                else:
+                    date_data = "%s/" % str(date.today().year)
+                date_data += "%s/%s" % (re_date.group('month'),
+                                        re_date.group('day')
+                                       )
+            try:
+                if date_data and date_now > datetime.strptime(date_data, "%Y/%m/%d"):
+                    return date_data
+            except Exception:
+                pass
+        elif isinstance(type_data.data, DBBoolean):
+            if re.match(r"(0|Off|False)", data):
+                return False
+            elif re.match(r"(1|On|True)", data):
                 return True
-        elif isinstance(type_data, DBDate):
-            if re.match(r"^(201[0-9]\/)?\d{1,2}\/\d{1,2}$", data):
-                return True
-        elif isinstance(type_data, DBBoolean):
-            if re.match(r"(True|False)", data):
-                return True
-        return False
-        #Do for integer
-        #Do for date
-        #Do for boolean
+        return None
 
 def main():
     """ Main function """

@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
 from base import Base
+from compta.db.categorie import Categorie
 
 #CREATE TABLE "ecriture" (
 #    "id" integer NOT NULL PRIMARY KEY,
@@ -33,9 +34,9 @@ class Ecriture(Base):
     """ Class to manage ecriture table """
     __tablename__ = 'ecriture'
     id = Column(Integer, primary_key=True)
-    date = Column('date', Date, nullable=False)
-    dc = Column(Integer, nullable=False)
-    type = Column('type', Enum('Vr', 'Pr', 'Cb', 'Ch', 'Re', 'Li'), nullable=False)
+    date = Column('date', Date, key="[YYYY]/MM/DD/[YYYY]", nullable=False)
+    dc = Column(Integer, nullable=False, key="1/-1", default=1)
+    type = Column('type', Enum('Vr', 'Pr', 'Cb', 'Ch', 'Re', 'Li'), key='Vr, Pr, Cb, Ch, Re, Li', nullable=False)
     nom = Column(String(200), nullable=False)
     valide = Column(Boolean, default=False)
     compte_id = Column(Integer, ForeignKey('compte.id'), nullable=False)
@@ -56,7 +57,7 @@ class Montant(Base):
     description = Column(String(), nullable=True)
     ecriture_id = Column(Integer, ForeignKey('ecriture.id'), nullable=False)
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=True)
-    categorie = relationship('Categorie')
+    categorie = relationship(Categorie)
 
 class EcritureTag(Base):
     """ Class to manage ecriture_tag table """
