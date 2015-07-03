@@ -29,7 +29,7 @@ class Server(object):
             self.options = parser
         self.filter = None
         self.sort = None
-        self.attribut = None
+        self.attribut = {}
         self.rest_method = None
         self.parse_args()
 
@@ -47,10 +47,10 @@ class Server(object):
            if self.options.sort:
                 self.sort = self.options.sort
         if self.options.cmd != 'list':
-            self.attribut = {}
-            for attribut in self.options.attribut:
-                tmp_attr = attribut.split('=')
-                self.attribut[tmp_attr[0]] = tmp_attr[1]
+            if self.options.attribut:
+                for attribut in self.options.attribut:
+                    tmp_attr = attribut.split('=')
+                    self.attribut[tmp_attr[0]] = tmp_attr[1]
 
     def list(self):
         """ get data by rest method """
@@ -65,7 +65,7 @@ class Server(object):
 
     def create(self):
         """ create data by rest method """
-        if self.check_args():
+        if self.check_args(True):
             self.rqst = RequestServer.post_method(self.rest_method,
                                                   self.attribut,
                                                  )
@@ -107,24 +107,24 @@ class Server(object):
         mapper = inspect(self.database)
         orm_data = {}
         for column in mapper.attrs:
-            if isinstance(column, ColumnProperty) and not column.columns[0].primary_key:
-                if not column.columns[0].nullable:
-                    orm_data[column.key] = column.columns[0].type
-        if self.attribut:
-            for column,value in orm_data.iteritems():
-                if self.attribut.has_key(column):
-                    if self.check_type_data(value,self.attribut[column]):
-                        print "OK"
-                elif not prompt:
-                    return False
-            return True
-        return False
+            print type(column), column.columns[0].primary_key, column.columns[0].nullable, column.key
+            if isinstance(column, ColumnProperty) and \
+               not column.columns[0].primary_key and \
+               not column.columns[0].nullable and \
+               not self.attribut.has_key(column.key):
+                   if prompt:
+                       data = unicode(raw_input("%s: " % column.key))
+                       if not self.check_type_data(column.columns[0].type, data):
+                           return False
+                       self.attribut[column.key] = data
+                       print self.attribut[column.key]
+                   else:
+                       return False
+        return True
     
     def check_type_data(self, type_data, data):
         """Check datatype to see if is correct before to send to database"""
-        print type_data, data, type(type_data)
         if isinstance(type_data, DBString):
-            print dir(type_data), type_data.length
             if len(data) <= type_data.length:
                 return True
         return False
