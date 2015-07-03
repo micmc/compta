@@ -69,10 +69,13 @@ class Server(object):
 
     def create(self):
         """ create data by rest method """
-        if self.check_args(True):
+        if self.check_args(self.options.prompt):
             self.rqst = RequestServer.post_method(self.rest_method,
                                                   self.attribut,
                                                  )
+        else:
+            print "Erreur de saisie pour l'ajout"
+            sys.exit(1)
 
     def update(self):
         """ create data by rest method """
@@ -108,10 +111,10 @@ class Server(object):
             mapper = inspect(database)
             for column in mapper.attrs:
                 if isinstance(column, ColumnProperty) and \
-                        not column.columns[0].primary_key and \
-                        not  column.columns[0].foreign_keys and \
-                        not column.columns[0].nullable:
-                    if not attrs.has_key(column.key):
+                        not column.columns[0].primary_key:
+                    if not attrs.has_key(column.key) and \
+                            not column.columns[0].foreign_keys and \
+                            not column.columns[0].nullable:
                         if prompt:
                             data = unicode(raw_input("%s [%s]: " % (column.key,
                                                                     column.columns[0].key
@@ -125,11 +128,11 @@ class Server(object):
                             self.attribut[column.key] = data
                         else:
                             return False
-                    else:
+                    elif attrs.has_key(column.key):
                         del(attrs[column.key])
-            if attrs:
-                print "champs non reconnu %s" % attrs
-                return False
+        if attrs:
+            print "champs non reconnu %s" % attrs
+            return False
         return True
 
     def check_type_data(self, type_data, data):

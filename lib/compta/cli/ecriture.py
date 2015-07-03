@@ -3,6 +3,7 @@
 """ Module to manage ecriture """
 
 #from simplejson.scanner import JSONDecodeError
+import re
 
 from compta.db.ecriture import Ecriture as DBEcriture
 from compta.db.ecriture import Montant as DBMontant
@@ -40,6 +41,26 @@ class Ecriture(Server):
                     print "%s -> %s" % (k, v)
         except Exception as ex:
             print ex
+
+    def create(self):
+        """ Redefine create to add categorie """
+        list_categorie = RequestServer.get_method("categorie",
+                                            {},
+                                            ['nom',],
+                                            []
+                                           )
+        for i in range(1, 10):
+            tmp_str = ""
+            for categorie in list_categorie[(i-1)*5:i*5]:
+                tmp_str += "%2d - %16s | " % (categorie['id'], categorie['nom'].strip())
+            print tmp_str[:-3]
+        data = unicode(raw_input("categorie :"))
+        if re.match(r"^\d+([\.,]\d{1,2})?$", data):
+            self.attribut['categorie_id'] = data
+            Server.create(self)
+        else:
+            print "Categorie erroné"
+            sys.exit(1)
 
 def main():
     """ Main function """

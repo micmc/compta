@@ -12,6 +12,7 @@ class ParseArgs(object):
         """Initialize default initialisation parser"""
         self.parser = ArgumentParser(**kwargs)
         self.parser.add_argument('-d', '--debug', help='Debug', action='store_true')
+        self.parser.add_argument('-p', '--prompt', help='Prompt', action='store_true')
         self.subparsers = self.parser.add_subparsers(title='database',
                                                      dest='database',
                                                      help='Medthod to get information'
