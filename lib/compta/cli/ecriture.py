@@ -20,7 +20,7 @@ class Ecriture(Server):
 
         Server.__init__(self, parser)
         self.rest_method = "ecriture"
-        self.database = (DBEcriture, DBMontant)
+        self.database = (DBEcriture)
 
     def list(self):
         """ Redefine list to print """
@@ -44,6 +44,18 @@ class Ecriture(Server):
 
     def create(self):
         """ Redefine create to add categorie """
+
+        #Test data for ecriture
+        if self.check_args(self.options.prompt):
+            #Next test data for montant
+
+            self.rqst = RequestServer.post_method(self.rest_method,
+                                                  self.attribut,
+                                                 )
+        else:
+            print "Erreur de saisie pour l'ajout"
+            sys.exit(1)
+
         list_categorie = RequestServer.get_method("categorie",
                                             {},
                                             ['nom',],
