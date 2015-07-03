@@ -194,6 +194,10 @@ def main():
         from compta.cli.ecriture import Ecriture
         ecriture = Ecriture(parse_args)
         ecriture.launch_cmd()
+    if parse_args.database == 'montant':
+        from compta.cli.montant import Montant
+        montant = Montant(parse_args)
+        montant.launch_cmd()
     if parse_args.database == 'categorie':
         from compta.cli.categorie import Categorie
         categorie = Categorie(parse_args)

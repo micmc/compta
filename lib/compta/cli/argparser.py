@@ -61,6 +61,11 @@ class ParseArgs(object):
                                         help='filter on sort',
                                         nargs='+')
 
+    def get_compte(self):
+        """ Return argument compte"""
+        sys.argv[0] = 'compte'
+        return self.parser.parse_args(sys.argv)
+
     def get_categorie(self):
         """ Return argument categorie"""
         sys.argv[0] = 'categorie'
@@ -83,11 +88,6 @@ class ParseArgs(object):
                                         help='filter on sort',
                                         nargs='+')
 
-    def get_compte(self):
-        """ Return argument compte"""
-        sys.argv[0] = 'compte'
-        return self.parser.parse_args(sys.argv)
-
     def set_ecriture(self):
         """ Initialize ecriture """
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
@@ -104,64 +104,33 @@ class ParseArgs(object):
         self.parser_ecriture.add_argument('-s', '--sort', 
                                           help='filter on sort',
                                           nargs='+')
- 
-    def set_ecriture_old(self):
-        """ Initialize ecriture """
-
-        # Create ecriture object
-        self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
-        self.parser_ecriture.add_argument('cmd',
-                                          help='command to pass [list, update, delete, create, split]',
-                                          choices=('list', 'create', 'update', 'delete', 'split'))
-        self.parser_ecriture.add_argument('-i', '--id', type=int,
-                                          help='id of ecriture',
-                                         )
-        self.parser_ecriture.add_argument('-c', '--compte', type=int,
-                                          required=True,
-                                          help='id of the compte',
-                                         )
-        self.parser_ecriture.add_argument('-f', '--filter',
-                                          help='filter for compte, must be a number to print or sum',
-                                         )
-        self.parser_ecriture.add_argument('-s', '--sort',
-                                          help='sort for ecriture',
-                                         )
-        self.parser_ecriture.add_argument('-d', '--dc',
-                                          choices=["d", "c"],
-                                          help='Débit/Crédit',
-                                         )
-        self.parser_ecriture.add_argument('-t', '--type',
-                                          choices=["Pr", "Vr", "Cb", "Re", "Ch", "Li", "Prs"],
-                                          help='Type',
-                                         )
-        self.parser_ecriture.add_argument('-n', '--unvalid', action='store_true',
-                                          help='show only no-valid, default [all]'
-                                         )
-        self.parser_ecriture.add_argument('-v', '--valid', action='store_true',
-                                          help='show only valid, default [all]'
-                                         )
-        self.parser_ecriture.add_argument('--description',
-                                          help='Description',
-                                         )
-        self.parser_ecriture.add_argument('--nom',
-                                          help='Nom',
-                                         )
-        self.parser_ecriture.add_argument('--montant',
-                                          help='Montant',
-                                         )
-        self.parser_ecriture.add_argument('--date',
-                                          help='Date [YYYY/MM/DD]',
-                                         )
-        self.parser_ecriture.add_argument('--categorie',
-                                          help='Categorie',
-                                         )
-        self.parser_ecriture.add_argument('--ec',
-                                          help='Ecriture Categorie id',
-                                         )
+    
     def get_ecriture(self):
         """ Return argument """
         sys.argv[0] = 'ecriture'
         return self.parser.parse_args(sys.argv)
+
+    def get_montant(self):
+        """ Return argument montant"""
+        sys.argv[0] = 'montant'
+        return self.parser.parse_args(sys.argv)
+
+    def set_montant(self):
+        """ Initialize montant """
+        self.parser_categorie = self.subparsers.add_parser('montant', help='categorie help')
+        self.parser_categorie.add_argument('cmd',
+                                        help='command to pass [list, update, delete, create]',
+                                        choices=('list', 'create', 'update', 'delete')
+                                       )
+        self.parser_categorie.add_argument('-f', '--filter', 
+                                        help='filter to apply',
+                                        nargs='+')
+        self.parser_categorie.add_argument('-a', '--attribut', 
+                                        help='filter on attribut',
+                                        nargs='+')
+        self.parser_categorie.add_argument('-s', '--sort', 
+                                        help='filter on sort',
+                                        nargs='+')
 
     @staticmethod
     def get_method(method):
@@ -177,7 +146,10 @@ class ParseArgs(object):
         elif method == "ecriture":
             parse.set_ecriture()
             return parse.get_ecriture()
-        elif method == "categorie":
+        elif method == "montant":
+            parse.set_montant()
+            return parse.get_montant()
+         elif method == "categorie":
             parse.set_categorie()
             return parse.get_categorie()
         else:
@@ -185,6 +157,7 @@ class ParseArgs(object):
             parse.set_compte()
             parse.set_categorie()
             parse.set_ecriture()
+            parse.set_montant()
             return parse.get_args()
 
 class ParseEcriture(ParseArgs):
