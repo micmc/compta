@@ -16,7 +16,7 @@ class Categorie(Server):
 
         Server.__init__(self, parser)
         self.rest_method = "categorie"
-        self.database = DBCategorie
+        self.database = (DBCategorie,)
 
     def list(self):
         """ Redefine list to print """

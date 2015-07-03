@@ -5,6 +5,7 @@
 #from simplejson.scanner import JSONDecodeError
 
 from compta.db.ecriture import Ecriture as DBEcriture
+from compta.db.ecriture import Montant as DBMontant
 
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
@@ -18,7 +19,7 @@ class Ecriture(Server):
 
         Server.__init__(self, parser)
         self.rest_method = "ecriture"
-        self.database = DBEcriture
+        self.database = (DBEcriture, DBMontant)
 
     def list(self):
         """ Redefine list to print """

@@ -61,25 +61,25 @@ class Server(object):
 
     def list(self):
         """ get data by rest method """
-        rqst = RequestServer.get_method(self.rest_method,
-                                        self.filter,
-                                        self.sort,
-                                        self.attribut
-                                       )
+        self.rqst = RequestServer.get_method(self.rest_method,
+                                             self.filter,
+                                             self.sort,
+                                             self.attribut
+                                            )
 
     def create(self):
         """ create data by rest method """
         if self.check_args(True):
-            rqst = RequestServer.post_method(self.rest_method,
-                                             self.attribut,
-                                            )
+            self.rqst = RequestServer.post_method(self.rest_method,
+                                                  self.attribut,
+                                                 )
 
     def update(self):
         """ create data by rest method """
-        rqst = RequestServer.put_method(self.rest_method,
-                                        self.filter,
-                                        self.attribut
-                                       )
+        self.rqst = RequestServer.put_method(self.rest_method,
+                                             self.filter,
+                                             self.attribut
+                                            )
 
     def launch_cmd(self, cmd=None):
         """ launch command to execute """
@@ -102,32 +102,34 @@ class Server(object):
             return True if OK
             else False
         """
-        mapper = inspect(self.database)
         #attrs = dict((key,value) for key,value in self.attribut.items())
         attrs = copy.deepcopy(self.attribut)
-        for column in mapper.attrs:
-            if isinstance(column, ColumnProperty) and \
-                    not column.columns[0].primary_key and \
-                    not column.columns[0].nullable:
-                if not attrs.has_key(column.key):
-                    if prompt:
-                        data = unicode(raw_input("%s [%s]: " % (column.key,
-                                                                column.columns[0].key
-                                                               )
-                                                )
-                                      )
-                        data = self.check_type_data(column.columns[0], data)
-                        if data is None:
-                            print "Type non reconnue pour %s (%s)" % (column.key, column.columns[0].type)
+        for database in self.database:
+            mapper = inspect(database)
+            for column in mapper.attrs:
+                if isinstance(column, ColumnProperty) and \
+                        not column.columns[0].primary_key and \
+                        not  column.columns[0].foreign_keys and \
+                        not column.columns[0].nullable:
+                    if not attrs.has_key(column.key):
+                        if prompt:
+                            data = unicode(raw_input("%s [%s]: " % (column.key,
+                                                                    column.columns[0].key
+                                                                   )
+                                                    )
+                                          )
+                            data = self.check_type_data(column.columns[0], data)
+                            if data is None:
+                                print "Type non reconnue pour %s (%s)" % (column.key, column.columns[0].type)
+                                return False
+                            self.attribut[column.key] = data
+                        else:
                             return False
-                        self.attribut[column.key] = data
                     else:
-                        return False
-                else:
-                    del(attrs[column.key])
-        if attrs:
-            print "champs non reconnu %s" % attrs
-            return False
+                        del(attrs[column.key])
+            if attrs:
+                print "champs non reconnu %s" % attrs
+                return False
         return True
 
     def check_type_data(self, type_data, data):
