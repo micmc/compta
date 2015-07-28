@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Page web</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="js/jtable/themes/metro/blue/jtable.min.css" />
+    <script type="text/javascript" src="js/jquery-1.11.2.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/banque.js"></script>
+    <script type="text/javascript" src="js/jtable/jquery.jtable.min.js"></script>
+  </head>
+
+  <body>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#lst_banque').jtable({
+                title: 'Liste des banques',
+                actions: {
+                    listAction: 'localhost:8080/banque',
+                    createAction: '/GettingStarted/CreatePerson',
+                    updateAction: '/GettingStarted/UpdatePerson',
+                    deleteAction: '/GettingStarted/DeletePerson'
+                },
+                fields: {
+                    BanqueId: {
+                        key: true,
+                        list: false
+                    },
+                    nom: {
+                        title: 'Nom',
+                        width: '20%'
+                    },
+                    adresse: {
+                        title: 'Adresse',
+                        width: '30%'
+                    },
+                    cp: {
+                        title: 'Code Postal',
+                        width: '10%'
+                    },
+                    ville: {
+                        title: 'Ville',
+                        width: '10%'
+                    }
+                }
+            });
+            $('#lst_banque').jtable('load');
+        });
+    </script>
+    <h1>Liste des banques</h1>
+        <div id="lst_banque"></div>
+  </body>
+</html>
+
+
