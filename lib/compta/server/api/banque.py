@@ -65,6 +65,16 @@ def list_banque(db, id=None, nom=None):
                           )
     return dumps(list_banque)
 
+@app.get('/jtable/banque')
+def list_banque_jtable(db):
+    json_list = list_banque(db)
+    data_list =  loads(json_list)
+    data = {
+            "Result": "OK",
+            "Records" : data_list
+           }
+    return dumps(data)
+
 @app.post('/banque')
 def insert_banque(db):
     """ Create a banque """
