@@ -99,7 +99,7 @@ class ParseArgs(object):
                                           help='filter to apply',
                                           nargs='+')
         self.parser_ecriture.add_argument('-a', '--attribut', 
-                                          help='filter on attribut',
+                                          help='filter on attribut [nom, type, dc, date, valide, compte_id]',
                                           nargs='+')
         self.parser_ecriture.add_argument('-s', '--sort', 
                                           help='filter on sort',
@@ -149,7 +149,7 @@ class ParseArgs(object):
         elif method == "montant":
             parse.set_montant()
             return parse.get_montant()
-         elif method == "categorie":
+        elif method == "categorie":
             parse.set_categorie()
             return parse.get_categorie()
         else:
