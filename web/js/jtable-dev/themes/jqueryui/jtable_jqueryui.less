@@ -1,0 +1,480 @@
+﻿@import "../jtable_theme_base.less";
+
+.jtable_jqueryui_base()
+{
+    .jtable_theme_base;
+
+    div.jtable-main-container
+    {
+        div.jtable-title
+        {
+            position: relative;
+            line-height: 34px;
+            padding-left: 10px;
+
+            .jtable-close-button
+            {
+                .dock(right, 6px);
+                .opacity(0.8);
+                background: url('close.png') no-repeat;
+                width: 22px;
+                height: 22px;
+
+                &:hover
+                {
+                    .opacity(1);
+                }
+            }
+
+			// Toolbar -------------------------------------------------------------
+
+			div.jtable-toolbar
+			{
+				.dock(bottom-right);
+
+				line-height:20px;
+				margin-right:2px;
+				margin-bottom:2px;
+
+				span.jtable-toolbar-item
+				{
+					&.jtable-toolbar-item-add-record
+					{
+						span.jtable-toolbar-item-icon
+						{
+							background-image: url('add.png');
+						}
+					}
+				}
+			}
+        }
+
+        table.jtable
+        {
+            border-collapse: collapse;
+            border-spacing: 0;
+
+            thead
+            {
+                th
+                {
+                    padding: 4px 3px 4px 6px;
+
+                    &:first-child
+                    {
+                    }
+
+                    &th:last-child
+                    {
+                    }
+
+                    &.jtable-column-header
+                    {
+                        div.jtable-column-header-container
+                        {
+                            height: 20px;
+
+                            div.jtable-column-resize-handler
+                            {
+                            }
+                        }
+
+                        span.jtable-column-header-text
+                        {
+                            margin-top: 3px;
+                        }
+                    }
+
+                    &.jtable-column-header-selecting
+                    {
+						padding: 5px;
+                    }
+
+                    &.jtable-column-header-sortable div.jtable-column-header-container
+                    {
+                        background: url('column-sortable.png') no-repeat right;
+                    }
+
+                    &.jtable-column-header-sorted-asc div.jtable-column-header-container
+                    {
+                        background: url('column-asc.png') no-repeat right;
+                    }
+
+                    &.jtable-column-header-sorted-desc div.jtable-column-header-container
+                    {
+                        background: url('column-desc.png') no-repeat right;
+                    }
+                }
+            }
+
+            tbody
+            {
+                > tr
+                {
+                    padding: 2px;
+                    height: 30px;
+
+					> td
+                    {
+                        padding: 5px;
+                        border: 1px solid #ddd; //TODO
+
+                        &:first-child
+                        {
+                            border-left: none;
+                        }
+
+                        .jtable-edit-command-button
+                        {
+                            background: url('edit.png') no-repeat;
+                            width: 16px;
+                            height: 16px;
+                        }
+
+                        .jtable-delete-command-button
+                        {
+                            background: url('delete.png') no-repeat;
+                            width: 16px;
+                            height: 16px;
+                        }
+                    }
+
+                    &.jtable-row-even
+                    {
+                    }
+
+                    &:hover
+                    {
+                    }
+
+                    &.jtable-row-selected
+                    {
+
+                    }
+
+                    &.jtable-child-row
+                    {
+                        > td
+                        {
+							padding: 2px 1px 2px 2px;
+
+							div.jtable-toolbar
+							{
+								margin-right: 33px;
+							}
+
+                            .jtable
+                            {
+                                border: none;
+                            }
+
+                            .jtable-title,
+                            .jtable-bottom-panel
+                            {
+                                .border-radius(0px);
+                                border: none;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        div.jtable-bottom-panel
+        {
+            padding: 1px;
+            min-height: 24px;
+            line-height: 16px;
+            font-size: 0.9em;
+
+            div.jtable-right-area
+            {
+                padding: 2px;
+            }
+
+            .jtable-page-list
+            {
+                margin: 3px;
+
+                .jtable-page-number,
+                .jtable-page-number-space,
+                .jtable-page-number-first,
+                .jtable-page-number-last,
+                .jtable-page-number-previous,
+                .jtable-page-number-next,
+                .jtable-page-number-active
+                {
+                    padding: 2px 5px;
+                }
+
+                    .jtable-page-number:hover,
+                    .jtable-page-number-first:hover,
+                    .jtable-page-number-last:hover,
+                    .jtable-page-number-previous:hover,
+                    .jtable-page-number-next:hover
+                    {
+                    }
+
+                .jtable-page-number-active
+                {
+                }
+
+				.jtable-page-number-disabled
+				{
+					//.opacity(0.5);
+
+					&.jtable-page-number-active
+					{
+						//.opacity(1);
+					}
+
+					&:hover
+					{
+					}
+				}
+            }
+
+            span.jtable-page-size-change
+			{
+				vertical-align: middle;
+            }
+
+			span.jtable-goto-page
+			{
+				vertical-align: middle;
+			}
+
+			.jtable-page-info
+            {
+				display: inline-block;
+                padding: 4px;
+            }
+
+            span.jtable-add-record
+            {
+                margin: 3px;
+
+                a
+                {
+                    font-weight: bold;
+                    text-decoration: none;
+
+                    &:hover
+                    {
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+
+        div.jtable-column-selection-container
+        {
+            .border-radius(3px);
+            .box-shadow(2px 2px 4px rgba(50, 51, 50, 0.75));
+        }
+    }
+
+    form.jtable-dialog-form
+    {
+        div.jtable-input-label
+        {
+            font-weight: bold;
+            display:inline-block; 
+            width:160px;
+        }
+    }
+
+    div.jtable-busy-message
+    {
+        .border-radius(3px);
+        .box-shadow(2px 2px 4px rgba(50, 51, 50, 0.75));
+		padding: 5px;
+		color:none;
+    }
+}
+
+////////////////////////////////////////////////////////////////
+
+.jtable_jqueryui_base();
+
+
+
+/* Z-INDEX */
+ .formError { z-index: 990; }
+    .formError .formErrorContent { z-index: 991; }
+    .formError .formErrorArrow { z-index: 996; }
+
+    .ui-dialog .formError { z-index: 5000; }
+    .ui-dialog .formError .formErrorContent { z-index: 5001; }
+    .ui-dialog .formError .formErrorArrow { z-index: 5006; }
+
+
+
+
+.inputContainer {
+	position: relative;
+	float: left;
+}
+
+.formError {
+	position: absolute;
+	top: 300px;
+	left: 300px;
+	display: block;
+	cursor: pointer;
+	text-align: left;
+}
+
+.formError.inline {
+	position: relative;
+	top: 0;
+	left: 0;
+	display: inline-block;
+}
+
+.ajaxSubmit {
+	padding: 20px;
+	background: #55ea55;
+	border: 1px solid #999;
+	display: none;
+}
+
+.formError .formErrorContent {
+	width: 100%;
+	background: #ee0101;
+	position:relative;
+	color: #fff;
+	min-width: 120px;
+	font-size: 11px;
+	border: 2px solid #ddd;
+	box-shadow: 0 0 6px #000;
+	-moz-box-shadow: 0 0 6px #000;
+	-webkit-box-shadow: 0 0 6px #000;
+	-o-box-shadow: 0 0 6px #000;
+	padding: 4px 10px 4px 10px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	-o-border-radius: 6px;
+}
+
+.formError.inline .formErrorContent {
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	-o-box-shadow: none;
+	border: none;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	-o-border-radius: 0;
+}
+
+.greenPopup .formErrorContent {
+	background: #33be40;
+}
+
+.blackPopup .formErrorContent {
+	background: #393939;
+	color: #FFF;
+}
+
+.formError .formErrorArrow {
+	width: 15px;
+	margin: -2px 0 0 13px;
+	position:relative;
+}
+body[dir='rtl'] .formError .formErrorArrow,
+body.rtl .formError .formErrorArrow {
+	margin: -2px 13px 0 0;
+}
+
+.formError .formErrorArrowBottom {
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	-o-box-shadow: none;
+	margin: 0px 0 0 12px;
+	top:2px;
+}
+
+.formError .formErrorArrow div {
+	border-left: 2px solid #ddd;
+	border-right: 2px solid #ddd;
+	box-shadow: 0 2px 3px #444;
+	-moz-box-shadow: 0 2px 3px #444;
+	-webkit-box-shadow: 0 2px 3px #444;
+	-o-box-shadow: 0 2px 3px #444;
+	font-size: 0px;
+	height: 1px;
+	background: #ee0101;
+	margin: 0 auto;
+	line-height: 0;
+	font-size: 0;
+	display: block;
+}
+
+.formError .formErrorArrowBottom div {
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	-o-box-shadow: none;
+}
+
+.greenPopup .formErrorArrow div {
+	background: #33be40;
+}
+
+.blackPopup .formErrorArrow div {
+	background: #393939;
+	color: #FFF;
+}
+
+.formError .formErrorArrow .line10 {
+	width: 15px;
+	border: none;
+}
+
+.formError .formErrorArrow .line9 {
+	width: 13px;
+	border: none;
+}
+
+.formError .formErrorArrow .line8 {
+	width: 11px;
+}
+
+.formError .formErrorArrow .line7 {
+	width: 9px;
+}
+
+.formError .formErrorArrow .line6 {
+	width: 7px;
+}
+
+.formError .formErrorArrow .line5 {
+	width: 5px;
+}
+
+.formError .formErrorArrow .line4 {
+	width: 3px;
+}
+
+.formError .formErrorArrow .line3 {
+	width: 1px;
+	border-left: 2px solid #ddd;
+	border-right: 2px solid #ddd;
+	border-bottom: 0 solid #ddd;
+}
+
+.formError .formErrorArrow .line2 {
+	width: 3px;
+	border: none;
+	background: #ddd;
+}
+
+.formError .formErrorArrow .line1 {
+	width: 1px;
+	border: none;
+	background: #ddd;
+}
