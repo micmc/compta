@@ -65,7 +65,7 @@ def list_banque(db, id=None, nom=None):
                           )
     return dumps(list_banque)
 
-@app.get('/jtable/banque')
+@app.post('/jtable/ListBanque')
 def list_banque_jtable(db):
     json_list = list_banque(db)
     data_list =  loads(json_list)
@@ -91,6 +91,41 @@ def insert_banque(db):
         response.status = 201
         response.headers["Location"] = "/banque/%s" % (banque.id,)
 
+@app.post('/jtable/CreateBanque')
+def insert_banque_jtable(db):
+    """ Create a banque with jtable"""
+    entity = App.check_forms(Banque, request.forms)
+    if entity:
+        banque = Banque()
+        for column, value in entity.iteritems():
+            setattr(banque, column, value)
+        db.add(banque)
+        try:
+            db.commit()
+        except IntegrityError as ex:
+            data = {
+                    "Result": "ERROR",
+                    "Message": "Erreur d'intégrité"
+                   }    
+            return dumps(data)
+        data_list = {
+                     'id': banque.id,
+                     'nom': banque.nom,
+                     'adresse': banque.adresse,
+                     'ville': banque.ville,
+                     'cp': banque.cp,
+                     #'pays': banque.pays,
+                     #'cle': banque.cle_controle,
+                     'code_banque': banque.code_banque,
+                     'code_guichet': banque.code_guichet
+                    }
+
+        data = {
+                "Result": "OK",
+                "Record" : data_list
+               }
+        return dumps(data)
+
 @app.put(r'/banque/<id:int>')
 def update_banque(db, id=None):
     """ Update information for a banque """
@@ -109,6 +144,38 @@ def update_banque(db, id=None):
     except IntegrityError as ex:
         abort(404, ex.args)
 
+@app.post('/jtable/UpdateBanque')
+def update_banque_jtable(db):
+    """ Update information for a banque with jtable"""
+    entity = App.check_forms(Banque, request.forms)
+    if entity:
+        try:
+            banque = db.query(Banque).\
+                           filter(Banque.id == entity['id']).\
+                           one()
+        except NoResultFound:
+            data = {
+                    "Result": "ERROR",
+                    "Message": "Pes de resultat"
+                   }    
+            return dumps(data)
+    for column, value in entity.iteritems():
+        setattr(banque, column, value)
+    try:
+        db.commit()
+    except IntegrityError as ex:
+        data = {
+                "Result": "ERROR",
+                "Message": "Erreur d'intégrité"
+               }    
+        return dumps(data)
+    data = {
+            "Result": "OK",
+           }    
+    return dumps(data)
+
+
+
 @app.delete(r'/banque/<id:int>')
 def delete_banque(db, id=None):
     """ Delete a banque """
@@ -121,5 +188,26 @@ def delete_banque(db, id=None):
     db.delete(banque)
     db.commit()
 
+@app.post('/jtable/DeleteBanque')
+def delete_banque_jtable(db):
+    """ Delete a banque with jtable"""
+    entity = App.check_forms(Banque, request.forms)
+    try:
+        banque = db.query(Banque).\
+                    filter(Banque.id == entity['id']).\
+                    one()
+    except NoResultFound:
+        data = {
+                "Result": "ERROR",
+                "Message": "Pes de resultat"
+               }    
+        return dumps(data)
+    db.delete(banque)
+    db.commit()
+    data = {
+            "Result": "OK",
+           }    
+    return dumps(data)
 
+ 
 

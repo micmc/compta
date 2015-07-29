@@ -100,6 +100,31 @@ class App(object):
         return entity
 
     @classmethod
+    def check_forms(cls, database, data):
+        """ Check data from formif valid
+
+            return data in dict
+            else False
+        """
+        if not data:
+            abort(204, 'No data received')
+        mapper = inspect(database)
+        orm_data = {}
+        entity = {}
+        for column in mapper.attrs:
+            if isinstance(column, ColumnProperty):
+                orm_data[column.key] = column.columns[0].nullable
+        for column in data.iterkeys():
+            if orm_data.has_key(column):
+                del(orm_data[column])
+            else:
+                return False
+        for key, value in data.iteritems():
+            entity[key] = value
+        return entity
+
+
+    @classmethod
     def get_filter(cls, filter):
         """ Get filter in dict
 

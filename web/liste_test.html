@@ -11,8 +11,8 @@
     <script type="text/javascript" src="js/jquery-ui.js"></script>
     <script type="text/javascript" src="js/jtable/jquery.jtable.js"></script>
     <script type="text/javascript" src="js/jtable/localization/jquery.jtable.fr.js">
-    <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine-fr.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine-fr.js"></script>
   </head>
 
   <body>
@@ -20,13 +20,13 @@
         $(document).ready(function () {
             $('#lst_banque').jtable({
                 title: 'Liste des banques',
-                ajaxSettings: { type: 'GET' },
+                ajaxSettings: { type: 'POST' },
                 editinline:{enable:true},
                 actions: {
-                    listAction: 'http://localhost:8080/jtable/banque',
-                    createAction: '/GettingStarted/CreatePerson',
-                    updateAction: '/GettingStarted/UpdatePerson',
-                    deleteAction: '/GettingStarted/DeletePerson'
+                    listAction: 'http://localhost:8080/jtable/ListBanque',
+                    createAction: 'http://localhost:8080/jtable/CreateBanque',
+                    updateAction: 'http://localhost:8080/jtable/UpdateBanque',
+                    deleteAction: 'http://localhost:8080/jtable/DeleteBanque'
                 },
                 fields: {
                     id: {
