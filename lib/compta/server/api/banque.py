@@ -39,9 +39,9 @@ def list_banque(db, id=None, nom=None):
     if filter:
         for column, value in filter.iteritems():
             if not isinstance(value, list):
-                banques = banques.filter(getattr(Compte, column) == value)
+                banques = banques.filter(getattr(Banque, column) == value)
             else:
-                banques = banques.filter(getattr(Compte, column).in_(value))
+                banques = banques.filter(getattr(Banque, column).in_(value))
     if sort:
         for column in sort:
             banques = banques.order_by(getattr(Banque, column))
@@ -77,6 +77,20 @@ def list_banque_jtable(db):
             "Records": data_list
            }
     return dumps(data)
+
+@app.post('/jtable/GetBanqueName')
+def list_banque_jtable(db):
+    json_list = list_banque(db)
+    data_list = loads(json_list)
+    data_new = {}
+    for data in data_list:
+        data_new[data['nom']] =data['id']
+    data = {
+            "Result": "OK",
+            "Options": data_new
+           }
+    return dumps(data)
+
 
 @app.post('/banque')
 def insert_banque(db):

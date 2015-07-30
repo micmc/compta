@@ -71,6 +71,16 @@ def list_compte(db, id=None, nom=None, banque_id=None):
                             })
     return dumps(list_comptes)
 
+@app.post('/jtable/ListCompte')
+def list_compte_jtable(db):
+    json_list = list_compte(db)
+    data_list = loads(json_list)
+    data = {
+            "Result": "OK",
+            "Records": data_list
+           }
+    return dumps(data)
+
 @app.post('/compte')
 def insert_compte(db):
     """ Create a  compte """
