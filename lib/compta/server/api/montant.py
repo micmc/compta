@@ -89,7 +89,7 @@ def insert_montant(db):
         except IntegrityError as ex:
             abort(404, ex.args)
         response.status = 201
-        response.headers["Montant"] = "/montant/%s" % (montant.id,)
+        response.headers["Location"] = "/montant/%s" % (montant.id,)
 
 @app.put(r'/montant/<id:int>')
 def update_montant(db, id):

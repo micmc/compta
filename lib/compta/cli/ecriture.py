@@ -57,23 +57,37 @@ class Ecriture(Server):
             print "Erreur de saisie pour l'ajout"
             sys.exit(1)
 
-        list_categorie = RequestServer.get_method("categorie",
-                                            {},
-                                            ['nom',],
-                                            []
-                                           )
-        for i in range(1, 10):
-            tmp_str = ""
-            for categorie in list_categorie[(i-1)*5:i*5]:
-                tmp_str += "%2d - %16s | " % (categorie['id'], categorie['nom'].strip())
-            print tmp_str[:-3]
-        data = unicode(raw_input("categorie :"))
-        if re.match(r"^\d+([\.,]\d{1,2})?$", data):
-            self.attribut['categorie_id'] = data
-            Server.create(self)
-        else:
-            print "Categorie erroné"
-            sys.exit(1)
+        #Add information for table montant
+        if self.options.prompt:
+            attribut_montant = {}
+            new_ecriture = re.match(r"^\/ecriture\/(?P<ecriture_id>.*)\/$",
+                                    self.rqst.headers['Location']
+                                   )
+            attribut_montant['ecriture_id'] = new_ecriture.group('ecriture_id')
+            list_categorie = RequestServer.get_method("categorie",
+                                                {},
+                                                ['nom',],
+                                                []
+                                               )
+            for i in range(1, 10):
+                tmp_str = ""
+                for categorie in list_categorie[(i-1)*5:i*5]:
+                    tmp_str += "%2d - %16s | " % (categorie['id'], categorie['nom'].strip())
+                print tmp_str[:-3]
+            while True:
+                data = unicode(raw_input("categorie : "))
+                if re.match(r"^\d{1,2}$", data):
+                    attribut_montant['categorie_id'] = data
+                    break
+            while True: 
+                data = unicode(raw_input("Montant : "))
+                if re.match(r"^\d+[,\.]?\d*$", data):
+                    attribut_montant['montant'] = data
+                    break
+            montant_rqst = RequestServer.post_method('montant',
+                                                     attribut_montant,
+                                                    )
+            print montant_rqst.headers
 
 def main():
     """ Main function """

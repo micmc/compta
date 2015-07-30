@@ -110,6 +110,8 @@ class RequestServer(object):
             rqst = RequestServerCompte()
         elif method == "ecriture":
             rqst = RequestServerEcriture()
+        elif method == "montant":
+            rqst = RequestServerMontant()
         elif method == "categorie":
             rqst = RequestServerCategorie()
         else:
@@ -131,10 +133,12 @@ class RequestServer(object):
             rqst = RequestServerBanque()
         elif method == "compte":
             rqst = RequestServerCompte()
+        elif method == "ecriture":
+            rqst = RequestServerEcriture()
+        elif method == "montant":
+            rqst = RequestServerMontant()
         elif method == "categorie":
             rqst = RequestServerCategorie()
-        elif method == "Ecriture":
-            rqst = RequestServerEcriture()
         else:
             return False
         str_url = "/%s" % (filter["id"])
@@ -171,6 +175,16 @@ class RequestServerEcriture(RequestServer):
 
         RequestServer.__init__(self, address, port)
         self._url_data = self._url_data + "ecriture"
+
+class RequestServerMontant(RequestServer):
+    """ Class for create montant object """
+
+    def __init__(self, address='localhost', port='8080'):
+        """ Initialize default class """
+
+        RequestServer.__init__(self, address, port)
+        self._url_data = self._url_data + "montant"
+
 
 class RequestServerCategorie(RequestServer):
     """ Class for create categorie object """
