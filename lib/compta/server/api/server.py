@@ -137,6 +137,10 @@ class App(object):
             for lst_attribut in filter.split(','):
                 attribut = lst_attribut.split(':')
                 dict_filter[attribut[0]] = attribut[1]
+                if dict_filter[attribut[0]] == 'false':
+                    dict_filter[attribut[0]] = False
+                elif dict_filter[attribut[0]] == 'true':
+                    dict_filter[attribut[0]] = True
             return dict_filter
         return False
 
