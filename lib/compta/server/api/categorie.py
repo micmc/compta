@@ -41,7 +41,10 @@ def list_categorie(db, id=None, nom=None):
                     group_by(Categorie.nom)
     if filter:
         for column, value in filter.iteritems():
-            categories = categories.filter(getattr(Categorie, column) == value)
+            if not isinstance(value, list):
+                categories = categories.filter(getattr(Categorie, column) == value)
+            else:
+                categories = categories.filter(getattr(Categorie, column).in_(value))
     if sort:
         for column in sort:
             categories = categories.order_by(getattr(Categorie, column))

@@ -48,13 +48,16 @@ def list_montant(db, id=None, ecriture_id=None):
                     join(Categorie)
     if filter:
         for column, value in filter.iteritems():
-            montants = montants.filter(getattr(Montant, column) == value)
+            if not isinstance(value, list):
+                montants = montants.filter(getattr(Montant, column) == value)
+            else:
+                montants = montants.filter(getattr(Montant, column).in_(value))
     if sort:
         for column in sort:
             montants = montants.order_by(getattr(Montant, column))
     else:
         montants = montants.order_by(Montant.montant)
- 
+
     try:
         montants = montants.all()
     except NoResultFound:

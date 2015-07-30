@@ -35,10 +35,13 @@ def list_banque(db, id=None, nom=None):
     sort = App.get_sort(request.query.sort)
 
     banques = db.query(Banque)
-    
+
     if filter:
         for column, value in filter.iteritems():
-            banques = banques.filter(getattr(Banque, column) == value)
+            if not isinstance(value, list):
+                banques = banques.filter(getattr(Compte, column) == value)
+            else:
+                banques = banques.filter(getattr(Compte, column).in_(value))
     if sort:
         for column in sort:
             banques = banques.order_by(getattr(Banque, column))
@@ -68,10 +71,10 @@ def list_banque(db, id=None, nom=None):
 @app.post('/jtable/ListBanque')
 def list_banque_jtable(db):
     json_list = list_banque(db)
-    data_list =  loads(json_list)
+    data_list = loads(json_list)
     data = {
             "Result": "OK",
-            "Records" : data_list
+            "Records": data_list
            }
     return dumps(data)
 
@@ -106,7 +109,7 @@ def insert_banque_jtable(db):
             data = {
                     "Result": "ERROR",
                     "Message": "Erreur d'intégrité"
-                   }    
+                   }
             return dumps(data)
         data_list = {
                      'id': banque.id,
@@ -157,7 +160,7 @@ def update_banque_jtable(db):
             data = {
                     "Result": "ERROR",
                     "Message": "Pes de resultat"
-                   }    
+                   }
             return dumps(data)
     for column, value in entity.iteritems():
         setattr(banque, column, value)
@@ -167,11 +170,11 @@ def update_banque_jtable(db):
         data = {
                 "Result": "ERROR",
                 "Message": "Erreur d'intégrité"
-               }    
+               }
         return dumps(data)
     data = {
             "Result": "OK",
-           }    
+           }
     return dumps(data)
 
 
@@ -200,14 +203,14 @@ def delete_banque_jtable(db):
         data = {
                 "Result": "ERROR",
                 "Message": "Pes de resultat"
-               }    
+               }
         return dumps(data)
     db.delete(banque)
     db.commit()
     data = {
             "Result": "OK",
-           }    
+           }
     return dumps(data)
 
- 
+
 

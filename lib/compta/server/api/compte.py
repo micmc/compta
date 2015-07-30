@@ -43,7 +43,10 @@ def list_compte(db, id=None, nom=None, banque_id=None):
 
     if filter:
         for column, value in filter.iteritems():
-            comptes = comptes.filter(getattr(Compte, column) == value)
+            if not isinstance(value, list):
+                comptes = comptes.filter(getattr(Compte, column) == value)
+            else:
+                comptes = comptes.filter(getattr(Compte, column).in_(value))
     if sort:
         for column in sort:
             comptes = comptes.order_by(getattr(Compte, column))

@@ -136,11 +136,15 @@ class App(object):
             dict_filter = {}
             for lst_attribut in filter.split(','):
                 attribut = lst_attribut.split(':')
-                dict_filter[attribut[0]] = attribut[1]
-                if dict_filter[attribut[0]] == 'false':
-                    dict_filter[attribut[0]] = False
-                elif dict_filter[attribut[0]] == 'true':
-                    dict_filter[attribut[0]] = True
+                if "/" in attribut[1]:
+                    dict_filter[attribut[0]] =  attribut[1].split('/')
+                else:
+                    if attribut[1] == 'false':
+                        dict_filter[attribut[0]] = False
+                    elif attribut[1] == 'true':
+                        dict_filter[attribut[0]] = True
+                    else:
+                        dict_filter[attribut[0]] = attribut[1]
             return dict_filter
         return False
 

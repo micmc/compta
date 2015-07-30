@@ -82,7 +82,10 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
 
     if filter:
         for column, value in filter.iteritems():
-            ecritures = ecritures.filter(getattr(Ecriture, column) == value)
+            if not isinstance(value, list):
+                ecritures = ecritures.filter(getattr(Ecriture, column) == value)
+            else:
+                ecritures = ecritures.filter(getattr(Ecriture, column).in_(value))
     if sort:
         for column in sort:
             ecritures = ecritures.order_by(getattr(Ecriture, column))

@@ -47,7 +47,10 @@ def list_tag(db, id=None, nom=None, ecriture_id=None):
                    )
     if filter:
         for column, value in filter.iteritems():
-            tags = tags.filter(getattr(Tag, column) == value)
+            if not isinstance(value, list):
+                tags = tags.filter(getattr(Tag, column) == value)
+            else:
+                tags = tags.filter(getattr(Tag, column).in_(value))
     if sort:
         for column in sort:
             tags = tags.order_by(getattr(Tag, column))
