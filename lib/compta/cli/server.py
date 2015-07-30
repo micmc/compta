@@ -5,7 +5,7 @@
 import sys
 import re
 import copy
-from datetime import date,datetime
+from datetime import date, datetime
 
 #from simplejson.scanner import JSONDecodeError
 #from json import dumps
@@ -38,6 +38,7 @@ class Server(object):
         self.sort = None
         self.attribut = {}
         self.rest_method = None
+        self.rqst = None
         self.parse_args()
 
     def parse_args(self):
@@ -111,23 +112,50 @@ class Server(object):
             mapper = inspect(database)
             for column in mapper.attrs:
                 if isinstance(column, ColumnProperty) and \
-                        not column.columns[0].primary_key:
+                   not column.columns[0].primary_key:
                     if not attrs.has_key(column.key) and \
-                            not column.columns[0].foreign_keys and \
-                            not column.columns[0].nullable:
+                       not column.columns[0].foreign_keys and \
+                       not column.columns[0].nullable:
                         if prompt:
-                            while True:
-                                data = unicode(raw_input("%s [%s]: " % (column.key,
-                                                                        column.columns[0].key
-                                                                       )
-                                                        )
-                                              )
-                                data = self.check_type_data(column.columns[0], data)
-                                if data is None:
-                                    print "Type non reconnue pour %s (%s)" % (column.key, column.columns[0].type)
+                            # Particularity of type (Pr,Vr) and Name : must return compte_id
+                            if mapper.tables[0].name == 'ecriture' and \
+                               self.attribut.has_key('type') and \
+                               self.attribut['type'] in ('Pr', 'Vr') and \
+                               column.key == 'nom':
+                                if self.attribut['type'] == 'Pr':
+                                    compte_type = {'type': 'prv',
+                                                   'archive': 'false'
+                                                  }
                                 else:
-                                    self.attribut[column.key] = data
-                                    break
+                                    compte_type = {'type': 'prs/vir',
+                                                   'archive': 'false'
+                                                  }
+                                list_compte = RequestServer.get_method("compte",
+                                                                       compte_type,
+                                                                       ['nom',],
+                                                                       []
+                                                                      )
+                                for compte in list_compte:
+                                    print "%d - %s" % (compte['id'], compte['nom'])
+                                while True:
+                                    data = unicode(raw_input("compte : "))
+                                    if re.match(r"^\d{1,2}$", data):
+                                        self.attribut['nom_id'] = compte['id']
+                                        self.attribut['nom'] = compte['nom']
+                                        break
+                            else:
+                                while True:
+                                    data = unicode(raw_input("%s [%s]: " % (column.key,
+                                                                            column.columns[0].key
+                                                                           )
+                                                            )
+                                                  )
+                                    data = self.check_type_data(column.columns[0], data)
+                                    if data is None:
+                                        print "Type non reconnue pour %s (%s)" % (column.key, column.columns[0].type)
+                                    else:
+                                        self.attribut[column.key] = data
+                                        break
                         else:
                             return False
                     elif attrs.has_key(column.key):

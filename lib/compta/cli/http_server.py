@@ -24,7 +24,7 @@ class RequestServer(object):
         if url is not None:
             url_data += url
         if filter:
-            url_data += "?" + ",".join(["%s" % values for values in filter])
+            url_data += "?" + "&".join(["%s" % values for values in filter])
         self.__request = self.__session.get(url_data)
         if self.__request.status_code != 200:
             return False
