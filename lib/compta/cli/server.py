@@ -116,16 +116,18 @@ class Server(object):
                             not column.columns[0].foreign_keys and \
                             not column.columns[0].nullable:
                         if prompt:
-                            data = unicode(raw_input("%s [%s]: " % (column.key,
-                                                                    column.columns[0].key
-                                                                   )
-                                                    )
-                                          )
-                            data = self.check_type_data(column.columns[0], data)
-                            if data is None:
-                                print "Type non reconnue pour %s (%s)" % (column.key, column.columns[0].type)
-                                return False
-                            self.attribut[column.key] = data
+                            while True:
+                                data = unicode(raw_input("%s [%s]: " % (column.key,
+                                                                        column.columns[0].key
+                                                                       )
+                                                        )
+                                              )
+                                data = self.check_type_data(column.columns[0], data)
+                                if data is None:
+                                    print "Type non reconnue pour %s (%s)" % (column.key, column.columns[0].type)
+                                else:
+                                    self.attribut[column.key] = data
+                                    break
                         else:
                             return False
                     elif attrs.has_key(column.key):
