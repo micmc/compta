@@ -3,10 +3,6 @@
 
 = cli client =
 
-== Vérification du serveur ==
-
-Vérifier que l'on peut choisir les champs pour la sortie get
-
 == fast insert ==
 
 Ajouter une nouvelle options.

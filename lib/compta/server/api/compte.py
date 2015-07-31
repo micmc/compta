@@ -60,15 +60,23 @@ def list_compte(db, id=None, nom=None, banque_id=None):
     if not comptes:
         abort(404, "ID not found")
     list_comptes = []
-    for compte in comptes:
-        list_comptes.append({'id': compte.id,
-                             'nom': compte.nom,
-                             'numero': compte.numero,
-                             'cle': compte.cle,
-                             'type': compte.type,
-                             'archive': compte.archive,
-                             'banque_id': compte.banque_id,
-                            })
+    attributs = App.get_attribut(request.query.attribut)
+    if attributs:
+        for compte in comptes:
+            dict_attributs = {}
+            for attribut in attributs:
+                dict_attributs[attribut] = getattr(compte, attribut)
+            list_comptes.append(dict_attributs)
+    else:
+        for compte in comptes:
+            list_comptes.append({'id': compte.id,
+                                 'nom': compte.nom,
+                                 'numero': compte.numero,
+                                 'cle': compte.cle,
+                                 'type': compte.type,
+                                 'archive': compte.archive,
+                                 'banque_id': compte.banque_id,
+                                })
     return dumps(list_comptes)
 
 @app.post('/jtable/ListCompte')

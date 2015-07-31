@@ -53,17 +53,17 @@ def list_banque(db, id=None, nom=None):
         abort(404, "ID not found")
     if not banques:
         abort(404, "ID not found")
-    list_banque = []
+    list_banques = []
     attributs = App.get_attribut(request.query.attribut)
     if attributs:
         for banque in banques:
             dict_attributs = {}
             for attribut in attributs:
                 dict_attributs[attribut] = getattr(banque, attribut)
-            list_banque.append(dict_attributs)
+            list_banques.append(dict_attributs)
     else:
         for banque in banques:
-            list_banque.append({'id': banque.id,
+            list_banques.append({'id': banque.id,
                                 'nom': banque.nom,
                                 'adresse': banque.adresse,
                                 'ville': banque.ville,
@@ -74,8 +74,7 @@ def list_banque(db, id=None, nom=None):
                                 'code_guichet': banque.code_guichet
                                }
                               )
-    print list_banque
-    return dumps(list_banque)
+    return dumps(list_banques)
 
 @app.post('/jtable/ListBanque')
 def list_banque_jtable(db):

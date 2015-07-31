@@ -59,12 +59,20 @@ def list_categorie(db, id=None, nom=None):
         abort(404, "ID not found")
 
     list_categories = []
-    for categorie in categories:
-        list_categories.append({'id': categorie.id,
-                                'nom': categorie.nom,
-                                'count': categorie.count,
-                               }
-                              )
+    attributs = App.get_attribut(request.query.attribut)
+    if attributs:
+        for categorie in categories:
+            dict_attributs = {}
+            for attribut in attributs:
+                dict_attributs[attribut] = getattr(categorie, attribut)
+            list_categories.append(dict_attributs)
+    else:
+        for categorie in categories:
+            list_categories.append({'id': categorie.id,
+                                    'nom': categorie.nom,
+                                    'count': categorie.count,
+                                   }
+                                  )
     return dumps(list_categories)
 
 @app.post('/categorie')

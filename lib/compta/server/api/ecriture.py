@@ -100,18 +100,26 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
     if not ecritures:
         abort(404, "ID not found")
     list_ecritures = []
-    for ecriture in ecritures:
-        list_ecritures.append({'id': ecriture.id,
-                               'nom': ecriture.nom,
-                               'date': datetime.strftime(ecriture.date, "%Y/%m/%d"),
-                               #'dc': ecriture.Ecriture.dc,
-                               'type': ecriture.type,
-                               'valide': ecriture.valide,
-                               'categorie': ecriture.categorie,
-                               'montant': "%0.2f" % (ecriture.montant/100.0,),
-                               'description': ecriture.description,
-                               'montant_id' : ecriture.montant_id,
-                              })
+    attributs = App.get_attribut(request.query.attribut)
+    if attributs:
+        for ecriture in ecritures:
+            dict_attributs = {}
+            for attribut in attributs:
+                dict_attributs[attribut] = getattr(ecriture, attribut)
+            list_ecritures.append(dict_attributs)
+    else:
+        for ecriture in ecritures:
+            list_ecritures.append({'id': ecriture.id,
+                                   'nom': ecriture.nom,
+                                   'date': datetime.strftime(ecriture.date, "%Y/%m/%d"),
+                                   #'dc': ecriture.Ecriture.dc,
+                                   'type': ecriture.type,
+                                   'valide': ecriture.valide,
+                                   'categorie': ecriture.categorie,
+                                   'montant': "%0.2f" % (ecriture.montant/100.0,),
+                                   'description': ecriture.description,
+                                   'montant_id' : ecriture.montant_id,
+                                  })
     return dumps(list_ecritures)
 
 @app.post('/ecriture')

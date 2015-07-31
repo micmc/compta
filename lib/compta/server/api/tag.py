@@ -64,12 +64,20 @@ def list_tag(db, id=None, nom=None, ecriture_id=None):
         abort(404, "ID not found")
 
     list_tags = []
-    for tag in tags:
-        list_tags.append({'id': tag.id,
-                          'nom': tag.nom,
-                          'valeur': tag.valeur,
-                         }
-                        )
+    attributs = App.get_attribut(request.query.attribut)
+    if attributs:
+        for tag in tags:
+            dict_attributs = {}
+            for attribut in attributs:
+                dict_attributs[attribut] = getattr(tag, attribut)
+            list_tags.append(dict_attributs)
+    else:
+        for tag in tags:
+            list_tags.append({'id': tag.id,
+                              'nom': tag.nom,
+                              'valeur': tag.valeur,
+                             }
+                            )
     return dumps(list_tags)
 
 @app.post('/tag')

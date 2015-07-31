@@ -65,14 +65,22 @@ def list_montant(db, id=None, ecriture_id=None):
     if not montants:
         abort(404, "ID not found")
     list_montants = []
-    for montant in montants:
-        list_montants.append({'id': montant.id,
-                              'montant': "%0.2f" % (montant.montant/100.0,),
-                              'description': montant.description,
-                              'categorie_id': montant.categorie_id,
-                              'categorie_nom': montant.categorie_nom,
-                              'ecriture_id': montant.ecriture_id,
-                             })
+    attributs = App.get_attribut(request.query.attribut)
+    if attributs:
+        for montant in montants:
+            dict_attributs = {}
+            for attribut in attributs:
+                dict_attributs[attribut] = getattr(montant, attribut)
+            list_montants.append(dict_attributs)
+    else:
+        for montant in montants:
+            list_montants.append({'id': montant.id,
+                                  'montant': "%0.2f" % (montant.montant/100.0,),
+                                  'description': montant.description,
+                                  'categorie_id': montant.categorie_id,
+                                  'categorie_nom': montant.categorie_nom,
+                                  'ecriture_id': montant.ecriture_id,
+                                 })
     return dumps(list_montants)
 
 @app.post('/montant')
