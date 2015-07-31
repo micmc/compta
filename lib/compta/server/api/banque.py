@@ -82,9 +82,12 @@ def list_banque_jtable(db):
 def list_banque_jtable(db):
     json_list = list_banque(db)
     data_list = loads(json_list)
-    data_new = {}
+    data_new = []
     for data in data_list:
-        data_new[data['nom']] =data['id']
+        data_dict = {'DisplayText': data['nom'],
+                     'Value': data['id']
+                    }
+        data_new.append(data_dict)
     data = {
             "Result": "OK",
             "Options": data_new
