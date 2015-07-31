@@ -54,18 +54,27 @@ def list_banque(db, id=None, nom=None):
     if not banques:
         abort(404, "ID not found")
     list_banque = []
-    for banque in banques:
-        list_banque.append({'id': banque.id,
-                            'nom': banque.nom,
-                            'adresse': banque.adresse,
-                            'ville': banque.ville,
-                            'cp': banque.cp,
-                            'pays': banque.pays,
-                            'cle': banque.cle_controle,
-                            'code_banque': banque.code_banque,
-                            'code_guichet': banque.code_guichet
-                           }
-                          )
+    attributs = App.get_attribut(request.query.attribut)
+    if attributs:
+        for banque in banques:
+            dict_attributs = {}
+            for attribut in attributs:
+                dict_attributs[attribut] = getattr(banque, attribut)
+            list_banque.append(dict_attributs)
+    else:
+        for banque in banques:
+            list_banque.append({'id': banque.id,
+                                'nom': banque.nom,
+                                'adresse': banque.adresse,
+                                'ville': banque.ville,
+                                'cp': banque.cp,
+                                'pays': banque.pays,
+                                'cle': banque.cle_controle,
+                                'code_banque': banque.code_banque,
+                                'code_guichet': banque.code_guichet
+                               }
+                              )
+    print list_banque
     return dumps(list_banque)
 
 @app.post('/jtable/ListBanque')

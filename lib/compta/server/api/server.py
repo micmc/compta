@@ -152,13 +152,26 @@ class App(object):
     def get_sort(cls, sort):
         """ Get sort in list
 
-            return  dict of filter
+            return list of filter
             else false
         """
 
         if sort:
             lst_sort = ["%s" % value for value in sort.split(',')]
             return lst_sort
+        return False
+
+    @classmethod
+    def get_attribut(cls, attribut):
+        """ Get attribut in list
+
+            return list of filter
+            else false
+        """
+
+        if attribut:
+            lst_attribut = ["%s" % value for value in attribut.split(',')]
+            return lst_attribut
         return False
 
 
