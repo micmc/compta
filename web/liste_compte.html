@@ -23,7 +23,26 @@
                 ajaxSettings: { type: 'POST' },
                 editinline:{enable:true},
                 actions: {
-                    listAction: 'http://localhost:8080/jtable/ListCompte',
+                    listAction: function (postData, jtParams) {
+                        console.log("Loading from custom function...");
+                        return $.Deferred(function ($dfd) {
+                            $.ajax({
+                                url: 'http://localhost:8080/compte',
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (data) {
+                                    dict_data = {
+                                                    Result: "OK",
+                                                    Records: data
+                                                }
+                                    $dfd.resolve(dict_data);
+                                },
+                                error: function () {
+                                    $dfd.reject();
+                                }
+                            });
+                        });
+                    },
                     createAction: 'http://localhost:8080/jtable/CreateCompte',
                     updateAction: 'http://localhost:8080/jtable/UpdateCompte',
                     deleteAction: 'http://localhost:8080/jtable/DeleteCompte'
