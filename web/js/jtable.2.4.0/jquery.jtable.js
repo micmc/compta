@@ -2272,7 +2272,7 @@ THE SOFTWARE.
             if ($.isFunction(self.options.actions.createAction)) {
 
                 //Execute the function
-                var funcResult = self.options.actions.createAction($addRecordForm.serialize());
+                var funcResult = self.options.actions.createAction($addRecordForm.serializeArray());
 
                 //Check if result is a jQuery Deferred object
                 if (self._isDeferredObject(funcResult)) {
@@ -2667,7 +2667,7 @@ THE SOFTWARE.
             if ($.isFunction(self.options.actions.updateAction)) {
 
                 //Execute the function
-                var funcResult = self.options.actions.updateAction($editForm.serialize());
+                var funcResult = self.options.actions.updateAction($editForm.serializeArray());
 
                 //Check if result is a jQuery Deferred object
                 if (self._isDeferredObject(funcResult)) {
