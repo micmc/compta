@@ -43,8 +43,53 @@
                             });
                         });
                     },
-                    createAction: 'http://localhost:8080/jtable/CreateCompte',
-                    updateAction: 'http://localhost:8080/jtable/UpdateCompte',
+                    createAction: function(postData) {
+                        console.log("Loading from custom function...");
+                        //https://github.com/hikalkan/jtable/issues/64
+                        var jsonData = {};
+                        $.map(postData, function(n, i) {
+                                            jsonData[n['name']] = n['value'];
+                                        });
+                        return $.Deferred(function ($dfd) {
+                            $.ajax({
+                                url: 'http://localhost:8080/compte',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: JSON.stringify(jsonData),
+                                success: function (data) {
+                                    dict_data = {
+                                                    Result: "OK",
+                                                    Record: data
+                                                }
+                                    $dfd.resolve(dict_data);
+                                },
+                                error: function () {
+                                    $dfd.reject();
+                                }
+                            });
+                        });
+                    },
+                    updateAction: function(postData, jtParam) {
+                        console.log("Loading from custom function...");
+                        return $.Deferred(function ($dfd) {
+                            $.ajax({
+                                url: 'http://localhost:8080/compte/' + postData['id'],
+                                type: 'PUT',
+                                dataType: 'json',
+                                data: postData,
+                                success: function (data) {
+                                    dict_data = {
+                                                    Result: "OK",
+                                                    Record: data
+                                                }
+                                    $dfd.resolve(dict_data);
+                                },
+                                error: function () {
+                                    $dfd.reject();
+                                }
+                            });
+                        });
+                    },
                     deleteAction: 'http://localhost:8080/jtable/DeleteCompte'
                 },
                 fields: {
