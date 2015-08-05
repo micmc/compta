@@ -35,7 +35,6 @@ Max 10, pour le nombre des categorie
 
 = Vue Banque =
 
-* Réécrir l'api en ajax
 * Regarder pour faire un sous menu sur les comptes
 
 = Vue Categorie =

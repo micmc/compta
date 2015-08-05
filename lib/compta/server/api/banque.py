@@ -118,6 +118,8 @@ def insert_banque(db):
             abort(404, ex.args)
         response.status = 201
         response.headers["Location"] = "/banque/%s" % (banque.id,)
+        banque = loads(list_banque(db, banque.id))
+        return banque[0]
 
 @app.post('/jtable/CreateBanque')
 def insert_banque_jtable(db):
@@ -169,6 +171,8 @@ def update_banque(db, id=None):
         setattr(banque, column, value)
     try:
         db.commit()
+        banque = loads(list_banque(db, banque.id))
+        return banque[0]
     except IntegrityError as ex:
         abort(404, ex.args)
 
@@ -215,6 +219,7 @@ def delete_banque(db, id=None):
         abort(404, "ID not found")
     db.delete(banque)
     db.commit()
+    return dumps({'id': id})
 
 @app.post('/jtable/DeleteBanque')
 def delete_banque_jtable(db):
