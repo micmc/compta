@@ -63,6 +63,7 @@ def enable_cors():
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
 
 @app.route('/banque/<id:int>', method=['OPTIONS'])
+@app.route('/compte/<id:int>', method=['OPTIONS'])
 def default_banque(id):
     """ For firefox, ignore OPTIONS method """
     return {}

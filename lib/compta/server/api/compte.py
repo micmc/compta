@@ -104,6 +104,8 @@ def insert_compte(db):
             abort(404, ex.args)
         response.status = 201
         response.headers["Location"] = "/compte/%s" % (compte.id,)
+        compte = loads(list_compte(db, compte.id))
+        return compte[0]
 
 @app.put(r'/compte/<id:int>')
 def update_compte(db, id=None):
@@ -120,6 +122,8 @@ def update_compte(db, id=None):
         setattr(compte, column, value)
     try:
         db.commit()
+        compte = loads(list_compte(db, compte.id))
+        return compte[0]
     except IntegrityError as ex:
         abort(404, ex.args)
 
@@ -134,5 +138,5 @@ def delete_compte(db, id=None):
         abort(404, "ID not found")
     db.delete(compte)
     db.commit()
-
+    return dumps({'id': id})
 
