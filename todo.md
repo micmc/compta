@@ -33,29 +33,6 @@ Optimiser la base de données sur les categorie :
 Il faut modifier l'affichage de la vue des categorie 
 Max 10, pour le nombre des categorie
 
-= Vue compte = 
-
-== list ==
-
-Utiliser la commande rest get avec une fonction ajax plutôt que le code actuel 
-
-== create ==
-
-Utiliser la commande rest post avec une fonction ajax plutôt que le code actuel 
-
-== Update ==
-
-Utiliser la commande rest put avec une fonction ajax plutôt que le code actuel 
-
-== Delete == 
-
-Faire de même
-
-== Affichage des banques avec banque_id ==
-
-Faire le même principe que précédemment en revoyant une array : 
-http://www.jtable.org/
-
 = Vue Banque =
 
 * Réécrir l'api en ajax
