@@ -17,6 +17,7 @@
 
   <body>
     <script type="text/javascript">
+        var cachedBanqueOptions = null;
         $(document).ready(function () {
             $('#lst_compte').jtable({
                 title: 'Liste des compte',
@@ -24,7 +25,6 @@
                 editinline:{enable:true},
                 actions: {
                     listAction: function (postData, jtParams) {
-                        console.log("Loading from custom function...");
                         return $.Deferred(function ($dfd) {
                             $.ajax({
                                 url: 'http://localhost:8080/compte',
@@ -44,7 +44,6 @@
                         });
                     },
                     createAction: function(postData) {
-                        console.log("Loading from custom function...");
                         //https://github.com/hikalkan/jtable/issues/64
                         var jsonData = {};
                         $.map(postData, function(n, i) {
@@ -55,43 +54,66 @@
                                 url: 'http://localhost:8080/compte',
                                 type: 'POST',
                                 dataType: 'json',
+                                data: JSON.stringify(jsonData)
+                                }).done(function(data, textStatus, jqXHR){
+                                    if (jqXHR.status == 201) {
+                                        dict_data = {
+                                                        Result: "OK",
+                                                        Record: data
+                                                    }
+                                        $dfd.resolve(dict_data);
+                                    }
+                                    else {
+                                        $dfd.reject();
+                                    }
+                                }).fail(function(jqXHR, textStatus, errorThrown){
+                                    $dfd.reject();
+                                });
+                            });
+                    },
+                    updateAction: function(postData) {
+                        var jsonData = {};
+                        $.map(postData, function(n, i) {
+                                            jsonData[n['name']] = n['value'];
+                                        });
+                        return $.Deferred(function ($dfd) {
+                            $.ajax({
+                                url: 'http://localhost:8080/compte/' + jsonData['id'],
+                                type: 'PUT',
+                                dataType: 'json',
                                 data: JSON.stringify(jsonData),
                                 success: function (data) {
                                     dict_data = {
                                                     Result: "OK",
-                                                    Record: data
                                                 }
                                     $dfd.resolve(dict_data);
                                 },
                                 error: function () {
                                     $dfd.reject();
                                 }
+                                });
                             });
-                        });
-                    },
-                    updateAction: function(postData, jtParam) {
-                        console.log("Loading from custom function...");
+                    }, 
+                    deleteAction: function(postData) {
                         return $.Deferred(function ($dfd) {
                             $.ajax({
                                 url: 'http://localhost:8080/compte/' + postData['id'],
-                                type: 'PUT',
+                                type: 'DELETE',
                                 dataType: 'json',
-                                data: postData,
                                 success: function (data) {
+                                    console.log(data);
                                     dict_data = {
                                                     Result: "OK",
-                                                    Record: data
                                                 }
                                     $dfd.resolve(dict_data);
                                 },
                                 error: function () {
                                     $dfd.reject();
                                 }
+                                });
                             });
-                        });
-                    },
-                    deleteAction: 'http://localhost:8080/jtable/DeleteCompte'
-                },
+                    }, 
+                 },
                 fields: {
                     id: {
                         key: true,
@@ -101,11 +123,29 @@
                         title: 'Banque',
                         width: '20%',
                         options: function(data) {
-                            if (data.source == 'list') {
-                            //Return url all options for optimization.
-                                return 'http://localhost:8080/jtable/GetBanqueName';
+                            if (cachedBanqueOptions) { //Check for cache
+                                return cachedBanqueOptions;
                             }
-                            return 'http://localhost:8080/jtable/GetBanqueName';
+ 
+                            var options = [];
+ 
+                            $.ajax({ //Not found in cache, get from server
+                                url: 'http://localhost:8080/banque?attribut=id,nom',
+                                type: 'GET',
+                                dataType: 'json',
+                                async: false,
+                                success: function (data) {
+                                    var jsonData = {};
+                                    $.map(data, function(n, i) {
+                                                        jsonData[n['id']] = n['nom'];
+                                                    });
+                                    console.log(data);
+                                    console.log(jsonData);
+                                    options = jsonData;
+                                }
+                            });
+                             
+                            return cachedBanqueOptions = options; //Cache results and return options
                         },
                         list: 'false'
                     },
