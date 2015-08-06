@@ -11,6 +11,7 @@ from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
+from sqlalchemy import text
 
 from compta.server.api.bottle import response, request, abort
 
@@ -28,23 +29,24 @@ def list_categorie(db, id=None, nom=None):
     """ List categorie """
     filter = {}
     if id:
-        filter['id'] = id
+        filter = ['id', '=', id]
     elif nom:
-        filter['nom'] = nom
+        filter['nom', '=', "'%s'" % nom]
     else:
-        filter = App.get_filter(request.query.filter)
+        filter = App.get_filter(request.query.filter, True)
 
     sort = App.get_sort(request.query.sort)
 
     categories = db.query(Categorie.id, Categorie.nom, func.count(Categorie.nom).label("count")).\
                     outerjoin(Montant).\
-                    group_by(Categorie.nom)
+                    group_by(Categorie.nom, Categorie.id)
     if filter:
-        for column, value in filter.iteritems():
-            if not isinstance(value, list):
-                categories = categories.filter(getattr(Categorie, column) == value)
-            else:
-                categories = categories.filter(getattr(Categorie, column).in_(value))
+        for tmp_filter in filter:
+                categories = categories.having("%s %s %s" % (tmp_filter[0],
+                                                               tmp_filter[1],
+                                                               tmp_filter[2]
+                                                              )
+                                              )
     if sort:
         for column in sort:
             categories = categories.order_by(getattr(Categorie, column))

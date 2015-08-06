@@ -28,11 +28,6 @@ Optimiser la base de données sur les categorie :
 * Supprimer les doublons (fusion)
 * voir s'il est possible de fusionner les petites categorie
 
-== Insertion de nouvelle écriture ==
-
-Il faut modifier l'affichage de la vue des categorie 
-Max 10, pour le nombre des categorie
-
 = Vue Banque =
 
 * Regarder pour faire un sous menu sur les comptes

@@ -89,7 +89,10 @@ class RequestServer(object):
                 del(filter['id'])
         #Create filter
         if filter:
-            lst_filter.append('filter=' + ','.join(["%s:%s" % (keys, values) for keys, values in filter.iteritems()]))
+            if filter.has_key('odata'):
+                lst_filter.append('filter=' + filter['odata'])
+            else:
+                lst_filter.append('filter=' + ','.join(["%s:%s" % (keys, values) for keys, values in filter.iteritems()]))
         if sort:
             lst_filter.append('sort=' + ','.join(["%s" % values for values in sort]))
         if attribut:

@@ -125,28 +125,58 @@ class App(object):
 
 
     @classmethod
-    def get_filter(cls, filter):
+    def get_filter(cls, filter, odata=False):
         """ Get filter in dict
 
-            return  dict of filter
-            else false
+            return  dict of filter if odata=False
+            if odata=True return a list
+            else False
         """
 
         if filter:
-            dict_filter = {}
-            for lst_attribut in filter.split(','):
-                attribut = lst_attribut.split(':')
-                if "/" in attribut[1]:
-                    dict_filter[attribut[0]] =  attribut[1].split('/')
+            #www.odata.org/libraries
+            if odata:
+                lst_filter = []
+                if 'and' in filter:
+                    tmp_filters = filter.split('and')
                 else:
-                    if attribut[1] == 'false':
-                        dict_filter[attribut[0]] = False
-                    elif attribut[1] == 'true':
-                        dict_filter[attribut[0]] = True
+                    tmp_filters = [filter, ]
+                for tmp_filter in tmp_filters:
+                    print tmp_filter
+                    if 'eq' in tmp_filter:
+                        tmp_filter = tmp_filter.replace('eq', '=')
+                    elif 'gt' in tmp_filter:
+                        tmp_filter = tmp_filter.raplace('gt', '>')
+                    elif 'lt' in tmp_filter:
+                        tmp_filter = tmp_filter.replace('lt', '>')
+                    lst_filter.append(tmp_filter.split())
+                return lst_filter
+            else:
+                dict_filter = {}
+                for lst_attribut in filter.split(','):
+                    attribut = lst_attribut.split(':')
+                    if "/" in attribut[1]:
+                        dict_filter[attribut[0]] =  attribut[1].split('/')
                     else:
-                        dict_filter[attribut[0]] = attribut[1]
-            return dict_filter
+                        if attribut[1] == 'false':
+                            dict_filter[attribut[0]] = False
+                        elif attribut[1] == 'true':
+                            dict_filter[attribut[0]] = True
+                        else:
+                            dict_filter[attribut[0]] = attribut[1]
+                return dict_filter
         return False
+
+    @classmethod
+    def convert_value(cls, value):
+        if value == 'false':
+            return False
+        elif value == 'true':
+            return True
+        elif value == 'null':
+            return None
+        else:
+            return value
 
     @classmethod
     def get_sort(cls, sort):

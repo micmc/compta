@@ -65,7 +65,7 @@ class Ecriture(Server):
                                    )
             attribut_montant['ecriture_id'] = new_ecriture.group('ecriture_id')
             list_categorie = RequestServer.get_method("categorie",
-                                                {},
+                                                {'odata': 'count lt 20'},
                                                 ['nom',],
                                                 []
                                                )
