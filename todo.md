@@ -22,12 +22,6 @@ Champs obligatoire :
 * montant
 * categorie_id : consommation ou inconnue
 
-== Optimisation de la base de données ==
-
-Optimiser la base de données sur les categorie :
-* Supprimer les doublons (fusion)
-* voir s'il est possible de fusionner les petites categorie
-
 = Vue Banque =
 
 * Regarder pour faire un sous menu sur les comptes
