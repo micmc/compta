@@ -20,7 +20,7 @@ $('select[name="compte"]').ready(function(e) {
     $.ajax(
     {
         method: "GET",
-        url: "http://localhost:8080/compte?filter=prs&archive=no",
+        url: "http://localhost:8080/compte?filter=type:prs,archive:false",
         dataType: "json",
         success: function(data) {
             for(i=0; i< data.length; i++) {
@@ -40,7 +40,7 @@ $('select[name="compte"]').change(function(e) {
     $.ajax(
     {
         method: "GET",
-        url: "http://localhost:8080/compte/" + compte_id + "/ecriture?filter=sum",
+        url: "http://localhost:8080/compte/" + compte_id + "/ecriture/sum",
         dataType: "json",
         success: function(data) {
             $('#somme').text('Solde du compte : ' + data.somme + "€");
