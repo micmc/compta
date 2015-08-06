@@ -13,105 +13,23 @@
     <script type="text/javascript" src="js/jtable/localization/jquery.jtable.fr.js">
     <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine-fr.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/api.rest.js"></script>
   </head>
 
   <body>
     <script type="text/javascript">
+        api_rest = new ApiRest('banque');
+        var uriRest = 'banque';
         $(document).ready(function () {
             $('#lst_banque').jtable({
                 title: 'Liste des banques',
                 ajaxSettings: { type: 'POST' },
                 editinline:{enable:true},
                 actions: {
-                    listAction: function (postData, jtParams) {
-                        return $.Deferred(function ($dfd) {
-                            $.ajax({
-                                url: 'http://localhost:8080/banque',
-                                type: 'GET',
-                                dataType: 'json',
-                                success: function (data) {
-                                    dict_data = {
-                                                    Result: "OK",
-                                                    Records: data
-                                                }
-                                    $dfd.resolve(dict_data);
-                                },
-                                error: function () {
-                                    $dfd.reject();
-                                }
-                            });
-                        });
-                    },
-                    createAction: function(postData) {
-                        //https://github.com/hikalkan/jtable/issues/64
-                        var jsonData = {};
-                        $.map(postData, function(n, i) {
-                                            jsonData[n['name']] = n['value'];
-                                        });
-                        return $.Deferred(function ($dfd) {
-                            $.ajax({
-                                url: 'http://localhost:8080/banque',
-                                type: 'POST',
-                                dataType: 'json',
-                                data: JSON.stringify(jsonData)
-                                }).done(function(data, textStatus, jqXHR){
-                                    if (jqXHR.status == 201) {
-                                        dict_data = {
-                                                        Result: "OK",
-                                                        Record: data
-                                                    }
-                                        $dfd.resolve(dict_data);
-                                    }
-                                    else {
-                                        $dfd.reject();
-                                    }
-                                }).fail(function(jqXHR, textStatus, errorThrown){
-                                    $dfd.reject();
-                                });
-                            });
-                    },
-                    updateAction: function(postData) {
-                        var jsonData = {};
-                        $.map(postData, function(n, i) {
-                                            jsonData[n['name']] = n['value'];
-                                        });
-                        return $.Deferred(function ($dfd) {
-                            $.ajax({
-                                url: 'http://localhost:8080/banque/' + jsonData['id'],
-                                type: 'PUT',
-                                dataType: 'json',
-                                data: JSON.stringify(jsonData),
-                                success: function (data) {
-                                    dict_data = {
-                                                    Result: "OK",
-                                                }
-                                    $dfd.resolve(dict_data);
-                                },
-                                error: function () {
-                                    $dfd.reject();
-                                }
-                                });
-                            });
-                    }, 
-                    deleteAction: function(postData) {
-                        return $.Deferred(function ($dfd) {
-                            $.ajax({
-                                url: 'http://localhost:8080/banque/' + postData['id'],
-                                type: 'DELETE',
-                                dataType: 'json',
-                                success: function (data) {
-                                    console.log(data);
-                                    dict_data = {
-                                                    Result: "OK",
-                                                }
-                                    $dfd.resolve(dict_data);
-                                },
-                                error: function () {
-                                    $dfd.reject();
-                                }
-                                });
-                            });
-                    }, 
+                    listAction: api_rest.listData,
+                    createAction: api_rest.createData,
+                    updateAction: api_rest.updateData,
+                    deleteAction: api_rest.deleteData 
                 },
                 fields: {
                     id: {
