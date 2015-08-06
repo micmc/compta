@@ -37,13 +37,9 @@ Max 10, pour le nombre des categorie
 
 * Regarder pour faire un sous menu sur les comptes
 
-= Vue Tag =
-
-Faire la vue 
-
 = Vue Ecriture =
 
-* Faire la vue, en utilisant les montant
+* Faire la vue, en utilisant les montants
 * Ajouter des filtres
 * Ajouter le mode multipage
 * Essayer de voir s'il est possible d'ajouter les tags dans une liste ?

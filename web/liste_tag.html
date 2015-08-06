@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Liste des tags</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="js/jtable/themes/metro/blue/jtable.min.css" />
+    <link rel="stylesheet" href="css/validationEngine.jquery.css" type="text/css"/>
+    <script type="text/javascript" src="js/jquery-1.11.2.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/jtable/jquery.jtable.js"></script>
+    <script type="text/javascript" src="js/jtable/localization/jquery.jtable.fr.js">
+    <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine-fr.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/api.rest.js"></script>
+  </head>
+
+  <body>
+    <script type="text/javascript">
+        api_rest = new ApiRest('tag');
+        var uriRest = 'tag';
+        $(document).ready(function () {
+            $('#lst_tag').jtable({
+                title: 'Liste des tags',
+                ajaxSettings: { type: 'POST' },
+                editinline:{enable:true},
+                actions: {
+                    listAction: api_rest.listData,
+                    createAction: api_rest.createData,
+                    updateAction: api_rest.updateData,
+                    deleteAction: api_rest.deleteData 
+                },
+                fields: {
+                    id: {
+                        key: true,
+                        list: false
+                    },
+                    nom: {
+                        title: 'Nom',
+                        width: '20%'
+                    },
+                    valeur: {
+                        title: 'valeur',
+                        width: '20%'
+                    },
+                }
+            });
+            $('#lst_tag').jtable('load');
+        });
+    </script>
+    <h1>Liste des tags</h1>
+        <div id="lst_tag"></div>
+  </body>
+</html>
+
+

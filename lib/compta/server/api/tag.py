@@ -95,6 +95,8 @@ def insert_tag(db):
             abort(404, ex.args)
         response.status = 201
         response.headers["Tag"] = "/tag/%s" % (tag.id,)
+        tag = loads(list_tag(db, tag.id))
+        return tag[0]
 
 @app.put(r'/tag/<id:int>')
 def update_tag(db, id):
@@ -111,6 +113,8 @@ def update_tag(db, id):
         setattr(tag, column, value)
     try:
         db.commit()
+        tag = loads(list_tag(db, tag.id))
+        return tag[0]
     except IntegrityError as ex:
         abort(404, ex.args)
 
@@ -125,5 +129,6 @@ def delete_tag(db, id=None):
         abort(404, "ID not found")
     db.delete(tag)
     db.commit()
+    return dumps({'id': id})
 
 
