@@ -72,6 +72,7 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
                          (Montant.montant * Ecriture.dc).label("montant"),
                          Ecriture.type.label("type"),
                          Categorie.nom.label("categorie"),
+                         Categorie.id.label("categorie_id"),
                          Montant.description.label("description"),
                          Montant.id.label("montant_id"),
                          Ecriture.valide.label("valide"),
@@ -116,11 +117,16 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
                                    'type': ecriture.type,
                                    'valide': ecriture.valide,
                                    'categorie': ecriture.categorie,
+                                   'categorie_id': ecriture.categorie_id,
                                    'montant': "%0.2f" % (ecriture.montant/100.0,),
                                    'description': ecriture.description,
                                    'montant_id' : ecriture.montant_id,
                                   })
-    return dumps(list_ecritures)
+    if request.query['skip'] and  request.query['top']:
+        print len(list_ecritures)
+        return dumps(list_ecritures[int(request.query['skip'])::int(request.query['top'])])
+    else:
+        return dumps(list_ecritures)
 
 @app.post('/ecriture')
 def insert_ecriture(db):

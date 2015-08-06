@@ -155,6 +155,7 @@ class App(object):
                 dict_filter = {}
                 for lst_attribut in filter.split(','):
                     attribut = lst_attribut.split(':')
+                    print attribut
                     if "/" in attribut[1]:
                         dict_filter[attribut[0]] =  attribut[1].split('/')
                     else:

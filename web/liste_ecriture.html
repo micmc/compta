@@ -2,36 +2,102 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Page web</title>
+    <title>Liste des ecritures</title>
     <link rel="stylesheet" type="text/css" href="css/styles.css" />
     <link rel="stylesheet" type="text/css" href="css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="js/jtable/themes/metro/blue/jtable.min.css" />
+    <link rel="stylesheet" href="css/validationEngine.jquery.css" type="text/css"/>
     <script type="text/javascript" src="js/jquery-1.11.2.js"></script>
     <script type="text/javascript" src="js/jquery-ui.js"></script>
-    <script type="text/javascript" src="js/ecriture.js"></script>
+    <script type="text/javascript" src="js/jtable/jquery.jtable.js"></script>
+    <script type="text/javascript" src="js/jtable/localization/jquery.jtable.fr.js">
+    <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/jquery.validationEngine-fr.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/api.rest.js"></script>
   </head>
 
   <body>
-    <h1>Liste automate</h1>
-    <table class="ecriture">
-      <thead>
-        <tr>
-          <td>Date</td>
-          <td>Nom</td>
-          <td>Montant</td>
-          <td>Type</td>
-          <td>Categorie</td>
-          <td>Description</td>
-          <td>Valide</td>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-      <tfoot>
-          <tr>
-          <td>Ajouter</td>
-          </tr>
-      </tfoot>
-    </table>
+    <script type="text/javascript">
+        var cachedCategorieOptions = null;
+        api_rest = new ApiRest('ecriture');
+        id_compte = $(location).attr("search").replace("?id=","");
+        var uriRest = 'compte';
+        var idRest="/" + id_compte + "/ecriture";
+        $(document).ready(function () {
+            $('#lst_ecriture').jtable({
+                title: 'Liste des ecritures',
+                ajaxSettings: { type: 'POST' },
+                editinline:{enable:true},
+                paging: true,
+                actions: {
+                    listAction: api_rest.listData,
+                    createAction: api_rest.createData,
+                    updateAction: api_rest.updateData,
+                    deleteAction: api_rest.deleteData 
+                },
+                fields: {
+                    id: {
+                        key: true,
+                        list: false
+                    },
+                    nom: {
+                        title: 'Nom',
+                        width: '10%'
+                    },
+                    date: {
+                        title: 'Date',
+                        width: '10%',
+                        type: 'date'
+                    },
+                    valide: {
+                        title: 'Valide',
+                        width: '5%',
+                        type: 'checkbox',
+                        values: {'false': 'A Valider', 'true': 'OK'}
+                    },
+                    categorie_id: {
+                        title: 'Categorie',
+                        width: '20%',
+                        options: function(data) {
+                            if (cachedCategorieOptions) { //Check for cache
+                                return cachedCategorieOptions;
+                            }
+ 
+                            var options = [];
+ 
+                            $.ajax({ //Not found in cache, get from server
+                                url: 'http://localhost:8080/categorie?attribut=id,nom',
+                                type: 'GET',
+                                dataType: 'json',
+                                async: false,
+                                success: function (data) {
+                                    var jsonData = {};
+                                    $.map(data, function(n, i) {
+                                                        jsonData[n['id']] = n['nom'];
+                                                    });
+                                    options = jsonData;
+                                }
+                            });
+                             
+                            return cachedCategorieOptions = options; //Cache results and return options
+                        },
+                        list: 'false'
+ },
+                    montant: {
+                        title: 'Montant',
+                        width: '5%'
+                    },
+                    description: {
+                        title: 'Description',
+                        width: '20%'
+                    },
+                }
+            });
+            $('#lst_ecriture').jtable('load');
+        });
+    </script>
+    <h1>Liste des ecritures</h1>
+        <div id="lst_ecriture"></div>
   </body>
 </html>
 

@@ -3,8 +3,17 @@ function ApiRest(uri) {
 
 ApiRest.prototype.listData = function(postData, jtParams) {
     return $.Deferred(function ($dfd) {
+        console.log(jtParams);
+        if ("jtStartIndex" in jtParams && "jtPageSize" in jtParams) {
+            pagingRest = "?skip=" + jtParams['jtStartIndex'] + "&top=" + jtParams['jtPageSize']; 
+        } else {
+            pagingRest = ""
+        }
+        if (window.idRest === undefined) {
+            idRest="";
+        }
         $.ajax({
-             url: 'http://localhost:8080/' + uriRest,
+             url: 'http://localhost:8080/' + uriRest + idRest + pagingRest,
              type: 'GET',
              dataType: 'json',
              success: function (data) {
