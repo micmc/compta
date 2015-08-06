@@ -37,10 +37,6 @@ Max 10, pour le nombre des categorie
 
 * Regarder pour faire un sous menu sur les comptes
 
-= Vue Categorie =
-
-Faire la vue
-
 = Vue Tag =
 
 Faire la vue 

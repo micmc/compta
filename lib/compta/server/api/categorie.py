@@ -90,6 +90,8 @@ def insert_categorie(db):
             abort(404, ex.args)
         response.status = 201
         response.headers["Location"] = "/categorie/%s" % (categorie.id,)
+        categorie = loads(list_categorie(db, categorie.id))
+        return categorie[0]
 
 @app.put(r'/categorie/<id:int>')
 def update_categorie(db, id):
@@ -106,6 +108,8 @@ def update_categorie(db, id):
         setattr(categorie, column, value)
     try:
         db.commit()
+        categorie = loads(list_categorie(db, categorie.id))
+        return categorie[0]
     except IntegrityError as ex:
         abort(404, ex.args)
 
@@ -120,5 +124,6 @@ def delete_categorie(db, id=None):
         abort(404, "ID not found")
     db.delete(categorie)
     db.commit()
+    return dumps({'id': id})
 
 
