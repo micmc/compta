@@ -25,6 +25,8 @@ Champs obligatoire :
 = Vue Banque =
 
 * Regarder pour faire un sous menu sur les comptes
+    -> En cours, voir le problème d'édition avec idRest
+    
 
 = Vue Ecriture =
 

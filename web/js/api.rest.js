@@ -1,3 +1,5 @@
+//Class for master api
+
 function ApiRest(uri) {
 }
 
@@ -110,4 +112,29 @@ ApiRest.prototype.deleteData = function(postData) {
         });
 }
 
+function ApiChildRest(uri) {
+}
 
+ApiChildRest.prototype.listData = function(postData, jtParams) {
+    return $.Deferred(function ($dfd) {
+        if (window.idRest === undefined) {
+            idChildRest="";
+        }
+        $.ajax({
+             url: 'http://localhost:8080/' + uriChildRest + '/' + idChildRest,
+             type: 'GET',
+             dataType: 'json',
+             success: function (data) {
+                dict_data = {
+                                Result: "OK",
+                                Records: data,
+                                TotalRecordCount: data['ecriture_count']
+                            }
+                $dfd.resolve(dict_data);
+             },
+             error: function () {
+                $dfd.reject();
+             }
+         });
+    });
+}
