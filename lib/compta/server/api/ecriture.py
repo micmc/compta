@@ -120,11 +120,13 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
                                    'categorie_id': ecriture.categorie_id,
                                    'montant': "%0.2f" % (ecriture.montant/100.0,),
                                    'description': ecriture.description,
-                                   'montant_id' : ecriture.montant_id,
+                                   'montant_id': ecriture.montant_id,
                                   })
     if request.query['skip'] and  request.query['top']:
-        print len(list_ecritures)
-        return dumps(list_ecritures[int(request.query['skip'])::int(request.query['top'])])
+        return dumps({'count': len(list_ecritures),
+                      'values': list_ecritures[int(request.query['skip']):int(request.query['skip']) + int(request.query['top'])]
+                     }
+                    )
     else:
         return dumps(list_ecritures)
 

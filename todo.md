@@ -28,10 +28,6 @@ Champs obligatoire :
 
 = Vue Ecriture =
 
-* Ajouter des filtres
-    - Regarder obdata pour le retour et modifier tout les list
-* Ajouter le mode multipage
-    - En cours de résolution
 * Essayer de voir s'il est possible d'ajouter les tags dans une liste ?
 * Faire de tel sorte que les prélèvement / virement soit affiché.
 

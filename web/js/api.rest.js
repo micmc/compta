@@ -3,7 +3,6 @@ function ApiRest(uri) {
 
 ApiRest.prototype.listData = function(postData, jtParams) {
     return $.Deferred(function ($dfd) {
-        console.log(jtParams);
         if ("jtStartIndex" in jtParams && "jtPageSize" in jtParams) {
             pagingRest = "?skip=" + jtParams['jtStartIndex'] + "&top=" + jtParams['jtPageSize']; 
         } else {
@@ -17,10 +16,19 @@ ApiRest.prototype.listData = function(postData, jtParams) {
              type: 'GET',
              dataType: 'json',
              success: function (data) {
-                dict_data = {
-                                Result: "OK",
-                                Records: data
-                            }
+                if ("jtStartIndex" in jtParams && "jtPageSize" in jtParams) {
+                    dict_data = {
+                                    Result: "OK",
+                                    Records: data['values'],
+                                    TotalRecordCount: data['count']
+                                }
+                } else {
+                    dict_data = {
+                                    Result: "OK",
+                                    Records: data,
+                                    TotalRecordCount: data['ecriture_count']
+                                }
+                }
                 $dfd.resolve(dict_data);
              },
              error: function () {
