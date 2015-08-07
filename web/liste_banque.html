@@ -44,19 +44,43 @@
                         title: '',
                         width: '5%',
                         sorting: false,
+                        edit: false,
+                        create: false,
                         display: function (banqueData) {
                             var $img = $('<img src="list_metro.png" title="Compte" />');
                             $img.click(function() {
-                                idRest = '/' + banqueData.record.id + '/compte'
+                                //idRest = '/' + banqueData.record.id + '/compte'
                                 $('#lst_banque').jtable('openChildTable',
                                     $img.closest('tr'), //Parent row
                                     {
                                         title: 'Compte',
                                         actions: {
-                                            listAction: api_rest.listData,
-                                            updateAction: api_rest.updateData,
-                                        },
+                                            listAction: function(postData, jtParams) {
+                                                var restCompte = new ApiRestTest()
+                                                return restCompte.listData('banque/' + banqueData.record.id + '/compte');
+                                            },
+                                            createAction: function(postData) {
+                                                var restCompte = new ApiRestTest();
+                                                return restCompte.createData('compte', postData);
+                                            },
+                                            updateAction: function(postData) {
+                                                var restCompte = new ApiRestTest();
+                                                return restCompte.updateData('compte', postData);
+                                            },
+                                            deleteAction: function(postData) {
+                                                var restCompte = new ApiRestTest();
+                                                return restCompte.deleteData('compte', postData);
+                                            },
+                                         },
                                         fields: {
+                                            id: {
+                                                key: true,
+                                                list: false
+                                            },
+                                            banque_id: {
+                                                type: 'hidden',
+                                                defaultValue: banqueData.record.id
+                                            },
                                             nom: {
                                                 title: 'Nom',
                                             },

@@ -25,7 +25,8 @@ Champs obligatoire :
 = Vue Banque =
 
 * Regarder pour faire un sous menu sur les comptes
-    -> En cours, voir le problème d'édition avec idRest
+    -> En cours, reste à renommer correctement la classe et la mettre en globale
+    -> Correction du bogue sur insertion de banque
     
 
 = Vue Ecriture =

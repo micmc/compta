@@ -28,7 +28,6 @@ ApiRest.prototype.listData = function(postData, jtParams) {
                     dict_data = {
                                     Result: "OK",
                                     Records: data,
-                                    TotalRecordCount: data['ecriture_count']
                                 }
                 }
                 $dfd.resolve(dict_data);
@@ -112,23 +111,19 @@ ApiRest.prototype.deleteData = function(postData) {
         });
 }
 
-function ApiChildRest(uri) {
+function ApiRestTest() {
 }
 
-ApiChildRest.prototype.listData = function(postData, jtParams) {
+ApiRestTest.prototype.listData = function(id) {
     return $.Deferred(function ($dfd) {
-        if (window.idRest === undefined) {
-            idChildRest="";
-        }
         $.ajax({
-             url: 'http://localhost:8080/' + uriChildRest + '/' + idChildRest,
+             url: 'http://localhost:8080/' + id,
              type: 'GET',
              dataType: 'json',
              success: function (data) {
                 dict_data = {
                                 Result: "OK",
                                 Records: data,
-                                TotalRecordCount: data['ecriture_count']
                             }
                 $dfd.resolve(dict_data);
              },
@@ -137,4 +132,75 @@ ApiChildRest.prototype.listData = function(postData, jtParams) {
              }
          });
     });
+}
+
+ApiRestTest.prototype.createData = function(uri, postData) {
+    //https://github.com/hikalkan/jtable/issues/64
+    var jsonData = {};
+    $.map(postData, function(n, i) {
+                        jsonData[n['name']] = n['value'];
+                    });
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+            url: 'http://localhost:8080/' + uri,
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(jsonData)
+            }).done(function(data, textStatus, jqXHR){
+                if (jqXHR.status == 201) {
+                    dict_data = {
+                                    Result: "OK",
+                                    Record: data
+                                }
+                    $dfd.resolve(dict_data);
+                }
+                else {
+                    $dfd.reject();
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown){
+                $dfd.reject();
+            });
+        });
+}
+ApiRestTest.prototype.updateData = function(uri, postData) {
+    var jsonData = {};
+    $.map(postData, function(n, i) {
+                        jsonData[n['name']] = n['value'];
+                    });
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+            url: 'http://localhost:8080/' + uri + '/' + jsonData['id'],
+            type: 'PUT',
+            dataType: 'json',
+            data: JSON.stringify(jsonData),
+            success: function (data) {
+                dict_data = {
+                                Result: "OK",
+                            }
+                $dfd.resolve(dict_data);
+            },
+            error: function () {
+                $dfd.reject();
+            }
+            });
+        });
+}
+
+ApiRestTest.prototype.deleteData = function(uri, postData) {
+    return $.Deferred(function ($dfd) {
+        $.ajax({
+            url: 'http://localhost:8080/' + uri + '/' + postData['id'],
+            type: 'DELETE',
+            dataType: 'json',
+            success: function (data) {
+                dict_data = {
+                                Result: "OK",
+                            }
+                $dfd.resolve(dict_data);
+            },
+            error: function () {
+                $dfd.reject();
+            }
+            });
+        });
 }
