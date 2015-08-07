@@ -111,10 +111,10 @@ ApiRest.prototype.deleteData = function(postData) {
         });
 }
 
-function ApiRestTest() {
+function ApiRestChild() {
 }
 
-ApiRestTest.prototype.listData = function(id) {
+ApiRestChild.prototype.listData = function(id) {
     return $.Deferred(function ($dfd) {
         $.ajax({
              url: 'http://localhost:8080/' + id,
@@ -134,7 +134,7 @@ ApiRestTest.prototype.listData = function(id) {
     });
 }
 
-ApiRestTest.prototype.createData = function(uri, postData) {
+ApiRestChild.prototype.createData = function(uri, postData) {
     //https://github.com/hikalkan/jtable/issues/64
     var jsonData = {};
     $.map(postData, function(n, i) {
@@ -162,7 +162,7 @@ ApiRestTest.prototype.createData = function(uri, postData) {
             });
         });
 }
-ApiRestTest.prototype.updateData = function(uri, postData) {
+ApiRestChild.prototype.updateData = function(uri, postData) {
     var jsonData = {};
     $.map(postData, function(n, i) {
                         jsonData[n['name']] = n['value'];
@@ -186,7 +186,7 @@ ApiRestTest.prototype.updateData = function(uri, postData) {
         });
 }
 
-ApiRestTest.prototype.deleteData = function(uri, postData) {
+ApiRestChild.prototype.deleteData = function(uri, postData) {
     return $.Deferred(function ($dfd) {
         $.ajax({
             url: 'http://localhost:8080/' + uri + '/' + postData['id'],

@@ -48,6 +48,7 @@
                         create: false,
                         display: function (banqueData) {
                             var $img = $('<img src="list_metro.png" title="Compte" />');
+                            var restCompte = new ApiRestChild();
                             $img.click(function() {
                                 //idRest = '/' + banqueData.record.id + '/compte'
                                 $('#lst_banque').jtable('openChildTable',
@@ -56,19 +57,15 @@
                                         title: 'Compte',
                                         actions: {
                                             listAction: function(postData, jtParams) {
-                                                var restCompte = new ApiRestTest()
                                                 return restCompte.listData('banque/' + banqueData.record.id + '/compte');
                                             },
                                             createAction: function(postData) {
-                                                var restCompte = new ApiRestTest();
                                                 return restCompte.createData('compte', postData);
                                             },
                                             updateAction: function(postData) {
-                                                var restCompte = new ApiRestTest();
                                                 return restCompte.updateData('compte', postData);
                                             },
                                             deleteAction: function(postData) {
-                                                var restCompte = new ApiRestTest();
                                                 return restCompte.deleteData('compte', postData);
                                             },
                                          },

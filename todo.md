@@ -22,13 +22,6 @@ Champs obligatoire :
 * montant
 * categorie_id : consommation ou inconnue
 
-= Vue Banque =
-
-* Regarder pour faire un sous menu sur les comptes
-    -> En cours, reste à renommer correctement la classe et la mettre en globale
-    -> Correction du bogue sur insertion de banque
-    
-
 = Vue Ecriture =
 
 * Essayer de voir s'il est possible d'ajouter les tags dans une liste ?
