@@ -18,6 +18,7 @@
 
   <body>
     <script type="text/javascript">
+        var cachedTagOptions = null;
         var cachedCategorieOptions = null;
         api_rest = new ApiRest('ecriture');
         id_compte = $(location).attr("search").replace("?id=","");
@@ -44,6 +45,78 @@
                         title: 'Nom',
                         width: '10%'
                     },
+                    tag: {
+                        title: '',
+                        width: '5%',
+                        sorting: false,
+                        edit: false,
+                        create: false,
+                        display: function (tagData) {
+                            var $img = $('<img src="list_metro.png" title="Tag" />');
+                            var restTag = new ApiRestChild();
+                            $img.click(function() {
+                                $('#lst_ecriture').jtable('openChildTable',
+                                    $img.closest('tr'), //Parent row
+                                    {
+                                        title: 'Tag',
+                                        actions: {
+                                            listAction: function(postData, jtParams) {
+                                                return restTag.listData('ecriture/' + tagData.record.id + '/tag');
+                                            },
+                                            createAction: function(postData) {
+                                                return restTag.createData('ecriture/' + tagData.record.id + '/tag', postData);
+                                            },
+                                            updateAction: function(postData) {
+                                                return restTag.updateData('tag', postData);
+                                            },
+                                            deleteAction: function(postData) {
+                                                return restTag.deleteData('tag', postData);
+                                            },
+                                         },
+                                        fields: {
+                                            //id: {
+                                            //    key: true,
+                                            //    list: false
+                                            //},
+                                            ecriture_id: {
+                                                type: 'hidden',
+                                                defaultValue: tagData.record.id
+                                            },
+                                            tag_id: {
+                                                title: 'Nom du Tag',
+                                                width: '20%',
+                                                options: function(data) {
+                                                    if (cachedTagOptions) { //Check for cache
+                                                        return cachedTagOptions;
+                                                    }
+                                                    var options = [];
+                                                    $.ajax({ //Not found in cache, get from server
+                                                        url: 'http://localhost:8080/tag?attribut=id,nom,valeur',
+                                                        type: 'GET',
+                                                        dataType: 'json',
+                                                        async: false,
+                                                        success: function (data) {
+                                                            var jsonData = {};
+                                                            $.map(data, function(n, i) {
+                                                                                jsonData[n['id']] = n['nom'] + " " + n['valeur'];
+                                                                            });
+                                                            options = jsonData;
+                                                        }
+                                                    });
+                                                    return cachedTagOptions = options; //Cache results and return options
+                                                },
+                                                list: 'false'
+                                            },
+                                        }
+                                     },
+                                    function (data) { //opened handler
+                                        data.childTable.jtable('load');
+                                    }
+                                );
+                            });
+                            return $img;
+                        }
+                    },
                     date: {
                         title: 'Date',
                         width: '10%',
@@ -62,9 +135,7 @@
                             if (cachedCategorieOptions) { //Check for cache
                                 return cachedCategorieOptions;
                             }
- 
                             var options = [];
- 
                             $.ajax({ //Not found in cache, get from server
                                 url: 'http://localhost:8080/categorie?attribut=id,nom',
                                 type: 'GET',
@@ -78,7 +149,6 @@
                                     options = jsonData;
                                 }
                             });
-                             
                             return cachedCategorieOptions = options; //Cache results and return options
                         },
                         list: 'false'
