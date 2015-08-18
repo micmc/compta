@@ -25,6 +25,9 @@ Champs obligatoire :
 = Vue Ecriture =
 
 * Essayer de voir s'il est possible d'ajouter les tags dans une liste ?
+ -> En cours de creation
+    Affiche, le champ to nom du tag est vide bien que la liste soit complète...
+
 * Faire de tel sorte que les prélèvement / virement soit affiché.
 
 = Stats =
