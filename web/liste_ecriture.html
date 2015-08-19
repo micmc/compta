@@ -43,7 +43,7 @@
                     },
                     nom: {
                         title: 'Nom',
-                        width: '10%'
+                        width: '20%'
                     },
                     tag: {
                         title: '',
@@ -72,17 +72,13 @@
                                             deleteAction: function(postData) {
                                                 return restTag.deleteData('tag', postData);
                                             },
-                                         },
+                                        },
                                         fields: {
-                                            //id: {
-                                            //    key: true,
-                                            //    list: false
-                                            //},
                                             ecriture_id: {
                                                 type: 'hidden',
                                                 defaultValue: tagData.record.id
                                             },
-                                            tag_id: {
+                                            id: {
                                                 title: 'Nom du Tag',
                                                 width: '20%',
                                                 options: function(data) {
@@ -98,7 +94,7 @@
                                                         success: function (data) {
                                                             var jsonData = {};
                                                             $.map(data, function(n, i) {
-                                                                                jsonData[n['id']] = n['nom'] + " " + n['valeur'];
+                                                                                jsonData[n['id']] = n['nom'];
                                                                             });
                                                             options = jsonData;
                                                         }
@@ -106,6 +102,10 @@
                                                     return cachedTagOptions = options; //Cache results and return options
                                                 },
                                                 list: 'false'
+                                            },
+                                            valeur: {
+                                                title: 'valeur',
+                                                width: '10%'
                                             },
                                         }
                                      },
@@ -159,7 +159,7 @@
                     },
                     description: {
                         title: 'Description',
-                        width: '20%'
+                        width: '50%'
                     },
                 }
             });

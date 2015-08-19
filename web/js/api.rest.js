@@ -127,7 +127,16 @@ ApiRestChild.prototype.listData = function(id) {
                             }
                 $dfd.resolve(dict_data);
              },
-             error: function () {
+             error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR.status() + textStatus);
+                if (jqXHR.status == 204) {
+                    dict_data = {
+                                    Result: "OK",
+                                    Records: [],
+                                }
+                    console.log(dict_data);
+                    $dfd.resolve(dict_data);
+                }
                 $dfd.reject();
              }
          });
