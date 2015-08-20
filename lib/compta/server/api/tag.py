@@ -76,19 +76,10 @@ def list_tag(db, id=None, nom=None):
     return dumps(list_tags)
 
 @app.get(r'/ecriture/<ecriture_id:int>/tag')
-@app.get(r'/ecriture/<ecriture_id:int>/tag/<id:int>')
-@app.get(r'/ecriture/<ecriture_id:int>/tag/<nom:re:[a-zA-Z\ ]+>')
-def list_ecriture_tag(db, id=None, nom=None, ecriture_id=None):
+def list_ecriture_tag(db, ecriture_id=None):
     """ List ecriture for tag """
     filter = {}
-    if id:
-        filter['id'] = tag_id
-    elif nom:
-        filter['nom'] = nom
-    #elif ecriture_id:
-    #    filter['ecriture_id'] = ecriture_id
-    else:
-        filter = App.get_filter(request.query.filter)
+    filter = App.get_filter(request.query.filter)
 
     sort = App.get_sort(request.query.sort)
 
@@ -128,7 +119,7 @@ def list_ecriture_tag(db, id=None, nom=None, ecriture_id=None):
             list_tags.append(dict_attributs)
     else:
         for tag in tags:
-            list_tags.append({'id': tag.id,
+            list_tags.append({'tag_id': tag.id,
                               'nom': tag.nom,
                               'valeur': tag.valeur,
                              }
@@ -155,22 +146,20 @@ def insert_tag(db):
         return tag[0]
 
 @app.post(r'/ecriture/<ecriture_id:int>/tag')
-def insert_ecriture_tag(db, id):
-    """ Insert a new tag for an existing ecriture """
-    entity = App.check_data(Tag, request.body.readline())
+def insert_ecriture_tag(db, ecriture_id):
+    """ Insert a new ecriture_tag for an existing ecriture """
+    entity = App.check_data(EcritureTag, request.body.readline())
     if entity:
-        ecriture_tag = EcritureTag(ecriture_id=id, tag_id=entity['tag_id'])
-        #for column, value in entity.iteritems():
-        #    setattr(tag, column, value)
+        ecriture_tag = EcritureTag(ecriture_id=ecriture_id, tag_id=entity['tag_id'])
         db.add(ecriture_tag)
         try:
             db.commit()
         except IntegrityError as ex:
             abort(404, ex.args)
         response.status = 201
-        response.headers["Tag"] = "/tag/%s" % (tag.id,)
-        tag = loads(list_tag(db, entity['tag_id'], ecriture_id=id))
-        return tag[0]
+        response.headers["Tag"] = "/tag/%s" % (ecriture_tag.tag_id,)
+        ecriture_tag = {'tag_id': entity['tag_id'], 'ecriture_id': entity['ecriture_id']}
+        return ecriture_tag
 
 @app.put(r'/tag/<id:int>')
 def update_tag(db, id):
@@ -194,7 +183,7 @@ def update_tag(db, id):
 
 @app.delete(r'/tag/<id:int>')
 def delete_tag(db, id=None):
-    """ Delete a tag """
+    """ Delete a ecriture_tag for an ecriture"""
     try:
         tag = db.query(Tag).\
                     filter(Tag.id == id).\
@@ -204,5 +193,19 @@ def delete_tag(db, id=None):
     db.delete(tag)
     db.commit()
     return dumps({'id': id})
+
+@app.delete(r'/ecriture/<ecriture_id:int>/tag/<id:int>')
+def delete_tag(db, id=None, ecriture_id=None):
+    """ Delete a tag """
+    try:
+        ecriture_tag = db.query(EcritureTag).\
+                          filter(EcritureTag.tag_id == id).\
+                          filter(EcritureTag.ecriture_id == id).\
+                          one()
+    except NoResultFound:
+        abort(404, "ID not found")
+    db.delete(ecriture_tag)
+    db.commit()
+    return dumps({'tag_id': id, 'ecriture_id': ecriture_id})
 
 
