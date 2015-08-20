@@ -66,11 +66,11 @@
                                             createAction: function(postData) {
                                                 return restTag.createData('ecriture/' + tagData.record.id + '/tag', postData);
                                             },
-                                            updateAction: function(postData) {
-                                                return restTag.updateData('tag', postData);
-                                            },
+                                            //updateAction: function(postData) {
+                                            //    return restTag.updateData('tag', postData);
+                                            //},
                                             deleteAction: function(postData) {
-                                                return restTag.deleteData('tag', postData);
+                                                return restTag.deleteData('ecriture/' + tagData.record.id + '/tag', postData);
                                             },
                                         },
                                         fields: {
@@ -78,7 +78,7 @@
                                                 type: 'hidden',
                                                 defaultValue: tagData.record.id
                                             },
-                                            id: {
+                                            tag_id: {
                                                 title: 'Nom du Tag',
                                                 width: '20%',
                                                 options: function(data) {
@@ -87,7 +87,7 @@
                                                     }
                                                     var options = [];
                                                     $.ajax({ //Not found in cache, get from server
-                                                        url: 'http://localhost:8080/tag?attribut=id,nom,valeur',
+                                                        url: 'http://localhost:8080/tag',
                                                         type: 'GET',
                                                         dataType: 'json',
                                                         async: false,
@@ -105,7 +105,9 @@
                                             },
                                             valeur: {
                                                 title: 'valeur',
-                                                width: '10%'
+                                                width: '10%',
+                                                edit: false,
+                                                create: false,
                                             },
                                         }
                                      },
