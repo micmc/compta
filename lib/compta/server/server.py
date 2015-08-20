@@ -66,6 +66,7 @@ def enable_cors():
 @app.route('/compte/<id:int>', method=['OPTIONS'])
 @app.route('/categorie/<id:int>', method=['OPTIONS'])
 @app.route('/tag/<id:int>', method=['OPTIONS'])
+@app.route('/ecriture/<ecriture_id:int>/tag/<id:int>', method=['OPTIONS'])
 def default_banque(id):
     """ For firefox, ignore OPTIONS method """
     return {}
