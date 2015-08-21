@@ -6,7 +6,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Date, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
-from base import Base
+from base import Table
 from compta.db.categorie import Categorie
 
 #CREATE TABLE "ecriture" (
@@ -30,7 +30,7 @@ from compta.db.categorie import Categorie
 #, categorie_id integer  references "categorie" ("id"));
 #CREATE INDEX "ecriture_categorie_507077e5" ON "ecriture_categorie" ("ecri
 
-class Ecriture(Base):
+class Ecriture(Table):
     """ Class to manage ecriture table """
     __tablename__ = 'ecriture'
     id = Column(Integer, primary_key=True)
@@ -42,14 +42,18 @@ class Ecriture(Base):
     compte_id = Column(Integer, ForeignKey('compte.id'), nullable=False)
     nom_id = Column(Integer, ForeignKey('compte.id'), nullable=True)
     montant = relationship('Montant',
+                           single_parent=True,
+                           cascade="all, delete-orphan",
                            backref='ecritures'
                           )
     tags = relationship('Tag',
+                        cascade="all, delete-orphan",
+                        single_parent=True,
                         secondary='ecriture_tag',
                         backref='ecritures'
                        )
 
-class Montant(Base):
+class Montant(Table):
     """ Class to manage montant table """
     __tablename__ = 'montant'
     id = Column(Integer, primary_key=True)
@@ -59,14 +63,14 @@ class Montant(Base):
     categorie_id = Column(Integer, ForeignKey('categorie.id'), nullable=True)
     categorie = relationship(Categorie)
 
-class EcritureTag(Base):
+class EcritureTag(Table):
     """ Class to manage ecriture_tag table """
     __tablename__ = 'ecriture_tag'
     id = Column(Integer, primary_key=True)
     ecriture_id = Column(Integer, ForeignKey('ecriture.id'))
     tag_id = Column(Integer, ForeignKey('tag.id'))
 
-class Tag(Base):
+class Tag(Table):
     """ Class to manage tag table """
     __tablename__ = 'tag'
     id = Column(Integer, primary_key=True)

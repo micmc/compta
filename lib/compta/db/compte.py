@@ -6,7 +6,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Enum
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
-from compta.db.base import Base
+from compta.db.base import Table
 
 #CREATE TABLE "compte" (
 #    "id" integer NOT NULL PRIMARY KEY,
@@ -19,7 +19,7 @@ from compta.db.base import Base
 #);
 #CREATE INDEX "banque_compte_decbfcd4" ON "compte" ("banque_id");
 
-class Compte(Base):
+class Compte(Table):
     """ Class to manage compte
 
         Two constraints is used in sqlite :

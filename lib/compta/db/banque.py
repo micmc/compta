@@ -5,7 +5,7 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
-from compta.db.base import Base
+from compta.db.base import Table
 
 #CREATE TABLE "banque" (
 #    "id" integer NOT NULL PRIMARY KEY,
@@ -19,7 +19,7 @@ from compta.db.base import Base
 #    "code_guichet" varchar(5)
 #);
 
-class Banque(Base):
+class Banque(Table):
     """ Class to manage banque table """
     __tablename__ = 'banque'
     id = Column(Integer, primary_key=True)
@@ -31,4 +31,7 @@ class Banque(Base):
     cle_controle = Column(String(2), default="76")
     code_banque = Column(String(5), nullable=True)
     code_guichet = Column(String(5), nullable=True)
-    comptes = relationship('Compte', backref='banque')
+    comptes = relationship('Compte',
+                           cascade="all, delete-orphan",
+                           backref='banque'
+                          )
