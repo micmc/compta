@@ -83,11 +83,13 @@ def list_ecriture_tag(db, ecriture_id=None):
 
     sort = App.get_sort(request.query.sort)
 
-    tags = db.query(Tag.id,
+    tags = db.query(EcritureTag.id,
                     Tag.nom,
                     Tag.valeur,
-                    EcritureTag.ecriture_id
+                    EcritureTag.ecriture_id,
+                    EcritureTag.tag_id
                    ).\
+              select_from(Tag).\
               join(EcritureTag).\
               filter(EcritureTag.ecriture_id == ecriture_id)
 
@@ -119,7 +121,9 @@ def list_ecriture_tag(db, ecriture_id=None):
             list_tags.append(dict_attributs)
     else:
         for tag in tags:
-            list_tags.append({'tag_id': tag.id,
+            list_tags.append({'id': tag.tag_id,
+                              'tag_id': tag.id,
+                              'ecriture_id' : tag.ecriture_id,
                               'nom': tag.nom,
                               'valeur': tag.valeur,
                              }
@@ -157,8 +161,11 @@ def insert_ecriture_tag(db, ecriture_id):
         except IntegrityError as ex:
             abort(404, ex.args)
         response.status = 201
-        response.headers["Tag"] = "/tag/%s" % (ecriture_tag.tag_id,)
-        ecriture_tag = {'tag_id': entity['tag_id'], 'ecriture_id': entity['ecriture_id']}
+        response.headers["Tag"] = "/tag/%s" % (ecriture_tag.id,)
+        ecriture_tag = {'id': ecriture_tag.id,
+                        'tag_id': ecriture_tag.tag_id,
+                        'ecriture_id': ecriture_tag.ecriture_id
+                       }
         return ecriture_tag
 
 @app.put(r'/tag/<id:int>')
@@ -199,13 +206,12 @@ def delete_tag(db, id=None, ecriture_id=None):
     """ Delete a tag """
     try:
         ecriture_tag = db.query(EcritureTag).\
-                          filter(EcritureTag.tag_id == id).\
-                          filter(EcritureTag.ecriture_id == id).\
+                          filter(EcritureTag.id == id).\
                           one()
     except NoResultFound:
         abort(404, "ID not found")
     db.delete(ecriture_tag)
     db.commit()
-    return dumps({'tag_id': id, 'ecriture_id': ecriture_id})
+    return dumps({'id': id,})
 
 

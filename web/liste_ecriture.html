@@ -74,6 +74,10 @@
                                             },
                                         },
                                         fields: {
+                                            id: {
+                                                key: true,
+                                                list: false
+                                            },
                                             ecriture_id: {
                                                 type: 'hidden',
                                                 defaultValue: tagData.record.id
@@ -110,7 +114,7 @@
                                                 create: false,
                                             },
                                         }
-                                     },
+                                    },
                                     function (data) { //opened handler
                                         data.childTable.jtable('load');
                                     }
