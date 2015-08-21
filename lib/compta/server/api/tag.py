@@ -109,7 +109,8 @@ def list_ecriture_tag(db, ecriture_id=None):
     except NoResultFound:
         abort(404, "ID not found")
     if not tags:
-        abort(204, "ID not found")
+        response.status = 204
+        return "ID not found"
 
     list_tags = []
     attributs = App.get_attribut(request.query.attribut)
