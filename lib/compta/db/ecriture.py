@@ -62,8 +62,9 @@ class Montant(Base):
 class EcritureTag(Base):
     """ Class to manage ecriture_tag table """
     __tablename__ = 'ecriture_tag'
-    ecriture_id = Column(Integer, ForeignKey('ecriture.id'), primary_key=True)
-    tag_id = Column(Integer, ForeignKey('tag.id'), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    ecriture_id = Column(Integer, ForeignKey('ecriture.id'))
+    tag_id = Column(Integer, ForeignKey('tag.id'))
 
 class Tag(Base):
     """ Class to manage tag table """
