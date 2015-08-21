@@ -122,7 +122,8 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
                                    'description': ecriture.description,
                                    'montant_id': ecriture.montant_id,
                                   })
-    if request.query['skip'] and  request.query['top']:
+    print type(request.query)
+    if request.query.has_key('skip') and request.query.has_key('top'):
         return dumps({'count': len(list_ecritures),
                       'values': list_ecritures[int(request.query['skip']):int(request.query['skip']) + int(request.query['top'])]
                      }
@@ -138,16 +139,45 @@ def insert_ecriture(db):
         ecriture = Ecriture()
         for column, value in entity.iteritems():
             if column == 'date':
-                ecriture.date = datetime.strptime(value, "%Y/%m/%d")
-            else:
-                setattr(ecriture, column, value)
-        db.add(ecriture)
+                ecriture.date = datetime.strptime(value, "%Y-%m-%d")
+            #else:
+            #    setattr(ecriture, column, value)
+            elif column == 'nom':
+                ecriture.nom = value
+            elif column == 'type':
+                ecriture.type = value
+            elif column == 'dc':
+                ecriture.dc = value
+            elif column == 'valide':
+                ecriture.dc = value
+            elif column == 'compte_id':
+                ecriture.compte_id = value
         try:
+            db.add(ecriture)
             db.commit()
         except IntegrityError as ex:
+            print ex.args
+            abort(404, ex.args)
+        montant = Montant()
+        for column, value in entity.iteritems():
+            print column, value
+            if column == 'montant':
+                montant.montant = int(locale.atof(entity["montant"])*100)
+            elif column == 'description':
+                montant.description = value
+            elif column == 'categorie_id':
+                montant.categorie_id = value
+        try:
+            ecriture.montant.append(montant)
+            db.commit()
+        except IntegrityError as ex:
+            print ex.args
             abort(404, ex.args)
         response.status = 201
         response.headers["Location"] = "/ecriture/%s/" % (ecriture.id,)
+        ecriture = loads(list_ecriture(db, ecriture.id))
+        print "ecriture", ecriture[0]
+        return ecriture[0]
 
 
 @app.put(r'/ecriture/<id:int>')
@@ -168,6 +198,8 @@ def update_ecriture(db, id=None, ec_id=None):
             setattr(ecriture, column, value)
     try:
         db.commit()
+        ecriture = loads(list_ecriture(db, ecriture.id))
+        return ecriture[0]
     except IntegrityError as ex:
         abort(404, ex.args)
 
@@ -182,3 +214,5 @@ def delete_ecriture(db, id=None):
         abort(404, "ID not found")
     db.delete(ecriture)
     db.commit()
+    return dumps({'id': id,})
+    

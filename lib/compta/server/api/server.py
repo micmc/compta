@@ -90,11 +90,17 @@ class App(object):
         mapper = inspect(database)
         orm_data = {}
         for column in mapper.attrs:
-            if isinstance(column, ColumnProperty):
+            if isinstance(column, ColumnProperty) and \
+               not column.columns[0].nullable and \
+               not column.columns[0].foreign_keys and \
+               not column.columns[0].primary_key:
                 orm_data[column.key] = column.columns[0].nullable
-        for column in entity.iterkeys():
-            if orm_data.has_key(column):
-                del(orm_data[column])
+            else:
+                pass
+        for field in orm_data.iterkeys():
+            if entity.has_key(field):
+                #del(orm_data[column])
+                pass
             else:
                 return False
         return entity
