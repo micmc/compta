@@ -21,9 +21,10 @@
         var cachedTagOptions = null;
         var cachedCategorieOptions = null;
         api_rest = new ApiRest('ecriture');
-        id_compte = $(location).attr("search").replace("?id=","");
-        var uriRest = 'compte';
-        var idRest="/" + id_compte + "/ecriture";
+        compte_id = $(location).attr("search").replace("?id=","");
+        //var uriRest = 'compte';
+        //var idRest="/" + compte_id + "/ecriture";
+        var apiRest = new ApiRestChild();
         $(document).ready(function () {
             $('#lst_ecriture').jtable({
                 title: 'Liste des ecritures',
@@ -31,15 +32,31 @@
                 editinline:{enable:true},
                 paging: true,
                 actions: {
-                    listAction: api_rest.listData,
-                    createAction: api_rest.createData,
-                    updateAction: api_rest.updateData,
-                    deleteAction: api_rest.deleteData 
-                },
+                    //listAction: api_rest.listData,
+                    //createAction: api_rest.createData,
+                    //updateAction: api_rest.updateData,
+                    //deleteAction: api_rest.deleteData 
+                    listAction: function(postData, jtParams) {
+                        return apiRest.listData('compte/' + compte_id +  '/ecriture', jtParams);
+                    },
+                    createAction: function(postData) {
+                        return apiRest.createData('ecriture', postData);
+                    },
+                    updateAction: function(postData) {
+                        return apiRest.updateData('ecriture', postData);
+                    },
+                    deleteAction: function(postData) {
+                        return apiRest.deleteData('ecriture', postData);
+                    },
+                 },
                 fields: {
                     id: {
                         key: true,
                         list: false
+                    },
+                    compte_id: {
+                        type: 'hidden',
+                        defaultValue: compte_id
                     },
                     nom: {
                         title: 'Nom',
@@ -128,6 +145,11 @@
                         width: '10%',
                         type: 'date'
                     },
+                    type: {
+                        title: 'Type',
+                        width: '10%',
+                        options: ['Vr', 'Pr', 'Cb', 'Ch', 'Re', 'Li']
+                    },
                     valide: {
                         title: 'Valide',
                         width: '5%',
@@ -162,6 +184,11 @@
                     montant: {
                         title: 'Montant',
                         width: '5%'
+                    },
+                    dc: {
+                        title: 'Débit / Crédit',
+                        hidden: true,
+                        defaultValue: 1,
                     },
                     description: {
                         title: 'Description',

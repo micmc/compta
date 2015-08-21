@@ -3,8 +3,9 @@
 function ApiRest(uri) {
 }
 
-ApiRest.prototype.listData = function(postData, jtParams) {
+ApiRest.prototype.listData = function(postData, jtParams={}) {
     return $.Deferred(function ($dfd) {
+        console.log(jtParams);
         if ("jtStartIndex" in jtParams && "jtPageSize" in jtParams) {
             pagingRest = "?skip=" + jtParams['jtStartIndex'] + "&top=" + jtParams['jtPageSize']; 
         } else {
@@ -114,17 +115,33 @@ ApiRest.prototype.deleteData = function(postData) {
 function ApiRestChild() {
 }
 
-ApiRestChild.prototype.listData = function(id) {
+ApiRestChild.prototype.listData = function(id, jtParams={}) {
     return $.Deferred(function ($dfd) {
+        if ("jtStartIndex" in jtParams && "jtPageSize" in jtParams) {
+            pagingRest = "?skip=" + jtParams['jtStartIndex'] + "&top=" + jtParams['jtPageSize']; 
+        } else {
+            pagingRest = ""
+        }
+        if (window.idRest === undefined) {
+            idRest="";
+        }
         $.ajax({
-             url: 'http://localhost:8080/' + id,
+             url: 'http://localhost:8080/' + id + idRest + pagingRest,
              type: 'GET',
              dataType: 'json',
              success: function (data) {
-                dict_data = {
-                                Result: "OK",
-                                Records: data,
-                            }
+                if ("jtStartIndex" in jtParams && "jtPageSize" in jtParams) {
+                    dict_data = {
+                                    Result: "OK",
+                                    Records: data['values'],
+                                    TotalRecordCount: data['count']
+                                }
+                } else {
+                    dict_data = {
+                                    Result: "OK",
+                                    Records: data,
+                                }
+                }
                 $dfd.resolve(dict_data);
              },
              error: function (jqXHR, textStatus, errorThrown) {
