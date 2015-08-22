@@ -24,9 +24,12 @@ Champs obligatoire :
 
 = Vue Ecriture =
 
-* Essayer de voir s'il est possible d'ajouter les tags dans une liste ?
- -> En cours de creation
-    Affiche, le champ to nom du tag est vide bien que la liste soit complète...
+Bogue sur DC :
+Revoir le fonctionnement.
+Faire abastraction de la base de données. Un montant est soit positif ou négatif.
+DC doit-il être supprimé, mais facultatif
+On sauvegarde en valeur absolur type int
+Si montant < 0 : dc type debit
 
 * Faire de tel sorte que les prélèvement / virement soit affiché.
 
