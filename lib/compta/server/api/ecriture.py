@@ -122,10 +122,9 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
                                    'description': ecriture.description,
                                    'montant_id': ecriture.montant_id,
                                   })
-    print type(request.query)
-    if request.query.has_key('skip') and request.query.has_key('top'):
+    if request.query.get('skip') and request.query.get('top'):
         return dumps({'count': len(list_ecritures),
-                      'values': list_ecritures[int(request.query['skip']):int(request.query['skip']) + int(request.query['top'])]
+                      'values': list_ecritures[request.query.get('skip',type=int):request.query.get('skip', type=int) + request.query.get('top', type=int)]
                      }
                     )
     else:
@@ -160,7 +159,6 @@ def insert_ecriture(db):
             abort(404, ex.args)
         montant = Montant()
         for column, value in entity.iteritems():
-            print column, value
             if column == 'montant':
                 montant.montant = int(locale.atof(entity["montant"])*100)
             elif column == 'description':
@@ -176,29 +174,46 @@ def insert_ecriture(db):
         response.status = 201
         response.headers["Location"] = "/ecriture/%s/" % (ecriture.id,)
         ecriture = loads(list_ecriture(db, ecriture.id))
-        print "ecriture", ecriture[0]
         return ecriture[0]
 
 
 @app.put(r'/ecriture/<id:int>')
-def update_ecriture(db, id=None, ec_id=None):
+@app.put(r'/ecriture/<id:int>/montant/<montant_id:int>')
+def update_ecriture(db, id=None, montant_id=None):
     """ Update information for an ecriture """
     entity = App.check_data(Ecriture, request.body.readline())
     if entity:
         try:
-            ecriture = db.query(Ecriture).\
-                           filter(Ecriture.id == id).\
-                           one()
+            ecriture = db.query(Ecriture, Montant).\
+                          join(Ecriture.montant).\
+                          filter(Ecriture.id == id)
+            if montant_id:
+                ecriture = ecriture.filter(Montant.id == montant_id).\
+            ecriture = ecriture.one()
         except NoResultFound:
             abort(404, "ID not found")
     for column, value in entity.iteritems():
         if column == 'date':
-            ecriture.date = datetime.strptime(value, "%Y/%m/%d")
-        else:
-            setattr(ecriture, column, value)
+            ecriture.date = datetime.strptime(value, "%Y-%m-%d")
+        elif column == 'nom':
+            ecriture.nom = value
+        elif column == 'type':
+            ecriture.type = value
+        elif column == 'dc':
+            ecriture.dc = value
+        elif column == 'valide':
+            ecriture.dc = value
+        elif column == 'compte_id':
+            ecriture.compte_id = value
+        if column == 'montant':
+            ecriture.montant = int(locale.atof(entity["montant"])*100)
+        elif column == 'description':
+            ecriture.description = value
+        elif column == 'categorie_id':
+            ecriture.categorie_id = value
     try:
         db.commit()
-        ecriture = loads(list_ecriture(db, ecriture.id))
+        ecriture = loads(list_ecriture(db, id))
         return ecriture[0]
     except IntegrityError as ex:
         abort(404, ex.args)
