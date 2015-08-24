@@ -150,6 +150,45 @@
                         width: '10%',
                         options: ['Vr', 'Pr', 'Cb', 'Ch', 'Re', 'Li']
                     },
+                    nom_id: {
+                        title: 'Nom Compte',
+                        width: '10%',
+                        list: false,
+                        dependsOn: 'type',
+                        options: function(data) {
+                            if (data.source != 'list') {
+                                var restCompte = new ApiRestChild();
+                                switch(data.dependedValues.type) {
+                                    case 'Pr':
+                                        console.log('prélèvement');
+                                        rqst = 'compte?filter=archive:false,type:prv';
+                                        break;
+                                    case 'Vr':
+                                        console.log('virement');
+                                        rqst =  'compte?filter=archive:false,type:prs/vir';
+                                        break;
+                                    default:
+                                        return [];
+                                }
+                                var jsonData = {};
+                                $.ajax({ //Not found in cache, get from server
+                                    url: 'http://localhost:8080/' + rqst,
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    async: false,
+                                    success: function (data) {
+                                        $.map(data, function(n, i) {
+                                                            jsonData[n['id']] = n['nom'];
+                                                        });
+                                    }
+                                });
+                                return jsonData; //Cache results and return options
+                            }
+                            else {
+                                return [];
+                            }
+                        },
+                    },
                     valide: {
                         title: 'Valide',
                         width: '5%',
@@ -185,16 +224,35 @@
                         title: 'Montant',
                         width: '5%'
                     },
+                    montant_id: {
+                        title: 'Montant_id',
+                        width: '5%',
+                        type: 'hidden',
+                    },
                     dc: {
                         title: 'Débit / Crédit',
-                        hidden: true,
+                        list: 'false',
+                        type: 'hidden',
                         defaultValue: 1,
                     },
                     description: {
                         title: 'Description',
                         width: '50%'
                     },
-                }
+                },
+                formCreated: function (event, data) {
+                    data.form.find('select[name=nom_id]').change(function(){
+                        data.form.find('input[name=nom]').val($(this).children('option').filter(':selected').text());
+                    });
+                },
+                formSubmitting(event, data) {
+                    montant = parseInt(data.form.find('input[name=montant]').val());
+                    if (montant < 0) {
+                        console.log('montant : ' + montant);
+                        data.form.find('input[name=dc]').val("-1");
+                        console.log(data.form.find('input[name=dc]').val());
+                    }
+                }                
             });
             $('#lst_ecriture').jtable('load');
         });
