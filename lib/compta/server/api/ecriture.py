@@ -160,7 +160,7 @@ def insert_ecriture(db):
         montant = Montant()
         for column, value in entity.iteritems():
             if column == 'montant':
-                montant.montant = int(locale.atof(entity["montant"])*100)
+                montant.montant = int(abs(locale.atof(entity["montant"])*100))
             elif column == 'description':
                 montant.description = value
             elif column == 'categorie_id':
@@ -183,40 +183,51 @@ def update_ecriture(db, id=None, montant_id=None):
     """ Update information for an ecriture """
     entity = App.check_data(Ecriture, request.body.readline())
     if entity:
+        print entity
         try:
-            ecriture = db.query(Ecriture, Montant).\
-                          join(Ecriture.montant).\
-                          filter(Ecriture.id == id)
-            if montant_id:
-                ecriture = ecriture.filter(Montant.id == montant_id).\
-            ecriture = ecriture.one()
+            ecriture = db.query(Ecriture).\
+                          filter(Ecriture.id == id).\
+                          one()
+            # if montant_id:
+            #     ecriture = ecriture.filter(Montant.id == montant_id).\
+            #ecriture = ecriture.one()
         except NoResultFound:
             abort(404, "ID not found")
-    for column, value in entity.iteritems():
-        if column == 'date':
-            ecriture.date = datetime.strptime(value, "%Y-%m-%d")
-        elif column == 'nom':
-            ecriture.nom = value
-        elif column == 'type':
-            ecriture.type = value
-        elif column == 'dc':
-            ecriture.dc = value
-        elif column == 'valide':
-            ecriture.dc = value
-        elif column == 'compte_id':
-            ecriture.compte_id = value
-        if column == 'montant':
-            ecriture.montant = int(locale.atof(entity["montant"])*100)
-        elif column == 'description':
-            ecriture.description = value
-        elif column == 'categorie_id':
-            ecriture.categorie_id = value
-    try:
+        print 'ok'
+        for column, value in entity.iteritems():
+            if column == 'date':
+                ecriture.date = datetime.strptime(value, "%Y-%m-%d")
+            elif column == 'nom':
+                print 'nom'
+                ecriture.nom = value
+            elif column == 'type':
+                ecriture.type = value
+            elif column == 'dc':
+                ecriture.dc = value
+            elif column == 'valide':
+                ecriture.dc = value
+            elif column == 'compte_id':
+                ecriture.compte_id = value
+         #try:
+         #    montant = db.query(Montant).\
+         #                 filter(Montant.id == entity['montant_id']).\
+         #                 one
+         #except NoResultFound:
+         #    abort(404, "ID not found")
+         #for column, value in entity.iteritems():
+         #    #if column == 'montant':
+         #    #    ecriture.montant = int(abs(locale.atof(entity["montant"])*100))
+         #    if column == 'description':
+         #        ecriture.description = value
+         #    elif column == 'categorie_id':
+         #        ecriture.categorie_id = value
+        #try:
+        print "ok", id
         db.commit()
         ecriture = loads(list_ecriture(db, id))
         return ecriture[0]
-    except IntegrityError as ex:
-        abort(404, ex.args)
+        #except Exception as ex:
+        #    abort(404, ex.args)
 
 @app.delete(r'/ecriture/<id:int>')
 def delete_ecriture(db, id=None):
