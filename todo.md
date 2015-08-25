@@ -22,17 +22,6 @@ Champs obligatoire :
 * montant
 * categorie_id : consommation ou inconnue
 
-= Vue Ecriture =
-
-Bogue sur DC :
-Revoir le fonctionnement.
-Faire abastraction de la base de données. Un montant est soit positif ou négatif.
-DC doit-il être supprimé, mais facultatif
-On sauvegarde en valeur absolur type int
-Si montant < 0 : dc type debit
-
-* Faire de tel sorte que les prélèvement / virement soit affiché.
-
 = Stats =
 
 * Réfléchir à des applis de graph
