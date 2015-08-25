@@ -71,11 +71,13 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
                          Ecriture.date.label("date"),
                          (Montant.montant * Ecriture.dc).label("montant"),
                          Ecriture.type.label("type"),
+                         Ecriture.dc.label("dc"),
                          Categorie.nom.label("categorie"),
                          Categorie.id.label("categorie_id"),
                          Montant.description.label("description"),
                          Montant.id.label("montant_id"),
                          Ecriture.valide.label("valide"),
+                         Ecriture.compte_id.label("compte_id"),
                         ).\
                    join(Ecriture.montant).\
                    join(Montant.categorie)
@@ -113,7 +115,7 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
             list_ecritures.append({'id': ecriture.id,
                                    'nom': ecriture.nom,
                                    'date': datetime.strftime(ecriture.date, "%Y/%m/%d"),
-                                   #'dc': ecriture.Ecriture.dc,
+                                   'dc': ecriture.dc,
                                    'type': ecriture.type,
                                    'valide': ecriture.valide,
                                    'categorie': ecriture.categorie,
@@ -121,6 +123,7 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
                                    'montant': "%0.2f" % (ecriture.montant/100.0,),
                                    'description': ecriture.description,
                                    'montant_id': ecriture.montant_id,
+                                   'compte_id': ecriture.compte_id,
                                   })
     if request.query.get('skip') and request.query.get('top'):
         return dumps({'count': len(list_ecritures),
@@ -160,7 +163,7 @@ def insert_ecriture(db):
         montant = Montant()
         for column, value in entity.iteritems():
             if column == 'montant':
-                montant.montant = int(abs(locale.atof(entity["montant"])*100))
+                montant.montant = int(abs(locale.atof(value)*100))
             elif column == 'description':
                 montant.description = value
             elif column == 'categorie_id':
@@ -193,7 +196,6 @@ def update_ecriture(db, id=None, montant_id=None):
             #ecriture = ecriture.one()
         except NoResultFound:
             abort(404, "ID not found")
-        print 'ok'
         for column, value in entity.iteritems():
             if column == 'date':
                 ecriture.date = datetime.strptime(value, "%Y-%m-%d")
@@ -208,26 +210,25 @@ def update_ecriture(db, id=None, montant_id=None):
                 ecriture.dc = value
             elif column == 'compte_id':
                 ecriture.compte_id = value
-         #try:
-         #    montant = db.query(Montant).\
-         #                 filter(Montant.id == entity['montant_id']).\
-         #                 one
-         #except NoResultFound:
-         #    abort(404, "ID not found")
-         #for column, value in entity.iteritems():
-         #    #if column == 'montant':
-         #    #    ecriture.montant = int(abs(locale.atof(entity["montant"])*100))
-         #    if column == 'description':
-         #        ecriture.description = value
-         #    elif column == 'categorie_id':
-         #        ecriture.categorie_id = value
-        #try:
-        print "ok", id
-        db.commit()
-        ecriture = loads(list_ecriture(db, id))
-        return ecriture[0]
-        #except Exception as ex:
-        #    abort(404, ex.args)
+        try:
+            montant = db.query(Montant).\
+                         filter(Montant.id == entity['montant_id']).\
+                         one()
+        except NoResultFound:
+            abort(404, "ID not found")
+        for column, value in entity.iteritems():
+            if column == 'montant':
+                montant.montant = int(abs(locale.atof(value)*100))
+            if column == 'description':
+                montant.description = value
+            elif column == 'categorie_id':
+                montant.categorie_id = value
+        try:
+            db.commit()
+            ecriture = loads(list_ecriture(db, id))
+            return ecriture[0]
+        except Exception as ex:
+            abort(404, ex.args)
 
 @app.delete(r'/ecriture/<id:int>')
 def delete_ecriture(db, id=None):
