@@ -99,7 +99,7 @@ class ParseArgs(object):
                                           help='filter to apply',
                                           nargs='+')
         self.parser_ecriture.add_argument('-a', '--attribut', 
-                                          help='filter on attribut [nom, type, dc, date, valide, compte_id]',
+                                          help='filter on attribut [nom, type, date, valide, compte_id, montant, description]',
                                           nargs='+')
         self.parser_ecriture.add_argument('-s', '--sort', 
                                           help='filter on sort',
