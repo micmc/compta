@@ -44,7 +44,7 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
     # return sums of account
     if sum:
         ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
-                             (Montant.montant/100.0).label("somme")
+                             func.sum(Montant.montant/100.0).label("somme")
                             ).\
                        join(Ecriture.montant).\
                        filter(Ecriture.compte_id == compte_id).\
@@ -136,6 +136,7 @@ def insert_ecriture(db):
     """ Create an ecriture """
     entity = App.check_data(Ecriture, request.body.readline())
     if entity:
+        print entity
         ecriture = Ecriture()
         for column, value in entity.iteritems():
             if column == 'date':
@@ -150,16 +151,18 @@ def insert_ecriture(db):
                 ecriture.valide = value
             elif column == 'compte_id':
                 ecriture.compte_id = value
+            elif column == 'nom_id':
+                ecriture.nom_id = value
         try:
             db.add(ecriture)
             db.commit()
         except IntegrityError as ex:
-            print ex.args
+            print ex
             abort(404, ex.args)
         montant = Montant()
         for column, value in entity.iteritems():
             if column == 'montant':
-                montant.montant = int(abs(locale.atof(value)*100))
+                montant.montant = int(locale.atof(value)*100)
             elif column == 'description':
                 montant.description = value
             elif column == 'categorie_id':
@@ -168,7 +171,7 @@ def insert_ecriture(db):
             ecriture.montant.append(montant)
             db.commit()
         except IntegrityError as ex:
-            print ex.args
+            print ex
             abort(404, ex.args)
         response.status = 201
         response.headers["Location"] = "/ecriture/%s/" % (ecriture.id,)
@@ -192,6 +195,7 @@ def update_ecriture(db, id=None, montant_id=None):
         except NoResultFound:
             abort(404, "ID not found")
         for column, value in entity.iteritems():
+            print  column, value
             if column == 'date':
                 ecriture.date = datetime.strptime(value, "%Y-%m-%d")
             elif column == 'nom':
@@ -201,8 +205,8 @@ def update_ecriture(db, id=None, montant_id=None):
                 ecriture.type = value
             elif column == 'valide':
                 ecriture.valide = value
-            elif column == 'compte_id':
-                ecriture.compte_id = value
+            elif column == 'nom_id':
+                ecriture.nom_id = value
         try:
             montant = db.query(Montant).\
                          filter(Montant.id == entity['montant_id']).\
@@ -211,7 +215,7 @@ def update_ecriture(db, id=None, montant_id=None):
             abort(404, "ID not found")
         for column, value in entity.iteritems():
             if column == 'montant':
-                montant.montant = int(abs(locale.atof(value)*100))
+                montant.montant = int(locale.atof(value)*100)
             if column == 'description':
                 montant.description = value
             elif column == 'categorie_id':
@@ -221,7 +225,7 @@ def update_ecriture(db, id=None, montant_id=None):
             ecriture = loads(list_ecriture(db, id))
             return ecriture[0]
         except Exception as ex:
-            abort(404, ex.args)
+            abort(404, ex)
 
 @app.delete(r'/ecriture/<id:int>')
 def delete_ecriture(db, id=None):

@@ -21,9 +21,9 @@
         var cachedTagOptions = null;
         var cachedCategorieOptions = null;
         api_rest = new ApiRest('ecriture');
-        compte_id = $(location).attr("search").replace("?id=","");
+        compteId = $(location).attr("search").replace("?id=","");
         //var uriRest = 'compte';
-        //var idRest="/" + compte_id + "/ecriture";
+        //var idRest="/" + compteId + "/ecriture";
         var apiRest = new ApiRestChild();
         $(document).ready(function () {
             $('#lst_ecriture').jtable({
@@ -37,7 +37,7 @@
                     //updateAction: api_rest.updateData,
                     //deleteAction: api_rest.deleteData 
                     listAction: function(postData, jtParams) {
-                        return apiRest.listData('compte/' + compte_id +  '/ecriture', jtParams);
+                        return apiRest.listData('compte/' + compteId +  '/ecriture', jtParams);
                     },
                     createAction: function(postData) {
                         return apiRest.createData('ecriture', postData);
@@ -55,7 +55,11 @@
                         list: false
                     },
                     compte_id: {
+                        //list: false,
+                        //edit: false,
+                        //create: false,
                         type: 'hidden',
+                        defaultValue: compteId
                     },
                     nom: {
                         title: 'Nom',
@@ -147,7 +151,7 @@
                     type: {
                         title: 'Type',
                         width: '10%',
-                        options: ['Vr', 'Pr', 'Cb', 'Ch', 'Re', 'Li']
+                        options: ['Cb','Vr', 'Pr', 'Ch', 'Re', 'Li']
                     },
                     nom_id: {
                         title: 'Nom Compte',
@@ -228,10 +232,6 @@
                         width: '5%',
                         type: 'hidden',
                     },
-                    dc: {
-                        type: 'hidden',
-                        defaultValue: 1,
-                    },
                     description: {
                         title: 'Description',
                         width: '50%'
@@ -242,14 +242,14 @@
                         data.form.find('input[name=nom]').val($(this).children('option').filter(':selected').text());
                     });
                 },
-                formSubmitting(event, data) {
-                    montant = parseInt(data.form.find('input[name=montant]').val());
-                    if (montant < 0) {
-                        console.log('montant : ' + montant);
-                        data.form.find('input[name=dc]').val("-1");
-                        console.log(data.form.find('input[name=dc]').val());
-                    }
-                }                
+                //formSubmitting(event, data) {
+                //    montant = parseInt(data.form.find('input[name=montant]').val());
+                //    if (montant < 0) {
+                //        console.log('montant : ' + montant);
+                //        data.form.find('input[name=dc]').val("-1");
+                //        console.log(data.form.find('input[name=dc]').val());
+                //    }
+                //}                
             });
             $('#lst_ecriture').jtable('load');
         });
