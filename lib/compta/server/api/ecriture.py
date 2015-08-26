@@ -44,7 +44,7 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
     # return sums of account
     if sum:
         ecritures = db.query(func.count(Ecriture.nom).label("nombre"),
-                             (func.sum(Ecriture.dc * Montant.montant)/100.0).label("somme")
+                             (Montant.montant/100.0).label("somme")
                             ).\
                        join(Ecriture.montant).\
                        filter(Ecriture.compte_id == compte_id).\
@@ -69,9 +69,8 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
     ecritures = db.query(Ecriture.id.label("id"),
                          func.trim(Ecriture.nom).label("nom"),
                          Ecriture.date.label("date"),
-                         (Montant.montant * Ecriture.dc).label("montant"),
+                         Montant.montant.label("montant"),
                          Ecriture.type.label("type"),
-                         Ecriture.dc.label("dc"),
                          Categorie.nom.label("categorie"),
                          Categorie.id.label("categorie_id"),
                          Montant.description.label("description"),
@@ -115,7 +114,6 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
             list_ecritures.append({'id': ecriture.id,
                                    'nom': ecriture.nom,
                                    'date': datetime.strftime(ecriture.date, "%Y/%m/%d"),
-                                   'dc': ecriture.dc,
                                    'type': ecriture.type,
                                    'valide': ecriture.valide,
                                    'categorie': ecriture.categorie,
@@ -148,10 +146,8 @@ def insert_ecriture(db):
                 ecriture.nom = value
             elif column == 'type':
                 ecriture.type = value
-            elif column == 'dc':
-                ecriture.dc = value
             elif column == 'valide':
-                ecriture.dc = value
+                ecriture.valide = value
             elif column == 'compte_id':
                 ecriture.compte_id = value
         try:
@@ -186,7 +182,6 @@ def update_ecriture(db, id=None, montant_id=None):
     """ Update information for an ecriture """
     entity = App.check_data(Ecriture, request.body.readline())
     if entity:
-        print entity
         try:
             ecriture = db.query(Ecriture).\
                           filter(Ecriture.id == id).\
@@ -204,10 +199,8 @@ def update_ecriture(db, id=None, montant_id=None):
                 ecriture.nom = value
             elif column == 'type':
                 ecriture.type = value
-            elif column == 'dc':
-                ecriture.dc = value
             elif column == 'valide':
-                ecriture.dc = value
+                ecriture.valide = value
             elif column == 'compte_id':
                 ecriture.compte_id = value
         try:

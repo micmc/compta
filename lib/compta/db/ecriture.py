@@ -35,7 +35,6 @@ class Ecriture(Table):
     __tablename__ = 'ecriture'
     id = Column(Integer, primary_key=True)
     date = Column('date', Date, key="[YYYY]/MM/DD/[YYYY]", nullable=False)
-    dc = Column(Integer, nullable=False, key="1/-1", default=1)
     type = Column('type', Enum('Vr', 'Pr', 'Cb', 'Ch', 'Re', 'Li'), key='Vr, Pr, Cb, Ch, Re, Li', nullable=False)
     nom = Column(String(200), nullable=False)
     valide = Column(Boolean, default=False)
