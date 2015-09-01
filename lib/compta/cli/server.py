@@ -6,6 +6,7 @@ import sys
 import re
 import copy
 from datetime import date, datetime
+from sgmllib import SGMLParser
 
 #from simplejson.scanner import JSONDecodeError
 #from json import dumps
@@ -85,6 +86,10 @@ class Server(object):
                                              self.attribut
                                             )
 
+    def import_data(self):
+        """ Import data into server """
+        pass
+
     def launch_cmd(self, cmd=None):
         """ launch command to execute """
         if not cmd:
@@ -95,6 +100,8 @@ class Server(object):
             self.create()
         elif self.options.cmd == "update":
             self.update()
+        elif self.options.cmd == "import":
+            self.import_data()
 
     def check_args(self, prompt=False):
         """ Method to check wich argument is mandatory
@@ -208,6 +215,41 @@ class Server(object):
             elif re.match(r"(1|On|True)", data):
                 return True
         return None
+
+class LinkParser(SGMLParser):
+    """Class to import ofx file"""
+
+    def __init__(self):
+        """Inheritance of sgmlparser"""
+        SGMLParser.__init__(self)
+        self.banktranlist = False
+        self.stmttrn = False
+        self.name = False
+        self.memo = False
+
+    def do_banktranlist(self, attributes):
+        self.banktranlist = True
+
+    def do_stmttrn(self, attributes):
+        self.stmttrn = True
+    
+    def end_stmttrn(self, attributes):
+        self.stmttrn = False
+
+    def start_name(self, attributes):
+        self.name = True
+
+    def start_memo(self, attributes):
+        self.memo = True
+
+    def handle_data(self, text):
+        if self.stmttrn:
+            if self.name:
+                print text.strip()
+                self.name = False
+            if self.memo:
+                print text.strip()
+                self.memo = False
 
 def main():
     """ Main function """

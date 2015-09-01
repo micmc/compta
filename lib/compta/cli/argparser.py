@@ -5,6 +5,8 @@
 from argparse import ArgumentParser
 import sys
 
+DEFAULT_CONFIGURATION_FILE='/etc/compta/cli.cfg'
+
 class ParseArgs(object):
     """ Default class to manage parse argument """
 
@@ -13,6 +15,12 @@ class ParseArgs(object):
         self.parser = ArgumentParser(**kwargs)
         self.parser.add_argument('-d', '--debug', help='Debug', action='store_true')
         self.parser.add_argument('-p', '--prompt', help='Prompt', action='store_true')
+        self.parser.add_argument("-C", "--configfile", action="store",
+                                 dest="configfile",
+                                 default=DEFAULT_CONFIGURATION_FILE, type=str,
+                                 help="configuration file used for client")
+
+
         self.subparsers = self.parser.add_subparsers(title='database',
                                                      dest='database',
                                                      help='Medthod to get information'
@@ -92,8 +100,8 @@ class ParseArgs(object):
         """ Initialize ecriture """
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
         self.parser_ecriture.add_argument('cmd',
-                                          help='command to pass [list, update, delete, create]',
-                                          choices=('list', 'create', 'update', 'delete')
+                                          help='command to pass [list, update, delete, create, import]',
+                                          choices=('list', 'create', 'update', 'delete', 'import')
                                          )
         self.parser_ecriture.add_argument('-f', '--filter', 
                                           help='filter to apply',
@@ -104,6 +112,10 @@ class ParseArgs(object):
         self.parser_ecriture.add_argument('-s', '--sort', 
                                           help='filter on sort',
                                           nargs='+')
+        self.parser_ecriture.add_argument("-i", "--import", action="store",
+                                          dest="importfile",
+                                          default=None, type=str,
+                                          help="file to import, only ofx file is supported")
     
     def get_ecriture(self):
         """ Return argument """

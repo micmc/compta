@@ -12,6 +12,7 @@ from compta.db.ecriture import Montant as DBMontant
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
 from compta.cli.server import Server
+from compta.cli.server import LinkParser
 
 class Ecriture(Server):
     """ List ecriture """
@@ -88,6 +89,19 @@ class Ecriture(Server):
                                                      attribut_montant,
                                                     )
             print montant_rqst.headers
+
+    def import_data(self):
+        """Import ofx file to database, by account"""
+        if not self.options.importfile:
+            sys.exit(1)
+        ofx_file = open(self.options.importfile)
+        ofx_buf = ofx_file.read()
+        print "openfile OK"
+        p = LinkParser()
+        p.feed(ofx_buf)
+        p.close()
+        ofx_file.close()
+
 
 def main():
     """ Main function """
