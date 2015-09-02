@@ -3,24 +3,7 @@
 
 = cli client =
 
-== fast insert ==
-
-Ajouter une nouvelle options.
-faire l'import de fichier xml ou csv
-
-* On verifie s'il y a une entête de fichier
-* Pour chaque champ on vérifie l'équivalence et on propose si besoin
-* On ignore ensuite le reste du fichier
-* On import ensuite dans la base de données.
-
-Champs obligatoire : 
-* type,
-* dc,
-* compte_id,
-* date,
-* nom
-* montant
-* categorie_id : consommation ou inconnue
+Ajouter l'option tag pour l'insert/ajout d'ecriture
 
 = Stats =
 

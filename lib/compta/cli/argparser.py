@@ -96,6 +96,28 @@ class ParseArgs(object):
                                         help='filter on sort',
                                         nargs='+')
 
+    def get_tag(self):
+        """ Return argument categorie"""
+        sys.argv[0] = 'tag'
+        return self.parser.parse_args(sys.argv)
+
+    def set_tag(self):
+        """ Initialize tag """
+        self.parser_tag = self.subparsers.add_parser('tag', help='tag help')
+        self.parser_tag.add_argument('cmd',
+                                        help='command to pass [list, update, delete, create]',
+                                        choices=('list', 'create', 'update', 'delete')
+                                       )
+        self.parser_tag.add_argument('-f', '--filter', 
+                                        help='filter to apply',
+                                        nargs='+')
+        self.parser_tag.add_argument('-a', '--attribut', 
+                                        help='filter on attribut',
+                                        nargs='+')
+        self.parser_tag.add_argument('-s', '--sort', 
+                                        help='filter on sort',
+                                        nargs='+')
+
     def set_ecriture(self):
         """ Initialize ecriture """
         self.parser_ecriture = self.subparsers.add_parser('ecriture', help='ecriture help')
@@ -107,7 +129,15 @@ class ParseArgs(object):
                                           help='filter to apply',
                                           nargs='+')
         self.parser_ecriture.add_argument('-a', '--attribut', 
-                                          help='filter on attribut [nom, type, date, valide, compte_id, montant, description]',
+                                          help="""filter on attribut [nom,
+                                                                    type [Vr, Pr, Cb, Ch, Re, Li],
+                                                                    date [YYYY/MM/DD, DD/MM],
+                                                                    valide [true, false],
+                                                                    compte_id,
+                                                                    montant,
+                                                                    description,
+                                                                    tag
+                                                                   ]""",
                                           nargs='+')
         self.parser_ecriture.add_argument('-s', '--sort', 
                                           help='filter on sort',
@@ -170,13 +200,14 @@ class ParseArgs(object):
             parse.set_categorie()
             parse.set_ecriture()
             parse.set_montant()
+            parse.set_tag()
             return parse.get_args()
 
-class ParseEcriture(ParseArgs):
-    """ Class for create ecriture object """
-
-    def __init__(self, **kwargs):
-        """ Initialize default class """
-        ParseArgs.__init__(self, **kwargs)
+#class ParseEcriture(ParseArgs):
+#    """ Class for create ecriture object """
+#
+#    def __init__(self, **kwargs):
+#        """ Initialize default class """
+#        ParseArgs.__init__(self, **kwargs)
 
 

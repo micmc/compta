@@ -44,6 +44,14 @@ class RequestServer(object):
         self.__request = self.__session.put(url_data, data)
         return self.__request
 
+    def delete(self, url, data):
+        """delete url data"""
+
+        url_data = self._url_data + url
+        self.__request = self.__session.delete(url_data)
+        return self.__request
+
+
     @classmethod
     def get_method(cls,
                    method,
@@ -87,7 +95,12 @@ class RequestServer(object):
             if filter.has_key('id'):
                 str_url = "/%s" % (filter['id'],)
                 del(filter['id'])
-        #Create filter
+        elif method == "tag":
+            rqst = RequestServerTag()
+            if filter.has_key('id'):
+                str_url = "/%s" % (filter['id'],)
+                del(filter['id'])
+         #Create filter
         if filter:
             if filter.has_key('odata'):
                 lst_filter.append('filter=' + filter['odata'])
@@ -117,6 +130,8 @@ class RequestServer(object):
             rqst = RequestServerMontant()
         elif method == "categorie":
             rqst = RequestServerCategorie()
+        elif method == "tag":
+            rqst = RequestServerTag()
         else:
             return False
         return rqst.post(dumps(data))
@@ -142,10 +157,43 @@ class RequestServer(object):
             rqst = RequestServerMontant()
         elif method == "categorie":
             rqst = RequestServerCategorie()
+        elif method == "tag":
+            rqst = RequestServerTag()
         else:
             return False
         str_url = "/%s" % (filter["id"])
         return rqst.put(url=str_url, data=dumps(data))
+        #if method == "split":
+        #    rqst = RequestServerEcriture()
+        #    str_url = "/%s/ec/%s" % (entity['id'],entity['ecriture_categorie_id'])
+        #    return rqst.put(url=str_url, data=data)
+
+    @classmethod
+    def delete_method(cls,
+                      method,
+                      filter,
+                     ):
+        """ Static fabric method """
+
+        #entity = loads(data)
+        if not filter.has_key("id"):
+            return False
+        if method == "banque":
+            rqst = RequestServerBanque()
+        elif method == "compte":
+            rqst = RequestServerCompte()
+        elif method == "ecriture":
+            rqst = RequestServerEcriture()
+        elif method == "montant":
+            rqst = RequestServerMontant()
+        elif method == "categorie":
+            rqst = RequestServerCategorie()
+        elif method == "tag":
+            rqst = RequestServerTag()
+        else:
+            return False
+        str_url = "/%s" % (filter["id"])
+        return rqst.delete(url=str_url, data=None)
         #if method == "split":
         #    rqst = RequestServerEcriture()
         #    str_url = "/%s/ec/%s" % (entity['id'],entity['ecriture_categorie_id'])
@@ -197,5 +245,14 @@ class RequestServerCategorie(RequestServer):
 
         RequestServer.__init__(self, address, port)
         self._url_data = self._url_data + "categorie"
+
+class RequestServerTag(RequestServer):
+    """ Class for create tag object """
+
+    def __init__(self, address='localhost', port='8080'):
+        """ Initialize default class """
+
+        RequestServer.__init__(self, address, port)
+        self._url_data = self._url_data + "tag"
 
 

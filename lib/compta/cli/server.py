@@ -84,11 +84,18 @@ class Server(object):
             sys.exit(1)
 
     def update(self):
-        """ create data by rest method """
+        """ update data by rest method """
         self.rqst = RequestServer.put_method(self.rest_method,
                                              self.filter,
                                              self.attribut
                                             )
+
+    def delete(self):
+        """ delete data by rest method """
+        self.rqst = RequestServer.delete_method(self.rest_method,
+                                                self.filter,
+                                               )
+
 
     def import_data(self):
         """ Import data into server """
@@ -104,6 +111,8 @@ class Server(object):
             self.create()
         elif self.options.cmd == "update":
             self.update()
+        elif self.options.cmd == "delete":
+            self.delete()
         elif self.options.cmd == "import":
             self.import_data()
 
@@ -251,13 +260,13 @@ class LinkParser(SGMLParser):
 
     def start_bankid(self, attributes):
         self.bankid = True
-    
+
     def start_branchid(self, attributes):
         self.branchid = True
-    
+
     def start_acctid(self, attributes):
         self.acctid = True
-    
+
     def start_banktranlist(self, attributes):
         self.banktranlist = True
 
@@ -268,7 +277,7 @@ class LinkParser(SGMLParser):
         self.stmttrn = True
         #self.ecriture.append(self.ecriture_tmp)
         self.ecriture_tmp = {}
-    
+
     def end_stmttrn(self):
         self.stmttrn = False
         self.ecriture.append(self.ecriture_tmp)
@@ -287,7 +296,7 @@ class LinkParser(SGMLParser):
 
     def start_trntype(self, attributes):
         self.trntype = True
- 
+
     def handle_data(self, text):
         if self.bankacctfrom:
             if self.bankid:
@@ -304,7 +313,7 @@ class LinkParser(SGMLParser):
                 if self.dtposted:
                     self.ecriture_tmp['date'] = datetime.strptime(text.strip(), "%Y%m%d")
                     self.dtposted = False
-                if self.trnamt: 
+                if self.trnamt:
                     self.ecriture_tmp['montant'] = locale.atof(text.strip())
                     self.trnamt = False
                 if self.trntype:
@@ -317,52 +326,52 @@ class LinkParser(SGMLParser):
                     self.ecriture_tmp['memo'] = text.strip()
                     self.memo = False
 
-class Config(object): 
-    """ Read config 
-        Default file : 
-        1/ /etc/compta/cli.cfg 
-        2/ ~/.compta/cli.cfg 
-        3/ python_path/compta/server/cli.cfg 
-    """ 
- 
-    DEFAULT_CONFIGURATION_FILE = "/etc/compta/cli.cfg" 
- 
-    @classmethod 
-    def get_config(cls): 
-        """ Get data on file """ 
-        path_home = os.path.expanduser('~') 
-        path_app = os.path.dirname(__file__) 
-        config = ConfigParser.RawConfigParser() 
-        paths = [Config.DEFAULT_CONFIGURATION_FILE, 
-                 "%s/.compta/cli.cfg" % path_home, 
-                 "%s/../cli.cfg" % path_app 
-                ] 
-        get_file = False 
-        for path in paths: 
-            if os.path.exists(path): 
-                try: 
-                    config.read(path) 
-                    get_file = True 
-                except ConfigPArser.ParsingError as error: 
-                    print error 
-                    sys.exit(1) 
-                break 
-        if not get_file: 
-            print "No config files found" 
-            sys.exit(1) 
- 
-        dict_config = {} 
-        try: 
-            #dict_config["database_path"] = config.get("Database", "path") 
-            #dict_config["database_name"] = config.get("Database", "name") 
+class Config(object):
+    """ Read config
+        Default file :
+        1/ /etc/compta/cli.cfg
+        2/ ~/.compta/cli.cfg
+        3/ python_path/compta/server/cli.cfg
+    """
+
+    DEFAULT_CONFIGURATION_FILE = "/etc/compta/cli.cfg"
+
+    @classmethod
+    def get_config(cls):
+        """ Get data on file """
+        path_home = os.path.expanduser('~')
+        path_app = os.path.dirname(__file__)
+        config = ConfigParser.RawConfigParser()
+        paths = [Config.DEFAULT_CONFIGURATION_FILE,
+                 "%s/.compta/cli.cfg" % path_home,
+                 "%s/../cli.cfg" % path_app
+                ]
+        get_file = False
+        for path in paths:
+            if os.path.exists(path):
+                try:
+                    config.read(path)
+                    get_file = True
+                except ConfigPArser.ParsingError as error:
+                    print error
+                    sys.exit(1)
+                break
+        if not get_file:
+            print "No config files found"
+            sys.exit(1)
+
+        dict_config = {}
+        try:
+            #dict_config["database_path"] = config.get("Database", "path")
+            #dict_config["database_name"] = config.get("Database", "name")
             pass
-        except ConfigParser.NoSectionError as error: 
-            print error 
-            sys.exit(1) 
-        except ConfigParser.NoOptionError as error: 
-            print error 
-            sys.exit(1) 
-        return dict_config 
+        except ConfigParser.NoSectionError as error:
+            print error
+            sys.exit(1)
+        except ConfigParser.NoOptionError as error:
+            print error
+            sys.exit(1)
+        return dict_config
 
 def main():
     """ Main function """
@@ -391,6 +400,10 @@ def main():
         from compta.cli.categorie import Categorie
         categorie = Categorie(parse_args)
         categorie.launch_cmd()
+    if parse_args.database == 'tag':
+        from compta.cli.tag import Tag
+        tag = Tag(parse_args)
+        tag.launch_cmd()
 
 if __name__ == '__main__':
     main()
