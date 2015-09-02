@@ -117,7 +117,7 @@ class Ecriture(Server):
                 #{'date': datetime.datetime(2015, 9, 1, 0, 0), 'type': 'DEBIT', 'name': 'PRLV SEPA EPS 00291-000005722', 'montant': -12.0}
                 self.attribut = {'date': ecriture['date'].strftime("%Y-%m-%d"),
                                  'nom': ecriture['name'],
-                                 'montant': ecriture['montant'],
+                                 'montant': str(ecriture['montant']),
                                  'compte_id': compte_id,
                                  'categorie_id': '5'
                                 }

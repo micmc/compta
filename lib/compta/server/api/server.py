@@ -148,7 +148,6 @@ class App(object):
                 else:
                     tmp_filters = [filter, ]
                 for tmp_filter in tmp_filters:
-                    print tmp_filter
                     if 'eq' in tmp_filter:
                         tmp_filter = tmp_filter.replace('eq', '=')
                     elif 'gt' in tmp_filter:
@@ -161,7 +160,6 @@ class App(object):
                 dict_filter = {}
                 for lst_attribut in filter.split(','):
                     attribut = lst_attribut.split(':')
-                    print attribut
                     if "/" in attribut[1]:
                         dict_filter[attribut[0]] =  attribut[1].split('/')
                     else:
