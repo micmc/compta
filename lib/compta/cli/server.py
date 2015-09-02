@@ -62,13 +62,16 @@ class Server(object):
                     tmp_attr = attribut.split('=')
                     self.attribut[tmp_attr[0]] = tmp_attr[1]
 
-    def list(self):
-        """ get data by rest method """
+    def get(self):
+        """ get data by rest method and print it"""
         self.rqst = RequestServer.get_method(self.rest_method,
                                              self.filter,
                                              self.sort,
                                              self.attribut
                                             )
+    def list(self):
+        """ Print data get by get command """
+        self.get()
 
     def create(self):
         """ create data by rest method """

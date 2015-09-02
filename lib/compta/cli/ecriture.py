@@ -5,6 +5,7 @@
 #from simplejson.scanner import JSONDecodeError
 import re
 import sys
+from datetime import datetime
 
 from compta.db.ecriture import Ecriture as DBEcriture
 from compta.db.ecriture import Montant as DBMontant
@@ -13,6 +14,7 @@ from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
 from compta.cli.server import Server
 from compta.cli.server import LinkParser
+from compta.cli.compte import Compte
 
 class Ecriture(Server):
     """ List ecriture """
@@ -96,13 +98,43 @@ class Ecriture(Server):
             sys.exit(1)
         ofx_file = open(self.options.importfile)
         ofx_buf = ofx_file.read()
-        print "openfile OK"
         p = LinkParser()
         p.feed(ofx_buf)
         p.close()
         ofx_file.close()
-        print p.compte
-        print p.ecriture
+        #print p.compte
+        #print p.ecriture
+        comptes = Compte()
+        comptes.filter = {'type': 'prs', 'archive': 'false'}
+        comptes.get()
+        compte_id = None
+        for compte in comptes.rqst:
+            if compte['numero'] == p.compte['compte']:
+                compte_id = compte['id']
+                break
+        if compte_id:
+            for ecriture in p.ecriture:
+                #{'date': datetime.datetime(2015, 9, 1, 0, 0), 'type': 'DEBIT', 'name': 'PRLV SEPA EPS 00291-000005722', 'montant': -12.0}
+                self.attribut = {'date': ecriture['date'].strftime("%Y-%m-%d"),
+                                 'nom': ecriture['name'],
+                                 'montant': ecriture['montant'],
+                                 'compte_id': compte_id,
+                                 'categorie_id': '5'
+                                }
+                if ecriture.has_key('memo'):
+                    self.attribut['description'] = ecriture['memo']
+                if ecriture['type'] == 'DEBIT':
+                    self.attribut['type'] = 'Pr'
+                elif ecriture['type'] == 'CREDIT':
+                    self.attribut['type'] = 'Vr'
+                self.rqst = RequestServer.post_method(self.rest_method,
+                                                      self.attribut,
+                                                     )
+ 
+        else:
+            print "compte id not found"
+            sys.exit(1)
+
 
 
 def main():
