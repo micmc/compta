@@ -251,6 +251,53 @@ class LinkParser(SGMLParser):
                 print text.strip()
                 self.memo = False
 
+class Config(object): 
+    """ Read config 
+        Default file : 
+        1/ /etc/compta/cli.cfg 
+        2/ ~/.compta/cli.cfg 
+        3/ python_path/compta/server/cli.cfg 
+    """ 
+ 
+    DEFAULT_CONFIGURATION_FILE = "/etc/compta/cli.cfg" 
+ 
+    @classmethod 
+    def get_config(cls): 
+        """ Get data on file """ 
+        path_home = os.path.expanduser('~') 
+        path_app = os.path.dirname(__file__) 
+        config = ConfigParser.RawConfigParser() 
+        paths = [Config.DEFAULT_CONFIGURATION_FILE, 
+                 "%s/.compta/cli.cfg" % path_home, 
+                 "%s/../cli.cfg" % path_app 
+                ] 
+        get_file = False 
+        for path in paths: 
+            if os.path.exists(path): 
+                try: 
+                    config.read(path) 
+                    get_file = True 
+                except ConfigPArser.ParsingError as error: 
+                    print error 
+                    sys.exit(1) 
+                break 
+        if not get_file: 
+            print "No config files found" 
+            sys.exit(1) 
+ 
+        dict_config = {} 
+        try: 
+            #dict_config["database_path"] = config.get("Database", "path") 
+            #dict_config["database_name"] = config.get("Database", "name") 
+            pass
+        except ConfigParser.NoSectionError as error: 
+            print error 
+            sys.exit(1) 
+        except ConfigParser.NoOptionError as error: 
+            print error 
+            sys.exit(1) 
+        return dict_config 
+
 def main():
     """ Main function """
     parse_args = ParseArgs.get_method("all")
