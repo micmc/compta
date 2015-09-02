@@ -132,6 +132,9 @@ class RequestServer(object):
             rqst = RequestServerCategorie()
         elif method == "tag":
             rqst = RequestServerTag()
+        elif method == "tag_ecriture":
+            rqst = RequestServerTagEcriture()
+            rqst._url_data = rqst._url_data + "/%s/tag" % data['ecriture_id']
         else:
             return False
         return rqst.post(dumps(data))
@@ -254,5 +257,14 @@ class RequestServerTag(RequestServer):
 
         RequestServer.__init__(self, address, port)
         self._url_data = self._url_data + "tag"
+
+class RequestServerTagEcriture(RequestServer):
+    """ Class for create tag object """
+
+    def __init__(self, address='localhost', port='8080'):
+        """ Initialize default class """
+
+        RequestServer.__init__(self, address, port)
+        self._url_data = self._url_data + "ecriture"
 
 

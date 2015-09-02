@@ -194,6 +194,9 @@ class ParseArgs(object):
         elif method == "categorie":
             parse.set_categorie()
             return parse.get_categorie()
+        elif method == "tag":
+            parse.set_tag()
+            return parse.get_tag()
         else:
             parse.set_banque()
             parse.set_compte()

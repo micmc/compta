@@ -15,6 +15,7 @@ from compta.cli.http_server import RequestServer
 from compta.cli.server import Server
 from compta.cli.server import LinkParser
 from compta.cli.compte import Compte
+from compta.cli.tag import Tag
 
 class Ecriture(Server):
     """ List ecriture """
@@ -25,6 +26,10 @@ class Ecriture(Server):
         Server.__init__(self, parser)
         self.rest_method = "ecriture"
         self.database = (DBEcriture,)
+        self.tag = None
+        self.tag_id = None
+        if self.attribut['tag']:
+            self.tag = self.attribut['tag']
 
     def list(self):
         """ Redefine list to print """
@@ -82,7 +87,7 @@ class Ecriture(Server):
                 if re.match(r"^\d{1,2}$", data):
                     attribut_montant['categorie_id'] = data
                     break
-            while True: 
+            while True:
                 data = unicode(raw_input("Montant : "))
                 if re.match(r"^\d+[,\.]?\d*$", data):
                     attribut_montant['montant'] = data
@@ -90,7 +95,7 @@ class Ecriture(Server):
             montant_rqst = RequestServer.post_method('montant',
                                                      attribut_montant,
                                                     )
-            print montant_rqst.headers
+            self.set_tag()
 
     def import_data(self):
         """Import ofx file to database, by account"""
@@ -102,10 +107,9 @@ class Ecriture(Server):
         p.feed(ofx_buf)
         p.close()
         ofx_file.close()
-        #print p.compte
-        #print p.ecriture
         comptes = Compte()
         comptes.filter = {'type': 'prs', 'archive': 'false'}
+        comptes.attribut = {}
         comptes.get()
         compte_id = None
         for compte in comptes.rqst:
@@ -130,12 +134,33 @@ class Ecriture(Server):
                 self.rqst = RequestServer.post_method(self.rest_method,
                                                       self.attribut,
                                                      )
- 
+                self.set_tag()
         else:
             print "compte id not found"
             sys.exit(1)
 
-
+    def set_tag(self):
+        """ Insert a tag if attribute exist and tag name exists """
+        if self.tag:
+            if not self.tag_id:
+                tags = Tag()
+                tags.attribut = {}
+                tags.get()
+                for tag in tags.rqst:
+                    if tag['nom'] == self.tag:
+                        self.tag_id = tag['id']
+                        break
+                if not self.tag_id:
+                    return False
+            new_ecriture = re.match(r"^\/ecriture\/(?P<ecriture_id>.*)\/$",
+                                    self.rqst.headers['Location']
+                                   )
+            self.rqst = RequestServer.post_method("tag_ecriture",
+                                                  {'ecriture_id':  new_ecriture.group('ecriture_id'),
+                                                   'tag_id': self.tag_id
+                                                  },
+                                                 )
+        return False
 
 def main():
     """ Main function """
