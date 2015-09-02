@@ -101,6 +101,8 @@ class Ecriture(Server):
         p.feed(ofx_buf)
         p.close()
         ofx_file.close()
+        print p.compte
+        print p.ecriture
 
 
 def main():
