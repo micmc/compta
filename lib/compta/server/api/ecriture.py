@@ -136,7 +136,6 @@ def insert_ecriture(db):
     """ Create an ecriture """
     entity = App.check_data(Ecriture, request.body.readline())
     if entity:
-        print entity
         ecriture = Ecriture()
         for column, value in entity.iteritems():
             if column == 'date':
@@ -195,11 +194,9 @@ def update_ecriture(db, id=None, montant_id=None):
         except NoResultFound:
             abort(404, "ID not found")
         for column, value in entity.iteritems():
-            print  column, value
             if column == 'date':
                 ecriture.date = datetime.strptime(value, "%Y/%m/%d")
             elif column == 'nom':
-                print 'nom'
                 ecriture.nom = value
             elif column == 'type':
                 ecriture.type = value
