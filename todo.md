@@ -3,10 +3,7 @@
 
 = Web =
 
-* Mettre cache pour la saisie d'un compte et au retour de celui-ci
-
 = cli client =
-
 
 = Stats =
 

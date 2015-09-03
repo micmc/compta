@@ -1,7 +1,7 @@
 // Initialisation du Document
 // On efface toutes les lignes du tableau
 
-var id_compte;
+//var id_compte;
 
 $('document').ready(function(){
     //$("table.banque").load();
@@ -13,7 +13,8 @@ $('document').ready(function(){
     //$("table tbody tr").click(function(event) {
     //    alert("test");
     //});
-    id_compte = $(location).attr("search").replace("?id=","");
+    //id_compte = $(location).attr("search").replace("?id=","");
+        //$("#ref_ecriture").attr("href", "liste_ecriture.html?id=" + compteId);
 });
 
 $('select[name="compte"]').ready(function(e) {
@@ -29,6 +30,10 @@ $('select[name="compte"]').ready(function(e) {
                   '</option>'
                  ).appendTo('select[name="compte"]');
             }
+            if (compteId = getCookie('compte_id')) {
+                console.log("dernier cookie : " + compteId);
+                $('select[name="compte"]').val(compteId);
+            }
             $('select[name="compte"]').change()
         },
     });
@@ -36,7 +41,9 @@ $('select[name="compte"]').ready(function(e) {
 
 $('select[name="compte"]').change(function(e) {
     var compte_id = $(this).val();
+    console.log(compte_id);
     $("#ref_ecriture").attr("href", "liste_ecriture.html?id=" + compte_id);
+    setCookie('compte_id', compte_id);
     $.ajax(
     {
         method: "GET",
