@@ -9,6 +9,7 @@ from json import dumps, loads
 from datetime import datetime
 
 from sqlalchemy import desc
+from sqlalchemy import extract
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
@@ -31,7 +32,8 @@ app = App().server
 @app.get(r'/compte/<compte_id:int>/ecriture/<id:int>')
 @app.get(r'/compte/<compte_id:int>/ecriture/<nom:re:[a-zA-Z\ ]+>')
 @app.get(r'/compte/<compte_id:int>/ecriture/<sum:re:sum>')
-def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
+@app.get(r'/compte/<compte_id:int>/ecriture/<month:re:month>')
+def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None, month=None):
     """ List compte
         Filter to use :
         filter = [1-9]+ / sum : give number or sum
@@ -53,7 +55,23 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None):
                       'nombre': "%d" % ecritures.nombre,
                      }
                     )
-    # continue
+    if month:
+        ecritures = db.query(extract('month', Ecriture.date).label("date"),
+                             func.sum(Montant.montant/100.0).label("somme")
+                            ).\
+                       join(Ecriture.montant).\
+                       filter(Ecriture.compte_id == compte_id).\
+                       filter(extract('year', Ecriture.date) == 2015).\
+                       group_by(extract('month', Ecriture.date).label("date")).\
+                       all()
+        list_month = []
+        for ecriture in ecritures:
+            list_month.append([ecriture.date,
+                               float(ecriture.somme)
+                              ]
+                             )
+        return dumps(list_month)
+    
     filter = {}
     if id:
         filter['id'] = id
