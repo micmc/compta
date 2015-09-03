@@ -2,6 +2,5 @@
 *.py.swp
 build/
 dist/
-lib/ClaryServer.egg-info/
+lib/Compta.egg-info/
 utils/
-
