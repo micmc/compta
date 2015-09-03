@@ -1,9 +1,12 @@
 #David Micallef
 #2015-07-31
 
+= Web =
+
+* Mettre cache pour la saisie d'un compte et au retour de celui-ci
+
 = cli client =
 
-Ajouter l'option tag pour l'insert/ajout d'ecriture
 
 = Stats =
 
