@@ -8,6 +8,8 @@
     <script type="text/javascript" src="js/jquery-1.11.2.js"></script>
     <script type="text/javascript" src="js/jquery-ui.js"></script>
     <script type="text/javascript" src="js/api.js"></script>
+    <script language="javascript" type="text/javascript" src="js/jquery.jqplot.js"></script>
+    <link rel="stylesheet" type="text/css" href="js/jquery.jqplot.css" />
   </head>
   <body>
     <p><h1>Index</h1></p>
@@ -25,11 +27,16 @@
       Choix du compte :
          <select name="compte">
          </select>
-      <div id="somme">
-      </div>
       <ul>
         <li><a id="ref_ecriture" href="liste_ecriture.html">Gestion des ecritures</a></li>
       </ul>
+      <div id="somme">
+      </div>
+      <div id="graph_plot" style="height:400px;width:300px;">
+      </div> 
+<!--<script type="text/javascript">
+    $.jqplot('graph_plot',  [[[1, 2],[3,5.12],[5,13.1],[7,33.6],[9,85.9],[11,219.9]]]);
+</script>-->
       <script type="text/javascript" src="js/index.js"></script>
     </section>
 </body>

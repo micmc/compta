@@ -1,22 +1,6 @@
 // Initialisation du Document
 // On efface toutes les lignes du tableau
 
-//var id_compte;
-
-$('document').ready(function(){
-    //$("table.banque").load();
-    //Na marche pas !!!
-    //$("table tbody").find("tr:gt(0)").remove();
-    //test = $("table tbody").find("tr:gt(0)");
-    //alert(test.length);
-    //$("table").selectable({ distance: 1, filter: "tr" });
-    //$("table tbody tr").click(function(event) {
-    //    alert("test");
-    //});
-    //id_compte = $(location).attr("search").replace("?id=","");
-        //$("#ref_ecriture").attr("href", "liste_ecriture.html?id=" + compteId);
-});
-
 $('select[name="compte"]').ready(function(e) {
     $.ajax(
     {
@@ -31,7 +15,6 @@ $('select[name="compte"]').ready(function(e) {
                  ).appendTo('select[name="compte"]');
             }
             if (compteId = getCookie('compte_id')) {
-                console.log("dernier cookie : " + compteId);
                 $('select[name="compte"]').val(compteId);
             }
             $('select[name="compte"]').change()
@@ -41,7 +24,6 @@ $('select[name="compte"]').ready(function(e) {
 
 $('select[name="compte"]').change(function(e) {
     var compte_id = $(this).val();
-    console.log(compte_id);
     $("#ref_ecriture").attr("href", "liste_ecriture.html?id=" + compte_id);
     setCookie('compte_id', compte_id);
     $.ajax(
@@ -52,7 +34,15 @@ $('select[name="compte"]').change(function(e) {
         success: function(data) {
             $('#somme').text('Solde du compte : ' + data.somme + "€");
         },
-    })
+    });
+    $.ajax(
+    {
+        method: "GET",
+        url: "http://localhost:8080/compte/" + compte_id + "/ecriture/month",
+        dataType: "json",
+        success: function(data) {
+            console.log(data);      
+            $.jqplot('graph_plot', data);
+        },
+    });
 });
-
-
