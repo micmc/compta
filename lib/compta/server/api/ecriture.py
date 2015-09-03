@@ -140,7 +140,7 @@ def insert_ecriture(db):
         ecriture = Ecriture()
         for column, value in entity.iteritems():
             if column == 'date':
-                ecriture.date = datetime.strptime(value, "%Y-%m-%d")
+                ecriture.date = datetime.strptime(value, "%Y/%m/%d")
             #else:
             #    setattr(ecriture, column, value)
             elif column == 'nom':
@@ -197,7 +197,7 @@ def update_ecriture(db, id=None, montant_id=None):
         for column, value in entity.iteritems():
             print  column, value
             if column == 'date':
-                ecriture.date = datetime.strptime(value, "%Y-%m-%d")
+                ecriture.date = datetime.strptime(value, "%Y/%m/%d")
             elif column == 'nom':
                 print 'nom'
                 ecriture.nom = value

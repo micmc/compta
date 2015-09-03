@@ -13,7 +13,7 @@ from compta.db.ecriture import Montant as DBMontant
 from compta.cli.argparser import ParseArgs
 from compta.cli.http_server import RequestServer
 from compta.cli.server import Server
-from compta.cli.server import LinkParser
+from compta.cli.sgml_parser import LinkParser
 from compta.cli.compte import Compte
 from compta.cli.tag import Tag
 
@@ -28,8 +28,12 @@ class Ecriture(Server):
         self.database = (DBEcriture,)
         self.tag = None
         self.tag_id = None
-        if self.attribut['tag']:
+        if self.attribut.has_key('tag'):
             self.tag = self.attribut['tag']
+            del self.attribut['tag']
+        if not self.attribut.has_key('compte_id'):
+            print "-a compte_id=<id> is mandatory"
+            sys.exit(1)
 
     def list(self):
         """ Redefine list to print """
@@ -46,37 +50,25 @@ class Ecriture(Server):
                                                                       response["montant_id"],
                                                                      )
             elif isinstance(self.rqst, dict):
-                for k, v in self.rqst.iteritems():
-                    print "%s -> %s" % (k, v)
+                for key, value in self.rqst.iteritems():
+                    print "%s -> %s" % (key, value)
         except Exception as ex:
             print ex
 
     def create(self):
         """ Redefine create to add categorie """
 
-        #Test data for ecriture
-        if self.check_args(self.options.prompt):
-            #Next test data for montant
-
-            self.rqst = RequestServer.post_method(self.rest_method,
-                                                  self.attribut,
-                                                 )
-        else:
+        if not self.check_args(self.options.prompt):
             print "Erreur de saisie pour l'ajout"
             sys.exit(1)
 
         #Add information for table montant
         if self.options.prompt:
-            attribut_montant = {}
-            new_ecriture = re.match(r"^\/ecriture\/(?P<ecriture_id>.*)\/$",
-                                    self.rqst.headers['Location']
-                                   )
-            attribut_montant['ecriture_id'] = new_ecriture.group('ecriture_id')
             list_categorie = RequestServer.get_method("categorie",
-                                                {'odata': 'count lt 20'},
-                                                ['nom',],
-                                                []
-                                               )
+                                                      {'odata': 'count lt 20'},
+                                                      ['nom',],
+                                                      []
+                                                     )
             for i in range(1, 10):
                 tmp_str = ""
                 for categorie in list_categorie[(i-1)*5:i*5]:
@@ -85,16 +77,16 @@ class Ecriture(Server):
             while True:
                 data = unicode(raw_input("categorie : "))
                 if re.match(r"^\d{1,2}$", data):
-                    attribut_montant['categorie_id'] = data
+                    self.attribut['categorie_id'] = data
                     break
             while True:
                 data = unicode(raw_input("Montant : "))
-                if re.match(r"^\d+[,\.]?\d*$", data):
-                    attribut_montant['montant'] = data
+                if re.match(r"^[-+]?\d+[,\.]?\d*$", data):
+                    self.attribut['montant'] = data
                     break
-            montant_rqst = RequestServer.post_method('montant',
-                                                     attribut_montant,
-                                                    )
+            self.rqst = RequestServer.post_method('ecriture',
+                                                  self.attribut,
+                                                 )
             self.set_tag()
 
     def import_data(self):
@@ -103,9 +95,9 @@ class Ecriture(Server):
             sys.exit(1)
         ofx_file = open(self.options.importfile)
         ofx_buf = ofx_file.read()
-        p = LinkParser()
-        p.feed(ofx_buf)
-        p.close()
+        parser = LinkParser()
+        parser.feed(ofx_buf)
+        parser.close()
         ofx_file.close()
         comptes = Compte()
         comptes.filter = {'type': 'prs', 'archive': 'false'}
@@ -113,13 +105,12 @@ class Ecriture(Server):
         comptes.get()
         compte_id = None
         for compte in comptes.rqst:
-            if compte['numero'] == p.compte['compte']:
+            if compte['numero'] == parser.compte['compte']:
                 compte_id = compte['id']
                 break
         if compte_id:
-            for ecriture in p.ecriture:
-                #{'date': datetime.datetime(2015, 9, 1, 0, 0), 'type': 'DEBIT', 'name': 'PRLV SEPA EPS 00291-000005722', 'montant': -12.0}
-                self.attribut = {'date': ecriture['date'].strftime("%Y-%m-%d"),
+            for ecriture in parser.ecriture:
+                self.attribut = {'date': ecriture['date'].strftime("%Y/%m/%d"),
                                  'nom': ecriture['name'],
                                  'montant': str(ecriture['montant']),
                                  'compte_id': compte_id,

@@ -51,6 +51,15 @@ class RequestServer(object):
         self.__request = self.__session.delete(url_data)
         return self.__request
 
+    @property
+    def url(self):
+        """ Property to get the url """
+        return self._url_data
+
+    @url.setter
+    def url(self, value):
+        """ Set url """
+        self._url_data = value
 
     @classmethod
     def get_method(cls,
@@ -134,7 +143,7 @@ class RequestServer(object):
             rqst = RequestServerTag()
         elif method == "tag_ecriture":
             rqst = RequestServerTagEcriture()
-            rqst._url_data = rqst._url_data + "/%s/tag" % data['ecriture_id']
+            rqst.url = rqst.url + "/%s/tag" % data['ecriture_id']
         else:
             return False
         return rqst.post(dumps(data))
