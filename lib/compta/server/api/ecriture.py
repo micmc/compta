@@ -10,6 +10,7 @@ from datetime import datetime
 
 from sqlalchemy import desc
 from sqlalchemy import extract
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
@@ -56,17 +57,38 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None, month=None):
                      }
                     )
     if month:
-        ecritures = db.query(extract('month', Ecriture.date).label("date"),
-                             func.sum(Montant.montant/100.0).label("somme")
+        ecriture = aliased(Ecriture, name="ecriture_full")
+        debit = db.query(func.sum(Montant.montant/100.0)).\
+                   select_from(Ecriture).\
+                   join(Ecriture.montant).\
+                   filter(Ecriture.compte_id == compte_id).\
+                   filter(extract('year', Ecriture.date) == 2015).\
+                   filter(extract('month', Ecriture.date) == extract('month', ecriture.date)).\
+                   filter(Montant.montant < 0).\
+                   label("debit")
+        credit = db.query(func.sum(Montant.montant/100.0)).\
+                   select_from(Ecriture).\
+                   join(Ecriture.montant).\
+                   filter(Ecriture.compte_id == compte_id).\
+                   filter(extract('year', Ecriture.date) == 2015).\
+                   filter(extract('month', Ecriture.date) == extract('month', ecriture.date)).\
+                   filter(Montant.montant > 0).\
+                   label("credit")
+        ecritures = db.query(extract('month', ecriture.date).label("date"),
+                             debit,
+                             credit
                             ).\
-                       join(Ecriture.montant).\
-                       filter(Ecriture.compte_id == compte_id).\
-                       filter(extract('year', Ecriture.date) == 2015).\
-                       group_by(extract('month', Ecriture.date).label("date")).\
+                       join(ecriture.montant).\
+                       filter(ecriture.compte_id == compte_id).\
+                       filter(extract('year', ecriture.date) == 2015).\
+                       group_by(extract('month', ecriture.date).label("date")).\
                        all()
         list_month = [0 for number in range(12)]
+        print ecritures
         for ecriture in ecritures:
-            list_month[ecriture.date] = float(ecriture.somme)
+            list_month[ecriture.date] = [float(ecriture.debit),
+                                         float(ecriture.credit)
+                                        ]
         return dumps(list_month)
     
     filter = {}
