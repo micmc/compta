@@ -41,8 +41,19 @@ $('select[name="compte"]').change(function(e) {
         url: "http://localhost:8080/compte/" + compte_id + "/ecriture/month",
         dataType: "json",
         success: function(data) {
-            console.log(data);      
-            $.jqplot('graph_plot', data);
+            $.jqplot.config.enablePlugins = true;
+            month = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aout', 'Sep', 'Oct', 'Nov', 'Dec'];
+            options = {animate: !$.jqplot.use_excanvas,
+                       seriesDefaults:{renderer:$.jqplot.BarRenderer,
+                                       pointLabels: {show: true}
+                                      },
+                       axes: {xaxis: {renderer: $.jqplot.CategoryAxisRenderer,
+                                      ticks: month
+                                     }
+                             },
+                       highlighter: { show: false }
+                      };
+            $.jqplot('graph_plot', [data], options);
         },
     });
 });

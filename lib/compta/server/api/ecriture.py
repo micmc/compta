@@ -64,12 +64,9 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None, month=None):
                        filter(extract('year', Ecriture.date) == 2015).\
                        group_by(extract('month', Ecriture.date).label("date")).\
                        all()
-        list_month = []
+        list_month = [0 for number in range(12)]
         for ecriture in ecritures:
-            list_month.append([ecriture.date,
-                               float(ecriture.somme)
-                              ]
-                             )
+            list_month[ecriture.date] = float(ecriture.somme)
         return dumps(list_month)
     
     filter = {}
