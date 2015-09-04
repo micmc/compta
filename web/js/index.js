@@ -42,13 +42,14 @@ $('select[name="compte"]').change(function(e) {
         dataType: "json",
         success: function(data) {
             $.jqplot.config.enablePlugins = true;
-            month = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aout', 'Sep', 'Oct', 'Nov', 'Dec'];
-            options = {animate: !$.jqplot.use_excanvas,
+            var month = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aout', 'Sep', 'Oct', 'Nov', 'Dec'];
+            console.log(data);
+            var options = {animate: !$.jqplot.use_excanvas,
                        seriesDefaults:{renderer:$.jqplot.BarRenderer,
                                        pointLabels: {show: true}
                                       },
                        axes: {xaxis: {renderer: $.jqplot.CategoryAxisRenderer,
-                                      ticks: month
+                                     ticks: month
                                      }
                              },
                        highlighter: { show: false }
