@@ -83,13 +83,12 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None, month=None):
                        filter(extract('year', ecriture.date) == 2015).\
                        group_by(extract('month', ecriture.date).label("date")).\
                        all()
-        list_month = [0 for number in range(12)]
-        print ecritures
+        list_month_debit = [0 for number in range(12)]
+        list_month_credit = [0 for number in range(12)]
         for ecriture in ecritures:
-            list_month[ecriture.date] = [float(ecriture.debit),
-                                         float(ecriture.credit)
-                                        ]
-        return dumps(list_month)
+            list_month_debit[ecriture.date] = float(ecriture.debit) if float(ecriture.debit) != None else 0
+            list_month_credit[ecriture.date] = float(ecriture.credit) if float(ecriture.credit) != None else 0
+        return dumps([list_month_debit,list_month_credit])
     
     filter = {}
     if id:

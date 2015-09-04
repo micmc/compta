@@ -44,17 +44,31 @@ $('select[name="compte"]').change(function(e) {
             $.jqplot.config.enablePlugins = true;
             var month = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aout', 'Sep', 'Oct', 'Nov', 'Dec'];
             console.log(data);
-            var options = {animate: !$.jqplot.use_excanvas,
+            var options = {
+                       title:'Achat Mensuel',
+                       //animate: !$.jqplot.use_excanvas,
                        seriesDefaults:{renderer:$.jqplot.BarRenderer,
+                                       rendererOptions: { fillToZero: true },
                                        pointLabels: {show: true}
                                       },
                        axes: {xaxis: {renderer: $.jqplot.CategoryAxisRenderer,
-                                     ticks: month
+                                      ticks: month
                                      }
                              },
-                       highlighter: { show: false }
+                       highlighter: { show: false },
+                       legend: { renderer: $.jqplot.EnhancedLegendRenderer,
+                                  show: true,
+                                  location: 'ne',
+                                  rendererOptions: {
+                                    numberRows: 1
+                                  },
+                                  labels: ['débits', 'crédits']
+                                },
                       };
-            $.jqplot('graph_plot', [data], options);
+            plot1 = $.jqplot('graph_plot', [data[0], data[1]], options);
+            plot1.resetAxesScale(); 
+            plot1.replot(); 
+
         },
     });
 });
