@@ -31,7 +31,12 @@ class Ecriture(Server):
         if self.attribut.has_key('tag'):
             self.tag = self.attribut['tag']
             del self.attribut['tag']
-        if not self.attribut.has_key('compte_id'):
+        if self.options.cmd == 'list' and \
+                not self.filter.has_key('compte_id'):
+            print "-f compte_id=<id> is mandatory"
+            sys.exit(1)
+        if self.options.cmd == 'create' and \
+                not self.attribut.has_key('compte_id'):
             print "-a compte_id=<id> is mandatory"
             sys.exit(1)
 

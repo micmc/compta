@@ -155,13 +155,15 @@ class Server(object):
                                                                        ['nom',],
                                                                        []
                                                                       )
+                                dict_compte = {}
                                 for compte in list_compte:
                                     print "%d - %s" % (compte['id'], compte['nom'])
+                                    dict_compte[compte['id']] = compte['nom']
                                 while True:
                                     data = unicode(raw_input("compte : "))
                                     if re.match(r"^\d{1,2}$", data):
-                                        self.attribut['nom_id'] = compte['id']
-                                        self.attribut['nom'] = compte['nom']
+                                        self.attribut['nom_id'] = data
+                                        self.attribut['nom'] = dict_compte[int(data)]
                                         break
                             else:
                                 while True:
