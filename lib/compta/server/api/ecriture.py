@@ -197,7 +197,7 @@ def insert_ecriture(db):
         montant = Montant()
         for column, value in entity.iteritems():
             if column == 'montant':
-                montant.montant = int(locale.atof(value)*100)
+                montant.montant = int(round(locale.atof(value)*100,2))
             elif column == 'description':
                 montant.description = value
             elif column == 'categorie_id':
@@ -248,7 +248,7 @@ def update_ecriture(db, id=None, montant_id=None):
             abort(404, "ID not found")
         for column, value in entity.iteritems():
             if column == 'montant':
-                montant.montant = int(locale.atof(value)*100)
+                montant.montant = int(round(locale.atof(value)*100,2))
             if column == 'description':
                 montant.description = value
             elif column == 'categorie_id':
