@@ -64,7 +64,7 @@ class Ecriture(Server):
         """ Redefine create to add categorie """
 
         if not self.check_args(self.options.prompt):
-            print "Erreur de saisie pour l'ajout"
+            print "Erreur de saisie pour l'ajout, champ manquant ou utiliser prompt option"
             sys.exit(1)
 
         #Add information for table montant
