@@ -119,7 +119,13 @@ def update_compte(db, id=None):
         except NoResultFound:
             abort(404, "ID not found")
     for column, value in entity.iteritems():
-        setattr(compte, column, value)
+        if column == 'archive':
+            setattr(compte,
+                    "archive",
+                    App.convert_value(value)
+                    )
+        else:
+            setattr(compte, column, value)
     try:
         db.commit()
         compte = loads(list_compte(db, compte.id))
