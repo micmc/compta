@@ -52,7 +52,7 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None, month=None):
                        join(Ecriture.montant).\
                        filter(Ecriture.compte_id == compte_id).\
                        one()
-        return dumps({'somme': "%0.2f" % ecritures.somme,
+        return dumps({'somme': "%0.2f" % ecritures.somme if ecritures.somme is not None else 0,
                       'nombre': "%d" % ecritures.nombre,
                      }
                     )
@@ -86,8 +86,9 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None, month=None):
         list_month_debit = [0 for number in range(12)]
         list_month_credit = [0 for number in range(12)]
         for ecriture in ecritures:
-            list_month_debit[ecriture.date] = float(ecriture.debit) if float(ecriture.debit) != None else 0
-            list_month_credit[ecriture.date] = float(ecriture.credit) if float(ecriture.credit) != None else 0
+            print ecriture
+            list_month_debit[ecriture.date] = float(ecriture.debit) if ecriture.debit != None else 0
+            list_month_credit[ecriture.date] = float(ecriture.credit) if ecriture.credit != None else 0
         return dumps([list_month_debit,list_month_credit])
     
     filter = {}
