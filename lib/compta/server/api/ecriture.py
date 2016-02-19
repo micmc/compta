@@ -85,10 +85,12 @@ def list_ecriture(db, id=None, nom=None, compte_id=None, sum=None, month=None):
                        all()
         list_month_debit = [0 for number in range(12)]
         list_month_credit = [0 for number in range(12)]
+        cpt = 0
         for ecriture in ecritures:
-            print ecriture
-            list_month_debit[ecriture.date] = float(ecriture.debit) if ecriture.debit != None else 0
-            list_month_credit[ecriture.date] = float(ecriture.credit) if ecriture.credit != None else 0
+            cpt += 1
+            print ecriture, cpt
+            list_month_debit[ecriture.date-1] = float(ecriture.debit) if ecriture.debit != None else 0
+            list_month_credit[ecriture.date-1] = float(ecriture.credit) if ecriture.credit != None else 0
         return dumps([list_month_debit,list_month_credit])
     
     filter = {}
