@@ -21,6 +21,18 @@ Local API documentation is available, just type:
 
     $ pydoc Compta
 
+Some usual commands : 
+- python lib/compta/server/server.py
+  Launche server
+- python lib/compta/cli/server.py -p compte list
+  afficher la liste des comptes
+- python lib/compta/cli/server.py -p compte list -f type=prs archive=false
+  n'afficher que les comptes actifs de type compte courant
+- python lib/compta/cli/server.py  ecriture list -f compte_id=10 sum
+  Afficher les montants actuels pour la compte numéro 10
+- python server.py -p ecriture create -a compte_id=10
+  Creer une nouvelle ecriture
+
  ------------
  Installation
  ------------
