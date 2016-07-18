@@ -129,7 +129,6 @@ def list_ecriture_tag(db, ecriture_id=None):
                               'valeur': tag.valeur,
                              }
                             )
-    print list_tags
     return dumps(list_tags)
 
 
