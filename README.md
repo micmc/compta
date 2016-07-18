@@ -30,8 +30,13 @@ Some usual commands :
   n'afficher que les comptes actifs de type compte courant
 - python lib/compta/cli/server.py  ecriture list -f compte_id=10 sum
   Afficher les montants actuels pour la compte numéro 10
-- python server.py -p ecriture create -a compte_id=10
+- python lib/compta/cli/server.py -p ecriture create -a compte_id=10
   Creer une nouvelle ecriture
+- python server.py -p ecriture import  -i /data/commun/Facture/Fortuneo/2014/test.csv -a compte_id=10 tag=test233 type=Cb
+  Importer des ecritures depuis une fichier avec un tag
+  Utile pour importer les cartres bleus...
+  Le fichier csv doit être dans ce format : nom;montant;date
+  La catégorie est 5 par défaut où prendre le prompt pour choisir...
 
  ------------
  Installation
