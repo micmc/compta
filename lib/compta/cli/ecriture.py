@@ -29,6 +29,7 @@ class Ecriture(Server):
         self.database = (DBEcriture,)
         self.tag = None
         self.tag_id = None
+        self.cache_categorie = None
         if self.attribut.has_key('tag'):
             self.tag = self.attribut['tag']
             del self.attribut['tag']
@@ -79,19 +80,24 @@ class Ecriture(Server):
             self.rqst = RequestServer.post_method('ecriture',
                                                   self.attribut,
                                                  )
-            self.set_tag()
+            ecriture_id = re.match(r"^\/ecriture\/(?P<ecriture_id>.*)\/$",
+                                   self.rqst.headers['Location']
+                                  ).group('ecriture_id')
+            self.set_tag(ecriture_id, False)
 
     def prompt_categorie(self):
         """ print prompt to choose your categorie """
-        list_categorie = RequestServer.get_method("categorie",
-                                                  {'odata': 'count lt 20'},
-                                                  ['nom',],
-                                                  []
-                                                 )
+        if self.cache_categorie is None:
+            self.cache_categorie = RequestServer.get_method("categorie",
+                                                            {'odata': 'count lt 20'},
+                                                            ['nom',],
+                                                            []
+                                                           )
+
         for i in range(1, 10):
             tmp_str = ""
-            for categorie in list_categorie[(i-1)*5:i*5]:
-                tmp_str += "%2d - %16s | " % (categorie['id'], categorie['nom'].strip())
+            for categorie in self.cache_categorie[(i-1)*5:i*5]:
+                tmp_str += "%2d - %10s | " % (categorie['id'], categorie['nom'].strip()[0:10])
             print tmp_str[:-3]
         while True:
             data = unicode(raw_input("categorie (defaut: 5): "))
@@ -127,7 +133,7 @@ class Ecriture(Server):
                 for row in csvreader:
                     print "import %s - %s - %s" % (row['date'], row['montant'], row['nom'])
                     self.attribut['date'] = datetime.strptime(row['date'],
-                                                               "%y/%m/%d").strftime("%Y/%m/%d")
+                                                              "%d/%m/%Y").strftime("%Y/%m/%d")
                     self.attribut['nom'] = row['nom']
                     self.attribut['montant'] = str(row['montant'])
                     if self.options.prompt:
@@ -151,23 +157,19 @@ class Ecriture(Server):
                 tags.filter = {'nom': self.tag}
                 tags.get()
                 if tags.rqst != False:
-                    pass
                     self.tag_id = tags.rqst[0]['id']
                 elif create:
                     tags.attribut['nom'] = self.tag
                     tags.attribut['valeur'] = ""
                     tags.create()
                     self.tag_id = re.match(r"^\/tag\/(?P<tag_id>.*)\/$",
-                                           self.rqst.headers['Location']
+                                           tags.rqst.headers['Location']
                                           ).group('tag_id')
-                else:
-                    return False
-                self.rqst = RequestServer.post_method("tag_ecriture",
-                                                      {'ecriture_id': ecriture_id,
-                                                       'tag_id': self.tag_id
-                                                      },
-                                                     )
-        return True
+            self.rqst = RequestServer.post_method("tag_ecriture",
+                                                  {'ecriture_id': ecriture_id,
+                                                   'tag_id': self.tag_id
+                                                  },
+                                                 )
 
 def main():
     """ Main function """
