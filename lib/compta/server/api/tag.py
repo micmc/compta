@@ -122,13 +122,14 @@ def list_ecriture_tag(db, ecriture_id=None):
             list_tags.append(dict_attributs)
     else:
         for tag in tags:
-            list_tags.append({'id': tag.tag_id,
-                              'tag_id': tag.id,
+            list_tags.append({'id': tag.id,
+                              'tag_id': tag.tag_id,
                               'ecriture_id' : tag.ecriture_id,
                               'nom': tag.nom,
                               'valeur': tag.valeur,
                              }
                             )
+    print list_tags
     return dumps(list_tags)
 
 
@@ -146,7 +147,7 @@ def insert_tag(db):
         except IntegrityError as ex:
             abort(404, ex.args)
         response.status = 201
-        response.headers["Tag"] = "/tag/%s" % (tag.id,)
+        response.headers['Location'] = "/tag/%s/" % (tag.id,)
         tag = loads(list_tag(db, tag.id))
         return tag[0]
 
@@ -162,7 +163,7 @@ def insert_ecriture_tag(db, ecriture_id):
         except IntegrityError as ex:
             abort(404, ex.args)
         response.status = 201
-        response.headers["Tag"] = "/tag/%s" % (ecriture_tag.id,)
+        response.headers['Location'] = "/tag/%s/" % (ecriture_tag.id,)
         ecriture_tag = {'id': ecriture_tag.id,
                         'tag_id': ecriture_tag.tag_id,
                         'ecriture_id': ecriture_tag.ecriture_id
