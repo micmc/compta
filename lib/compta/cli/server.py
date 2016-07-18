@@ -32,16 +32,15 @@ class Server(object):
     def __init__(self, parser=None):
         """ Init class to manage parse argument """
 
-        if not parser:
-            self.options = ParseArgs.get_method("all")
-        else:
-            self.options = parser
         self.filter = None
         self.sort = None
         self.attribut = {}
         self.rest_method = None
         self.rqst = None
-        self.parse_args()
+        self.options = None
+        if  parser:
+            self.options = parser
+            self.parse_args()
 
     def parse_args(self):
         """ parse data """
@@ -75,13 +74,16 @@ class Server(object):
 
     def create(self):
         """ create data by rest method """
-        if self.check_args(self.options.prompt):
-            self.rqst = RequestServer.post_method(self.rest_method,
-                                                  self.attribut,
-                                                 )
+        if self.options is None:
+            pass
+        elif self.check_args(self.options.prompt):
+            pass
         else:
             print "Erreur de saisie pour l'ajout"
             sys.exit(1)
+        self.rqst = RequestServer.post_method(self.rest_method,
+                                              self.attribut,
+                                             )
 
     def update(self):
         """ update data by rest method """

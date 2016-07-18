@@ -13,7 +13,6 @@ class Tag(Server):
 
     def __init__(self, parser=None):
         """ Init class to manage parse argument """
-
         Server.__init__(self, parser)
         self.rest_method = "tag"
         self.database = (DBTag,)
