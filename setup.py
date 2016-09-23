@@ -10,10 +10,10 @@ setup(name="Compta",
       license="Copyright (C) 2015 David Micallef - All rights reserved",
       package_dir={'': 'lib'},
       packages=find_packages('lib'),
-      download_url="http://www.micallef.fr/compta",
-      url="http://www.micallef.fr/compta",
+      download_url="https://github.com/micmc/compta",
+      url="https://github.com/micmc/compta",
       author='David Micallef',
-      author_email='david@micallef.fr',
+      author_email='github@micallef.fr',
       platforms=['GNU/Linux'],
       entry_points={
           "console_scripts": [

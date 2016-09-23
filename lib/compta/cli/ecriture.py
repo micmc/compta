@@ -133,7 +133,7 @@ class Ecriture(Server):
                 for row in csvreader:
                     print "import %s - %s - %s" % (row['date'], row['montant'], row['nom'])
                     self.attribut['date'] = datetime.strptime(row['date'],
-                                                              "%d/%m/%Y").strftime("%Y/%m/%d")
+                                                              "%d/%m/%y").strftime("%Y/%m/%d")
                     self.attribut['nom'] = row['nom']
                     self.attribut['montant'] = str(row['montant'])
                     if self.options.prompt:

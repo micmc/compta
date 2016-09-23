@@ -32,7 +32,7 @@ Some usual commands :
   Afficher les montants actuels pour la compte numéro 10
 - python lib/compta/cli/server.py -p ecriture create -a compte_id=10
   Creer une nouvelle ecriture
-- python server.py -p ecriture import  -i /data/commun/Facture/Fortuneo/2014/test.csv -a compte_id=10 tag=test233 type=Cb
+- python server.py -p ecriture import  -i test.csv -a compte_id=10 tag=2016-06 type=Cb
   Importer des ecritures depuis une fichier avec un tag
   Utile pour importer les cartres bleus...
   Le fichier csv doit être dans ce format : nom;montant;date
@@ -41,17 +41,17 @@ Some usual commands :
 Par exemple pour fortnueo est l'exportation
 Exporter les données en csv
 - Ouvrir le csv avec libre office, supprimer les deux première colonnes
-- grep "^carte" compta_fortuneo.csv > fortuneo_2015.csv
-- sed -ie 's/^carte\ //g' fortuneo_2015.csv
-- sed -ie 's/^\([0-9][0-9]\/[0-9][0-9]\)\ \(.*\)$/\1\/2015;\2/g' fortuneo_2015.csv
+- grep "^carte" file > filen.csv
+- sed -ie 's/^carte\ //g' filen.csv
+- sed -ie 's/^\([0-9][0-9]\/[0-9][0-9]\)\ \(.*\)$/\1\/2015;\2/g' filen.csv
 
 Ensuite mettre les intitulé 
 date;nom;montant
 
 Il ne reste plus qu'à importer...
-- python lib/compta/cli/server.py -p ecriture import  -i ~/Documents/2014_04.csv -a compte_id=51 tag=fortuneo_2015-08 type=Cb
-- python lib/compta/cli/server.py -p ecriture create -a compte_id=51 tag=fortuneo_2015-07 
-- python lib/compta/cli/server.py -p ecriture create -a compte_id=33 tag=fortuneo_2015-07
+- python lib/compta/cli/server.py -p ecriture import  -i ~/Documents/2014_04.csv -a compte_id=51 tag=banque_2015-08 type=Cb
+- python lib/compta/cli/server.py -p ecriture create -a compte_id=51 tag=banque_2015-07 
+- python lib/compta/cli/server.py -p ecriture create -a compte_id=33 tag=banque_2015-07
 
  ------------
  Installation
@@ -67,4 +67,4 @@ Il ne reste plus qu'à importer...
  Authors
  -------
 
-David Micallef       <david@micallef.fr>
+David Micallef       <github@micallef.fr>
