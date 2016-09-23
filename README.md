@@ -38,6 +38,21 @@ Some usual commands :
   Le fichier csv doit être dans ce format : nom;montant;date
   La catégorie est 5 par défaut où prendre le prompt pour choisir...
 
+Par exemple pour fortnueo est l'exportation
+Exporter les données en csv
+- Ouvrir le csv avec libre office, supprimer les deux première colonnes
+- grep "^carte" compta_fortuneo.csv > fortuneo_2015.csv
+- sed -ie 's/^carte\ //g' fortuneo_2015.csv
+- sed -ie 's/^\([0-9][0-9]\/[0-9][0-9]\)\ \(.*\)$/\1\/2015;\2/g' fortuneo_2015.csv
+
+Ensuite mettre les intitulé 
+date;nom;montant
+
+Il ne reste plus qu'à importer...
+- python lib/compta/cli/server.py -p ecriture import  -i ~/Documents/2014_04.csv -a compte_id=51 tag=fortuneo_2015-08 type=Cb
+- python lib/compta/cli/server.py -p ecriture create -a compte_id=51 tag=fortuneo_2015-07 
+- python lib/compta/cli/server.py -p ecriture create -a compte_id=33 tag=fortuneo_2015-07
+
  ------------
  Installation
  ------------
